@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RankCentral</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Helvetica', sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .tier-list {
+            margin: 20px;
+            font-size: 16px;
+        }
+
+        .tier h2 {
+            background-color: #000080; /* Navy Blue */
+            color: white;
+            padding: 10px;
+            cursor: pointer;
+            margin: 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .tier h2:hover {
+            background-color: #003366; /* Darker Navy Blue */
+        }
+
+        .content {
+            display: none;
+            padding: 10px;
+            background-color: #e6e6e6;
+            border-left: 5px solid #32CD32; /* Vibrant Green */
+        }
+
+        .content p {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="tier-list">
+        <!-- S Tier -->
+        <div class="tier">
+            <h2 onclick="toggleTier('tierS')">S Tier</h2>
+            <div id="tierS" class="content">
+                <p>Deadbolt - This song has been my favorite song since the day I heard it in February 2002. There are plenty of other songs that move me (don’t cringe) either emotionally, physically, or mentally, but it’s cool to come back to Deadbolt and just love it all over again. What do I love most about it? It starts at 100 miles per hour - you are just dropped into a car driving straight ahead at full speed. The lyrics are just asking to be yelled at full volume. It’s a highly unconventional song - no standard verse or chorus here at all. I love that the album version has the piano outro leading directly into the next song, but that they tweaked and enhanced the live version so it’s more of a climax to the song. The jumping before “what have I done, is it too late to save me from this place” in the live version always gets the crowd hyped. The video is a pretty perfect distillation of the shows and crowds they played back then. It was fun to reunite with a lot of those folks at the 20th anniversary show and feel the weight of time, looking back at ourselves. We don’t get a chance to do this as much anymore, with jobs and kids and responsibilities. But damn it is a treat when we do.</p>
+
+                <p>Where Idols Once Stood - Another 100mph out the gate. The breakdown here is pretty legendary. My favorite part is when we seem to veer off course, spiraling out into space, only to be grabbed back and centered right after (and though it seems the sun will shine - I’LL DRAW THE SHADES AND STAY INSIDE) which is always super loud at the show. So much fun.</p>
+
+                <p>To Awake and Avenge the Dead - Ok you probably expected this to be higher, at least one higher. I’m not knocking the song at all when I say it just doesn’t hit quite as hard as it used to. I just like re-listening to Deadbolt and Idols a bit more, but that’s not really a slight on TAAATD. For years it seemed they didn’t want to play this song and then they finally came back to it and it was glorious. I still miss my sweatshirt with the lyrics on it and the skulls and so forth.</p>
+            </div>
+        </div>
+
+        <!-- A Tier -->
+        <div class="tier">
+            <h2 onclick="toggleTier('tierA')">A Tier</h2>
+            <div id="tierA" class="content">
+                <p>Betrayal is a Symptom - This was the first song from the “new album” that they started playing, and the first one they released in advance. It’s hard to convey now the unreal anticipation that came after hearing this song in waiting for the album to be released. Fans at the time were wondering how Thrice would change with newfound popularity and were concerned, as fans at the time and throughout history seem to be, with the perpetual fear of “selling out”. Playing more accessible songs for an MTV or radio audience instead of the harder, faster, heavier songs that we loved. You can be melodic but also fast, heavy, hard. And holy shit does this song prove that point. When we heard this song, we knew the album would be great. Some even were a little curious/ half-concerned(?) that the album might go too hard/heavy and lose the melodic, but thankfully this proved to be unfounded and was quickly and mostly forgotten. I debated putting this in the S tier or above TAAATD but felt like that might be a little too much revisionist history. But damn this still hits hard.</p>
+
+                <p>So Strange I Remember You - Airy and contemplative which is pretty welcome after a heavy hitting album before this, especially immediately before with TAAATD.</p>
+
+                <p>A Subtle Dagger - Probably my favorite lyrics on the album and some of my favorite in all Thrice. I defy you to learn the lyrics and sing/scream along and not just love every second of this certified banger. It just rips hard.</p>
+
+                <p>The Red Death - Big ups to Edgar Allen Poe for contributing immaculate lyrics to the track. This is the dark, foreboding scene that we want for the album. I suppose you could say “AND NOW YOU ALL DIE” is a little too dark and hey fair point. But damn this song is just tight - it fits together so well. I did happen to use this nickname for a larger ginger lady that my wife used to play water polo with and it was chef’s kiss perfect.</p>
+
+                <p>See You in the Shallows - The crowd participation here when Dustin lets us all sing together. Even though the song is melodic and a good tempo and riffy, it is still pretty melancholy in theme and makes you think which makes for an effective “radio”-like singalong song. I love this genre of song in general - thoughtful, contemplative lyrics wrapped in pop-punk like speed and singing, with metal riffing, and not only/directly about finding love. That can’t be blood the water here is far too blue makes you feel like you’re in a story. It’s so comforting to know I’ll never have to think again.</p>
+
+                <p>The Beltsville Crucible - You’ve got to play it again!!!!! Ok. True friends stab you in the front is iconic. I just learned it was an Oscar Wilde quote, but he never made an album like this. Shortcuts through graveyards and a brand new way to breathe. This supposedly is about Thrice recording this album (how meta), and that they really hard to work hard to make this great. As such, it has always resonated with me when I’m striving to make something better.</p>
+
+                <p>Kill Me Quickly - Ok this probably is tough to see this song so low on the list. In my defense, it’s still in the A tier! Of course it starts the album off in an incredible way, it builds nicely, the bassline is special, and the end is emotionally raw and powerful. So the placement here is only a nod to the power of the other songs on this list.</p>
+            </div>
+        </div>
+
+        <!-- B Tier -->
+        <div class="tier">
+            <h2 onclick="toggleTier('tierB')">B Tier</h2>
+            <div id="tierB" class="content">
+                <p>In Years to Come - I’m sure I’ll get crap for this, and trust me I do love this song. It just doesn’t hold up as well as the others listed above. The end where it picks up speed and sing “I want to write the perfect song” can get you going quickly.</p>
+
+                <p>A Living Dance Upon Dead Minds - a fun groove that builds to a heavy finish and perfectly sets up Idols. Only not higher just because it’s a little repetitive.</p>
+            </div>
+        </div>
+
+        <!-- C Tier -->
+        <div class="tier">
+            <h2 onclick="toggleTier('tierC')">C Tier</h2>
+            <div id="tierC" class="content">
+                <p>Trust - In the long tradition of Thrice songs like Ultra Blue, Stare at the Sun, The Artist in the Ambulance, and probably some others, Trust is a fine song but below average for Thrice songs. I understand why some people really love it, but I can’t see how they could say that it’s better than any of the other songs on this album. It is slow, and it does build, and some of the lyrics seem like they resonate strongly with folks. I do enjoy when they play it live, and I sing along. But I’d rather hear just about any other song of theirs. It’s not a bad song, it’s just a below average Thrice song and one I routinely skip on this album.</p>
+            </div>
+        </div>
+
+        <!-- Special Mention -->
+        <div class="tier">
+            <h2 onclick="toggleTier('tierSpecial')">Special Mention</h2>
+            <div id="tierSpecial" class="content">
+                <p>That Hideous Strength - Just imagine for a moment that instead of Trust, they had replaced it with the notable B-Side That Hideous Strength.
+And so we would have gone Idols-Hideous-TAAATD. Holy shit! That would have been insane.
+I kind of want to make a Spotify playlist like that just to experience how the album would feel like.
+If I ranked that as a true album song, I think it would go either above or just after Kill Me Quickly.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleTier(tierId) {
+            var content = document.getElementById(tierId);
+            if (content.style.display === "block") {
+                content.style.display = "none";
+            } else {
+                content.style.display = "block";
+            }
+        }
+    </script>
+</body>
+</html>
