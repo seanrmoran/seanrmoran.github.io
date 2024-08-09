@@ -1,0 +1,199 @@
+/* style.css */
+
+/* Variables for consistent theming */
+:root {
+    --text-primary: #363636; /* Dark gray for text */
+    --text-secondary: #D35400; /* Coral for accents */
+    --background-primary: #FFFFFF; /* White background */
+    --background-secondary: #F8F8F8; /* Light gray for elements */
+    --border-color: #BDC3C7; /* Light gray for borders */
+    --button-primary: #1ABC9C; /* Teal for buttons */
+    --button-hover: #16A085; /* Darker teal for hover states */
+    --highlight-background: #fffa90;
+    --highlight-border: #666;
+    --spacing-small: 5px;
+    --spacing-medium: 10px;
+    --spacing-large: 15px;
+}
+
+/* Global Styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--background-primary);
+    color: var(--text-primary);
+    margin: 0;
+    padding: var(--spacing-small);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700; /* Use a bold weight for headings */
+}
+
+/* Utility Classes */
+.hidden { display: none; }
+
+/* List Styles */
+.song-list, .sortable {
+    list-style: none;
+    padding: 0;
+    min-height: 30px; /* Reduced for less vertical space */
+}
+
+/* Song Item Styles */
+.song-item {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    background-color: var(--background-secondary);
+    margin-bottom: var(--spacing-small);
+    padding: var(--spacing-small);
+}
+
+/* Song Details Styles */
+.song-details {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-grow: 1;
+}
+
+.song-rank, .song-name, .track-number {
+    margin-right: var(--spacing-small);
+    white-space: nowrap;
+}
+
+/* Responsive Song Name */
+.song-name {
+    text-align: left;
+    flex-grow: 1;
+}
+
+/* Text Area Styles */
+textarea {
+    width: calc(100% - var(--spacing-large)); /* Account for padding */
+    height: 1.25em; /* Reduced height */
+    padding: var(--spacing-small);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    resize: vertical; /* Allow only vertical resizing */
+    box-sizing: border-box;
+}
+
+.description-wrapper {
+    display: none;
+    width: 100%;
+    padding-top: var(--spacing-small);
+}
+
+/* Button Styles */
+button {
+    background-color: #000080; /* Theme color */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button, select, textarea {
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for color and background */
+}
+
+button:hover {
+    background-color: var(--button-hover);
+    color: #FFFFFF;
+}
+
+.desc-toggle {
+    margin: var(--spacing-small) 0;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: var(--spacing-small);
+}
+
+.desc-toggle:hover { text-decoration: underline; }
+
+/* Tier Container Styles */
+#tierContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: var(--spacing-medium);
+}
+
+/* Tier Styles */
+.tier {
+    border: 1px solid var(--border-color);
+    padding: var(--spacing-small);
+    padding-top: var(--spacing-small); /* Reduce top padding */
+    margin-bottom: var(--spacing-medium);
+    width: 80%;
+}
+
+/* Tier Header Styles */
+.tier h2 {
+    background-color: #666;
+    color: #fff;
+    padding: var(--spacing-small);
+    margin-top: 0; /* Remove top margin to reduce space above the title */
+    margin-bottom: var(--spacing-small);
+    text-align: center;
+}
+
+/* Draggable Placeholder Highlighting */
+.ui-state-highlight {
+    height: 1.5em; /* Keep as is for visibility */
+    line-height: 1.5em;
+    background-color: var(--highlight-background);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed var(--highlight-border);
+}
+
+/* Additional Sortable List Styles */
+#sortable li .song-rank {
+    margin-right: var(--spacing-small);
+    border: 1px solid #000;
+    padding: var(--spacing-small);
+}
+
+
+
+/* Styles for the Song List Header */
+#songListHeader {
+    margin-bottom: var(--spacing-small); /* Reduced bottom margin */
+    padding: var(--spacing-small);
+    /* Other styling as needed */
+}
+
+/* Styles for the Reset Ranking Button */
+#resetRanking {
+    margin-top: var(--spacing-small); /* Reduced top margin */
+    padding: var(--spacing-small);
+    /* Other button styling as needed */
+}
+
+@media (max-width: 768px) {
+    #tierContainer {
+        flex-direction: column; /* Stack tiers vertically on small screens */
+    }
+
+    .tier, .song-item {
+        width: 100%; /* Full width for better readability */
+    }
+
+    /* Adjust font sizes for smaller screens */
+    h1, h2, h3 {
+        font-size: 1.5rem; /* Smaller headings */
+    }
+
+    /* Adjust form element sizes for better usability */
+    select, textarea, button {
+        width: 100%; /* Full width for easier interaction */
+    }
+}

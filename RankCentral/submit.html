@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<!-- submit.html -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rank Songs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+    <form method="post" id="songRankingForm">
+ <!-- Category Dropdown -->
+<label for="category">Category:</label>
+<select name="category" id="category">
+    <option value="">Select a Category</option>
+    <!-- Other categories will be dynamically populated -->
+</select>
+
+<!-- Band Dropdown (Initially Hidden) -->
+<label for="band" class="hidden" id="bandLabel">Band:</label>
+<select name="band" id="band" class="hidden">
+    <option value="">Select a Band</option>
+    <!-- Band options will be dynamically populated -->
+</select>
+
+<!-- Album Dropdown (Initially Hidden) -->
+<label for="album" class="hidden" id="albumLabel">Album:</label>
+<select name="album" id="album" class="hidden">
+    <option value="">Select an Album</option>
+    <!-- Album options will be dynamically populated -->
+</select>
+
+
+
+        <!-- Song List (Initially Hidden) -->
+        <h3 class="hidden" id="songListHeader">Drag and Drop Songs to Rank</h3>
+
+<button type="button" class="hidden" id="resetRanking"><i class="fas fa-undo"></i> Reset Ranking</button>
+
+
+        <div id="tierContainer" class="hidden">
+            <!-- Tiers for Ranking -->
+
+<div class="tier" data-tier="S">
+    <h2>S Tier</h2>
+    <ul class="sortable song-list" id="sortableS">
+        <!-- Songs are now only dynamically added here by JavaScript, not server-side -->
+    </ul>
+</div>
+
+<div class="tier" data-tier="A">
+    <h2>A Tier</h2>
+    <ul class="sortable song-list" id="sortableA">
+        <!-- Songs are now only dynamically added here by JavaScript, not server-side -->
+    </ul>
+</div>
+
+<div class="tier" data-tier="B">
+    <h2>B Tier</h2>
+    <ul class="sortable song-list" id="sortableA">
+        <!-- Songs are now only dynamically added here by JavaScript, not server-side -->
+    </ul>
+</div>
+
+<div class="tier" data-tier="C">
+    <h2>C Tier</h2>
+    <ul class="sortable song-list" id="sortableA">
+        <!-- Songs are now only dynamically added here by JavaScript, not server-side -->
+    </ul>
+</div>
+
+<!-- 'No Tier' Section -->
+<div class="tier" data-tier="No Tier">
+    <h2>No Tier</h2>
+    <ul class="sortable song-list" id="sortableNoTier">
+        <!-- Songs will be dynamically added here by the JavaScript -->
+    </ul>
+</div>
+
+
+            <!-- Repeat for other tiers -->
+        </div>
+
+        <button type="submit" class="hidden" id="submitBtn">Submit Ranking</button>
+    </form>
+<button type="button" id="testSubmitBtn">Test Submit</button>
+
+    <!-- Template for a song item (for dynamic JavaScript loading) -->
+    <template id="songItemTemplate">
+        <li class="ui-state-default song-item" data-song-id="" data-track-number="">
+        <div class="song-rank">1</div>
+        <div class="song-details">
+                <div class="song-name"></div>
+                <div class="track-number"></div>
+                <button type="button" class="desc-toggle">Add description...</button>
+            </div>
+            <div class="description-wrapper">
+                <textarea name="song_description[]" class="description"></textarea>
+            </div>
+            <input type="hidden" name="song_rank[]" value="">
+            <input type="hidden" name="song_name[]" value="">
+            <input type="hidden" name="song_tier[]" value="">
+        </li>
+    </template>
+</body>
+</html>
