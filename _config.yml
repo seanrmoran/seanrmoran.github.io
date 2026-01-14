@@ -1,0 +1,43 @@
+# Site settings
+title: Sean Moran
+description: Early stage startup builder and investor
+url: "https://www.seanrmoran.com"
+baseurl: ""
+
+# Author
+author:
+  name: Sean Moran
+  email: sean.r.moran@gmail.com
+  linkedin: seanrmoran
+  twitter: seanrmoran
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+permalink: /writing/:title/
+
+# Exclude from build
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - .bundle
+  - .jekyll-cache
+  - PHP
+  - RankCentral
+
+# Collections
+collections:
+  posts:
+    output: true
+    permalink: /writing/:title/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"

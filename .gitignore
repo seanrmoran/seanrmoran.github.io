@@ -3,6 +3,8 @@ _site
 .jekyll-cache
 .jekyll-metadata
 vendor
+Gemfile.lock
+_old_html
+*.html.old
 /PHP
 PHP/.DS_Store
-/PHP

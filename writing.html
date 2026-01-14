@@ -1,30 +1,22 @@
-<!DOCTYPE html>
-<html>
-<head><!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-NS36SRB9WL"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+---
+layout: default
+title: Writing
+---
 
-  gtag('config', 'G-NS36SRB9WL');
-</script>
-<title>Writing
-</title>
-</head>
-<body>
-<h2> Writing</h2>
+<div class="page-header">
+  <h1>Writing</h1>
+</div>
 
-<p><a href="music.html">Music</a></p>
-<p><a href="three-kids-under-five.html">Three Kids Under Five</a></p>
-<p><a href="how-to-manage-a-new-or-emerging-venture-fund.html">How to Manage a New or Emerging Venture Fund</a></p>
-<p><a href="the-ownership-graph-introduction.html">The Ownership Graph: Introduction</a></p>
-<p><a href="the-cap-table-on-the-full-ratchet-podcast.html">The Cap Table on The Full Ratchet podcast</a></p>
-<p><a href="inside-techcrunch-disrupt.html">Inside TechCrunch Disrupt</a></p>
-<p><a href="the-universe-is-inherently-just.html">The Universe is Inherently Just</a></p>
-<p><a href="investing-in-the-property-markets.html">Investing in the Property Markets</a></p>
-<p><a href="designing-difference-in-a-world-of-sameness.html">Designing Difference in a World of Sameness</a></p>
-<p><a href="how-to-project-customer-retention-for-a-subscription-business.html">How to Project Customer Retention for a Subscription Business</a></p>
-
-</body>
-</html>
+<ul class="article-list">
+  {% assign sorted_posts = site.posts | sort: 'date' | reverse %}
+  {% for post in sorted_posts %}
+  <li class="article-item">
+    <a href="{{ post.url | relative_url }}">
+      <h3>{{ post.title }}</h3>
+      <p class="article-meta">
+        <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%B %-d, %Y" }}</time>
+      </p>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
