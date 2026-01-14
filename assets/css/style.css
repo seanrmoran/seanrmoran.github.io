@@ -488,6 +488,11 @@ main {
   text-shadow: 0 0 8px var(--color-cyan-glow);
 }
 
+.post-content .image-container a,
+.post-content .image-container a:hover {
+  border-bottom: none;
+}
+
 .post-content ul,
 .post-content ol {
   margin-bottom: var(--spacing-md);
@@ -561,11 +566,18 @@ main {
   max-width: 100%;
 }
 
+.image-container a {
+  display: inline-block;
+  line-height: 0;
+}
+
 .image-container img {
+  display: block;
   max-width: 100%;
   border-radius: 2px;
   border: 1px solid var(--color-border);
   transition: all 0.3s ease;
+  margin: 0 auto; /* Centers the image if it's narrower than the container; removes all vertical margins */
 }
 
 .image-container img:hover {
