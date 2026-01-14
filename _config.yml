@@ -1,15 +1,15 @@
 # Site settings
-title: Sean Moran
+title: Sean R. Moran
 description: Early stage startup builder and investor
 url: "https://www.seanrmoran.com"
 baseurl: ""
 
 # Author
 author:
-  name: Sean Moran
+  name: Sean R. Moran
   email: sean.r.moran@gmail.com
   linkedin: seanrmoran
-  twitter: seanrmoran
+  x: seanrmoran
 
 # Build settings
 markdown: kramdown
