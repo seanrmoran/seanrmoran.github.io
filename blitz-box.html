@@ -8,7 +8,7 @@ title: Blitz Box
 <div class="blitz-hero">
   <h1 class="blitz-title">Blitz Box</h1>
   <p class="blitz-tagline">Roll. Match. Shut.</p>
-  <p class="blitz-desc">A dice and tiles game where every roll leads to a decision with real consequences. Three game modes, 18 unique cards, and centuries of game design — reimagined.</p>
+  <p class="blitz-desc">A dice and tiles game where every roll leads to a decision with real consequences. Three game modes, 18 unique cards, and centuries of game design, reimagined.</p>
 </div>
 
 <div class="post-content">
@@ -17,7 +17,7 @@ title: Blitz Box
 
 <p>Blitz Box is a modern take on <strong>Shut the Box</strong>, an ancient dice game that's been played in pubs, on ships, and across kitchen tables for centuries. The rules are simple: roll the dice, close tiles that match the total, and try to shut every tile on the board. But simple rules don't mean simple decisions.</p>
 
-<p>We discovered the original game at a Goodwill store for $4 and couldn't stop playing. So we built something new — bold, fast, and packed with more ways to play.</p>
+<p>We discovered the original game at a Goodwill store for $4 and couldn't stop playing. So we built something new: bold, fast, and packed with more ways to play.</p>
 
 <h2>Three Worlds, One Box</h2>
 
@@ -43,7 +43,7 @@ title: Blitz Box
       <h3>Two Rows</h3>
       <span class="blitz-mode-label">The Casino</span>
     </div>
-    <p>Front row and back row. Back tiles are blocked by the front — you have to clear a path before you can reach them. Sequencing matters. Planning ahead is everything.</p>
+    <p>Front row and back row. Back tiles are blocked by the front, so you have to clear a path before you can reach them. Sequencing matters. Planning ahead is everything.</p>
     <div class="blitz-mode-meta">
       <span>2 rows</span>
       <span>No cards</span>
@@ -56,7 +56,7 @@ title: Blitz Box
       <h3>Triple Stack</h3>
       <span class="blitz-mode-label">The Arcade</span>
     </div>
-    <p>Three rows of tiles with a full card economy. Draft powerups at the start, earn more by rolling doubles or clearing rows. But watch out — bad surprise cards can reopen tiles, freeze your board, or strip your hand.</p>
+    <p>Three rows of tiles with a full card economy. Draft powerups at the start, earn more by rolling doubles or clearing rows. But watch out: bad surprise cards can reopen tiles, freeze your board, or strip your hand.</p>
     <div class="blitz-mode-meta">
       <span>3 rows</span>
       <span>18 cards</span>
@@ -74,147 +74,313 @@ title: Blitz Box
 
 <p>Play these anytime from your hand to turn the tide.</p>
 
-<div class="blitz-card-grid">
-  <div class="blitz-card">
-    <img src="/assets/images/blitz-box/cards/wildCard.png" alt="Wild Card">
-    <div class="blitz-card-info">
-      <strong>Wild Card</strong>
-      <span>Replace any tile's value with any number 1-9</span>
+<div class="bb-card-row">
+
+  <div class="bb-card-shell">
+    <div class="bb-card-face" style="background:linear-gradient(145deg, hsl(270,75%,52%) 0%, hsl(274,72%,42%) 50%, hsl(280,78%,32%) 100%)">
+      <span class="bb-noise"></span>
+      <span class="bb-light"></span>
+      <div class="bb-img-zone">
+        <div class="bb-img-circle">
+          <img src="/assets/images/blitz-box/cards/wildCard.png" alt="Wild Card" style="object-position:center 20%;transform:scale(1.15)">
+        </div>
+      </div>
+      <div class="bb-text-zone">
+        <span class="bb-card-name">Wild Card</span>
+        <span class="bb-card-desc">Replace any tile's value</span>
+      </div>
     </div>
   </div>
-  <div class="blitz-card">
-    <img src="/assets/images/blitz-box/cards/mirrorMatch.png" alt="Copycat">
-    <div class="blitz-card-info">
-      <strong>Copycat</strong>
-      <span>Copy a closed tile's value to another row and close it</span>
+
+  <div class="bb-card-shell">
+    <div class="bb-card-face" style="background:linear-gradient(145deg, hsl(158,80%,48%) 0%, hsl(162,76%,38%) 50%, hsl(168,82%,28%) 100%)">
+      <span class="bb-noise"></span>
+      <span class="bb-light"></span>
+      <div class="bb-img-zone">
+        <div class="bb-img-circle">
+          <img src="/assets/images/blitz-box/cards/mirrorMatch.png" alt="Copycat" style="object-position:center 30%;transform:scale(1.15)">
+        </div>
+      </div>
+      <div class="bb-text-zone">
+        <span class="bb-card-name">Copycat</span>
+        <span class="bb-card-desc">Copy a closed tile to another row</span>
+      </div>
     </div>
   </div>
-  <div class="blitz-card">
-    <img src="/assets/images/blitz-box/cards/luckySeven.png" alt="Lucky Seven">
-    <div class="blitz-card-info">
-      <strong>Lucky Seven</strong>
-      <span>Set the roll to exactly 7</span>
+
+  <div class="bb-card-shell">
+    <div class="bb-card-face" style="background:linear-gradient(145deg, hsl(36,75%,42%) 0%, hsl(32,72%,34%) 50%, hsl(28,78%,24%) 100%)">
+      <span class="bb-noise"></span>
+      <span class="bb-light"></span>
+      <div class="bb-img-zone">
+        <div class="bb-img-circle bb-img-circle--icon">
+          <img src="/assets/images/blitz-box/cards/luckySeven.png" alt="Lucky Seven">
+        </div>
+      </div>
+      <div class="bb-text-zone">
+        <span class="bb-card-name">Lucky Seven</span>
+        <span class="bb-card-desc">Set your roll to 7</span>
+      </div>
     </div>
   </div>
-  <div class="blitz-card">
-    <img src="/assets/images/blitz-box/cards/tripleDown.png" alt="Triple Down">
-    <div class="blitz-card-info">
-      <strong>Triple Down</strong>
-      <span>Next roll uses 3 dice instead of 2</span>
+
+  <div class="bb-card-shell">
+    <div class="bb-card-face" style="background:linear-gradient(145deg, hsl(240,74%,36%) 0%, hsl(244,70%,28%) 50%, hsl(250,76%,20%) 100%)">
+      <span class="bb-noise"></span>
+      <span class="bb-light"></span>
+      <div class="bb-img-zone">
+        <div class="bb-img-circle bb-img-circle--icon">
+          <img src="/assets/images/blitz-box/cards/tripleDown.png" alt="Triple Down" style="transform:scale(2.5)">
+        </div>
+      </div>
+      <div class="bb-text-zone">
+        <span class="bb-card-name">Triple Down</span>
+        <span class="bb-card-desc">Roll three dice</span>
+      </div>
     </div>
   </div>
-  <div class="blitz-card">
-    <img src="/assets/images/blitz-box/cards/blitz.png" alt="Blitz!">
-    <div class="blitz-card-info">
-      <strong>Blitz!</strong>
-      <span>Close all open tiles in one chosen row instantly</span>
+
+  <div class="bb-card-shell">
+    <div class="bb-card-face" style="background:linear-gradient(145deg, hsl(355,80%,50%) 0%, hsl(352,76%,42%) 50%, hsl(348,82%,32%) 100%)">
+      <span class="bb-noise"></span>
+      <span class="bb-light"></span>
+      <div class="bb-img-zone">
+        <div class="bb-img-circle bb-img-circle--icon">
+          <img src="/assets/images/blitz-box/cards/blitz.png" alt="Blitz!" style="transform:scale(1.4)">
+        </div>
+      </div>
+      <div class="bb-text-zone">
+        <span class="bb-card-name">Blitz!</span>
+        <span class="bb-card-desc">Close all tiles in a row</span>
+      </div>
     </div>
   </div>
-  <div class="blitz-card">
-    <img src="/assets/images/blitz-box/cards/echoRoll.png" alt="Echo">
-    <div class="blitz-card-info">
-      <strong>Echo</strong>
-      <span>Replay your previous roll total</span>
+
+  <div class="bb-card-shell">
+    <div class="bb-card-face" style="background:linear-gradient(145deg, hsl(52,90%,54%) 0%, hsl(48,86%,46%) 50%, hsl(44,90%,36%) 100%)">
+      <span class="bb-noise"></span>
+      <span class="bb-light"></span>
+      <div class="bb-img-zone">
+        <div class="bb-img-circle bb-img-circle--icon">
+          <img src="/assets/images/blitz-box/cards/echoRoll.png" alt="Echo" style="transform:scale(2.5)">
+        </div>
+      </div>
+      <div class="bb-text-zone">
+        <span class="bb-card-name">Echo</span>
+        <span class="bb-card-desc">Replay your last roll</span>
+      </div>
     </div>
   </div>
-  <div class="blitz-card">
-    <img src="/assets/images/blitz-box/cards/deadRinger.png" alt="Sniper">
-    <div class="blitz-card-info">
-      <strong>Sniper</strong>
-      <span>Close any single open tile — no roll required</span>
+
+  <div class="bb-card-shell">
+    <div class="bb-card-face" style="background:linear-gradient(145deg, hsl(205,45%,46%) 0%, hsl(209,42%,38%) 50%, hsl(213,48%,28%) 100%)">
+      <span class="bb-noise"></span>
+      <span class="bb-light"></span>
+      <div class="bb-img-zone">
+        <div class="bb-img-circle bb-img-circle--icon">
+          <img src="/assets/images/blitz-box/cards/deadRinger.png" alt="Sniper" style="transform:scale(2.0)">
+        </div>
+      </div>
+      <div class="bb-text-zone">
+        <span class="bb-card-name">Sniper</span>
+        <span class="bb-card-desc">Close one open tile</span>
+      </div>
     </div>
   </div>
-  <div class="blitz-card">
-    <img src="/assets/images/blitz-box/cards/shelter.png" alt="Shelter">
-    <div class="blitz-card-info">
-      <strong>Shelter</strong>
-      <span>Absorb the next bad surprise with no effect</span>
+
+  <div class="bb-card-shell">
+    <div class="bb-card-face" style="background:linear-gradient(145deg, hsl(304,65%,50%) 0%, hsl(308,62%,42%) 50%, hsl(312,68%,32%) 100%)">
+      <span class="bb-noise"></span>
+      <span class="bb-light"></span>
+      <div class="bb-img-zone">
+        <div class="bb-img-circle bb-img-circle--icon">
+          <img src="/assets/images/blitz-box/cards/shelter.png" alt="Shelter" style="transform:scale(2.1)">
+        </div>
+      </div>
+      <div class="bb-text-zone">
+        <span class="bb-card-name">Shelter</span>
+        <span class="bb-card-desc">Block the next bad surprise</span>
+      </div>
     </div>
   </div>
-  <div class="blitz-card">
-    <img src="/assets/images/blitz-box/cards/swap.png" alt="Swap">
-    <div class="blitz-card-info">
-      <strong>Swap</strong>
-      <span>Trade values of two open tiles in different rows</span>
+
+  <div class="bb-card-shell">
+    <div class="bb-card-face" style="background:linear-gradient(145deg, hsl(18,84%,52%) 0%, hsl(14,80%,44%) 50%, hsl(10,86%,34%) 100%)">
+      <span class="bb-noise"></span>
+      <span class="bb-light"></span>
+      <div class="bb-img-zone">
+        <div class="bb-img-circle bb-img-circle--icon">
+          <img src="/assets/images/blitz-box/cards/swap.png" alt="Swap" style="transform:scale(2.6)">
+        </div>
+      </div>
+      <div class="bb-text-zone">
+        <span class="bb-card-name">Swap</span>
+        <span class="bb-card-desc">Trade a tile between rows</span>
+      </div>
     </div>
   </div>
+
 </div>
 
 <h3>Bad Surprises</h3>
 
-<p>Drawn from the deck when you roll 2 or 12, hit a pair, or trigger a force event. You don't choose these — they choose you.</p>
+<p>Drawn from the deck when you roll 2 or 12, hit a pair, or trigger a force event. You don't choose these. They choose you.</p>
 
-<div class="blitz-card-grid blitz-card-grid--bad">
-  <div class="blitz-card">
-    <img src="/assets/images/blitz-box/cards/shakedown.png" alt="The Shakedown">
-    <div class="blitz-card-info">
-      <strong>The Shakedown</strong>
-      <span>Discard a random powerup from your hand</span>
+<div class="bb-card-row">
+
+  <div class="bb-card-shell bb-card--bad">
+    <div class="bb-card-face" style="background:linear-gradient(145deg, hsl(0,10%,10%) 0%, hsl(0,8%,6%) 50%, hsl(0,12%,3%) 100%)">
+      <span class="bb-noise"></span>
+      <span class="bb-light"></span>
+      <div class="bb-img-zone">
+        <div class="bb-img-circle" style="border-color:rgba(220,50,50,0.55);box-shadow:0 0 0 2px rgba(220,50,50,0.2),0 0 0 5px rgba(220,40,40,0.1),0 0 14px rgba(255,40,40,0.35),0 0 28px rgba(255,30,30,0.18),inset 0 0 8px rgba(0,0,0,0.25)">
+          <img src="/assets/images/blitz-box/cards/shakedown.png" alt="The Shakedown" style="object-position:center 15%;transform:scale(1.4)">
+        </div>
+      </div>
+      <div class="bb-text-zone">
+        <span class="bb-card-name">The Shakedown</span>
+        <span class="bb-card-desc">Discard 1 random powerup</span>
+      </div>
     </div>
   </div>
-  <div class="blitz-card">
-    <img src="/assets/images/blitz-box/cards/theJammer.png" alt="The Jammer">
-    <div class="blitz-card-info">
-      <strong>The Jammer</strong>
-      <span>No powerups for 2 turns</span>
+
+  <div class="bb-card-shell bb-card--bad">
+    <div class="bb-card-face" style="background:linear-gradient(145deg, hsl(0,10%,10%) 0%, hsl(0,8%,6%) 50%, hsl(0,12%,3%) 100%)">
+      <span class="bb-noise"></span>
+      <span class="bb-light"></span>
+      <div class="bb-img-zone">
+        <div class="bb-img-circle" style="border-color:rgba(60,120,220,0.55);box-shadow:0 0 0 2px rgba(60,120,220,0.2),0 0 0 5px rgba(50,100,220,0.1),0 0 14px rgba(40,120,255,0.35),0 0 28px rgba(30,100,255,0.18),inset 0 0 8px rgba(0,0,0,0.25)">
+          <img src="/assets/images/blitz-box/cards/gravityShift.png" alt="Gravity Shift" style="object-position:center 20%;transform:scale(1.5)">
+        </div>
+      </div>
+      <div class="bb-text-zone">
+        <span class="bb-card-name">Gravity Shift</span>
+        <span class="bb-card-desc">Shuffle open tile values</span>
+      </div>
     </div>
   </div>
-  <div class="blitz-card">
-    <img src="/assets/images/blitz-box/cards/tilePlague.png" alt="Tile Plague">
-    <div class="blitz-card-info">
-      <strong>Tile Plague</strong>
-      <span>Reopen 1 random closed tile</span>
+
+  <div class="bb-card-shell bb-card--bad">
+    <div class="bb-card-face" style="background:linear-gradient(145deg, hsl(0,10%,10%) 0%, hsl(0,8%,6%) 50%, hsl(0,12%,3%) 100%)">
+      <span class="bb-noise"></span>
+      <span class="bb-light"></span>
+      <div class="bb-img-zone">
+        <div class="bb-img-circle bb-img-circle--icon" style="border-color:rgba(240,255,0,0.6);box-shadow:0 0 0 2px rgba(240,255,0,0.25),0 0 0 5px rgba(230,245,0,0.12),0 0 14px rgba(245,255,0,0.4),0 0 28px rgba(240,255,0,0.22),inset 0 0 8px rgba(0,0,0,0.25)">
+          <img src="/assets/images/blitz-box/cards/lockOut.png" alt="Lock Out" style="transform:scale(2.2)">
+        </div>
+      </div>
+      <div class="bb-text-zone">
+        <span class="bb-card-name">Lock Out</span>
+        <span class="bb-card-desc">Freeze one tile this turn</span>
+      </div>
     </div>
   </div>
-  <div class="blitz-card">
-    <img src="/assets/images/blitz-box/cards/gravityShift.png" alt="Gravity Shift">
-    <div class="blitz-card-info">
-      <strong>Gravity Shift</strong>
-      <span>Shuffle all open tile values randomly</span>
+
+  <div class="bb-card-shell bb-card--bad">
+    <div class="bb-card-face" style="background:linear-gradient(145deg, hsl(0,10%,10%) 0%, hsl(0,8%,6%) 50%, hsl(0,12%,3%) 100%)">
+      <span class="bb-noise"></span>
+      <span class="bb-light"></span>
+      <div class="bb-img-zone">
+        <div class="bb-img-circle" style="border-color:rgba(40,220,60,0.55);box-shadow:0 0 0 2px rgba(40,220,60,0.2),0 0 0 5px rgba(30,200,50,0.1),0 0 14px rgba(40,255,60,0.35),0 0 28px rgba(30,255,50,0.18),inset 0 0 8px rgba(0,0,0,0.25)">
+          <img src="/assets/images/blitz-box/cards/tilePlague.png" alt="Tile Plague" style="object-position:center 30%;transform:scale(1.4)">
+        </div>
+      </div>
+      <div class="bb-text-zone">
+        <span class="bb-card-name">Tile Plague</span>
+        <span class="bb-card-desc">Reopen 1 tile</span>
+      </div>
     </div>
   </div>
-  <div class="blitz-card">
-    <img src="/assets/images/blitz-box/cards/tripleTilePlague.png" alt="Triple Tile Plague">
-    <div class="blitz-card-info">
-      <strong>Triple Tile Plague</strong>
-      <span>Reopen up to 3 closed tiles</span>
+
+  <div class="bb-card-shell bb-card--bad">
+    <div class="bb-card-face" style="background:linear-gradient(145deg, hsl(0,10%,10%) 0%, hsl(0,8%,6%) 50%, hsl(0,12%,3%) 100%)">
+      <span class="bb-noise"></span>
+      <span class="bb-light"></span>
+      <div class="bb-img-zone">
+        <div class="bb-img-circle" style="border-color:rgba(40,255,60,0.65);box-shadow:0 0 0 2px rgba(40,255,60,0.25),0 0 0 5px rgba(30,240,50,0.15),0 0 16px rgba(40,255,60,0.45),0 0 32px rgba(30,255,50,0.25),inset 0 0 8px rgba(0,0,0,0.25)">
+          <img src="/assets/images/blitz-box/cards/tripleTilePlague.png" alt="Triple Tile Plague" style="object-position:center 40%;transform:scale(1.1)">
+        </div>
+      </div>
+      <div class="bb-text-zone">
+        <span class="bb-card-name">Triple Tile Plague</span>
+        <span class="bb-card-desc">Reopen 3 tiles</span>
+      </div>
     </div>
   </div>
-  <div class="blitz-card">
-    <img src="/assets/images/blitz-box/cards/lockOut.png" alt="Lock Out">
-    <div class="blitz-card-info">
-      <strong>Lock Out</strong>
-      <span>Freeze a random open tile for this turn</span>
+
+  <div class="bb-card-shell bb-card--bad">
+    <div class="bb-card-face" style="background:linear-gradient(145deg, hsl(0,10%,10%) 0%, hsl(0,8%,6%) 50%, hsl(0,12%,3%) 100%)">
+      <span class="bb-noise"></span>
+      <span class="bb-light"></span>
+      <div class="bb-img-zone">
+        <div class="bb-img-circle bb-img-circle--icon" style="border-color:rgba(255,160,0,0.7);box-shadow:0 0 0 2px rgba(255,160,0,0.3),0 0 0 5px rgba(255,140,0,0.15),0 0 16px rgba(255,170,0,0.5),0 0 32px rgba(255,150,0,0.3),inset 0 0 8px rgba(0,0,0,0.25)">
+          <img src="/assets/images/blitz-box/cards/deadEnd.png" alt="Dead End" style="transform:scale(2.2)">
+        </div>
+      </div>
+      <div class="bb-text-zone">
+        <span class="bb-card-name">Dead End</span>
+        <span class="bb-card-desc">Close the lowest tile</span>
+      </div>
     </div>
   </div>
-  <div class="blitz-card">
-    <img src="/assets/images/blitz-box/cards/debtCollector.png" alt="Debt Collector">
-    <div class="blitz-card-info">
-      <strong>Debt Collector</strong>
-      <span>Reopen the highest-value closed tile in current row</span>
+
+  <div class="bb-card-shell bb-card--bad">
+    <div class="bb-card-face" style="background:linear-gradient(145deg, hsl(0,10%,10%) 0%, hsl(0,8%,6%) 50%, hsl(0,12%,3%) 100%)">
+      <span class="bb-noise"></span>
+      <span class="bb-light"></span>
+      <div class="bb-img-zone">
+        <div class="bb-img-circle" style="border-color:rgba(255,40,150,0.7);box-shadow:0 0 0 2px rgba(255,40,150,0.3),0 0 0 5px rgba(255,30,140,0.15),0 0 16px rgba(255,50,160,0.5),0 0 32px rgba(255,40,150,0.3),inset 0 0 8px rgba(0,0,0,0.25)">
+          <img src="/assets/images/blitz-box/cards/debtCollector.png" alt="Debt Collector" style="object-position:center 18%;transform:scale(1.4)">
+        </div>
+      </div>
+      <div class="bb-text-zone">
+        <span class="bb-card-name">Debt Collector</span>
+        <span class="bb-card-desc">Reopen a high-value tile</span>
+      </div>
     </div>
   </div>
-  <div class="blitz-card">
-    <img src="/assets/images/blitz-box/cards/chainBreak.png" alt="Chain Break">
-    <div class="blitz-card-info">
-      <strong>Chain Break</strong>
-      <span>Closing a tile reopens its neighbors</span>
+
+  <div class="bb-card-shell bb-card--bad">
+    <div class="bb-card-face" style="background:linear-gradient(145deg, hsl(0,10%,10%) 0%, hsl(0,8%,6%) 50%, hsl(0,12%,3%) 100%)">
+      <span class="bb-noise"></span>
+      <span class="bb-light"></span>
+      <div class="bb-img-zone">
+        <div class="bb-img-circle" style="border-color:rgba(180,60,255,0.7);box-shadow:0 0 0 2px rgba(180,60,255,0.3),0 0 0 5px rgba(170,50,245,0.15),0 0 16px rgba(190,70,255,0.5),0 0 32px rgba(180,60,255,0.3),inset 0 0 8px rgba(0,0,0,0.25)">
+          <img src="/assets/images/blitz-box/cards/theJammer.png" alt="The Jammer" style="object-position:center 20%;transform:scale(1.3)">
+        </div>
+      </div>
+      <div class="bb-text-zone">
+        <span class="bb-card-name">The Jammer</span>
+        <span class="bb-card-desc">No powerups for 2 turns</span>
+      </div>
     </div>
   </div>
-  <div class="blitz-card">
-    <img src="/assets/images/blitz-box/cards/deadEnd.png" alt="Dead End">
-    <div class="blitz-card-info">
-      <strong>Dead End</strong>
-      <span>Permanently close the lowest open tile in a row</span>
+
+  <div class="bb-card-shell bb-card--bad">
+    <div class="bb-card-face" style="background:linear-gradient(145deg, hsl(0,10%,10%) 0%, hsl(0,8%,6%) 50%, hsl(0,12%,3%) 100%)">
+      <span class="bb-noise"></span>
+      <span class="bb-light"></span>
+      <div class="bb-img-zone">
+        <div class="bb-img-circle bb-img-circle--icon" style="border-color:rgba(200,210,225,0.7);box-shadow:0 0 0 2px rgba(200,210,225,0.3),0 0 0 5px rgba(190,200,220,0.15),0 0 16px rgba(210,220,235,0.5),0 0 32px rgba(200,210,225,0.3),inset 0 0 8px rgba(0,0,0,0.25)">
+          <img src="/assets/images/blitz-box/cards/chainBreak.png" alt="Chain Break" style="transform:scale(2.4)">
+        </div>
+      </div>
+      <div class="bb-text-zone">
+        <span class="bb-card-name">Chain Break</span>
+        <span class="bb-card-desc">Reopens a tile next close</span>
+      </div>
     </div>
   </div>
+
 </div>
 
 <h2>The History</h2>
 
-<p>Shut the Box has been played for over a century. The earliest written record dates to <strong>1893 in France</strong>, where it was known as <em>Jeu du Trac</em>. It spread sailor-to-sailor across ports and coastlines, became a staple in British pubs by the 1950s, and even appeared on NBC's <em>High Rollers</em> game show in 1974.</p>
+<p>The origins of Shut the Box are murky, and probably better for it. Some claim the game was invented by Norman fishermen in the 12th century, played on the lids of old sea chests to gamble for the day's catch. Others say it was a sailors' game, passed from port to port on merchant routes across the English Channel. None of this is documented, but the stories feel right for a game that has always lived in taverns, on docks, and around kitchen tables.</p>
 
-<p>There's something about the game that just works — simple enough to explain to anyone, tense enough to make every roll matter. Blitz Box takes that foundation and builds on it with blocking mechanics, a card economy, and three distinct visual worlds.</p>
+<p>What is documented starts in <strong>1893</strong>, when the game appeared in French records as <em>Jeu du Trac</em>. From there it spread through the Channel Islands and into British pub culture, where it became a staple by the 1950s. Cannonball, Bakeratz, Jackpot, Klackers: the game picked up names everywhere it went. It even showed up on American television when NBC's <em>High Rollers</em> game show featured it on July 1, 1974.</p>
+
+<p>We found our copy at a Goodwill in Sonoma County for $4. We couldn't stop playing, so we built Blitz Box.</p>
 
 <h2>Made in Sonoma County</h2>
 
