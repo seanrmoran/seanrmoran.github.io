@@ -4,27 +4,32 @@ title: Blitz Box Privacy Policy
 permalink: /blitz-box/privacy/
 ---
 
-*Last updated: February 21, 2026*
+*Effective date: February 21, 2026*
 
 ## Overview
 
-Blitz Box is made by a family in Sonoma County, California. We believe in transparency and respect your privacy. This policy explains what data Blitz Box collects, how it is used, and your choices.
+Blitz Box is made by the Moran Family in Sonoma County, California. We built this game for our family and yours. We respect your privacy and collect as little data as possible.
 
-## Analytics (Opt-In Only)
+## What We Collect
 
-Blitz Box includes an optional, opt-in analytics system. On first launch, the app asks if you would like to share anonymous gameplay data to help us balance the game. You can say no, and the app works exactly the same either way. You can change this choice at any time in Settings.
+**If you opt in to analytics**, we collect anonymous gameplay data to help us balance the game. This includes:
 
-If you opt in, we collect:
+- Dice rolls, tile choices, and card picks
+- Game outcomes (win/bust) and scores
+- Game mode and duration
+- A random device identifier (not linked to your Apple ID, name, email, or any personal information)
+- App version
 
-- **Gameplay data:** dice rolls, tile choices, card picks, game outcomes, mode played, and game duration
-- **A random device identifier:** generated locally on your device, not tied to your name, Apple ID, or any personal information
+Analytics is **opt-in only**. You are asked on first launch and can change your choice anytime in Settings. If you decline, no gameplay data leaves your device.
 
-We do **not** collect:
+## What We Don't Collect
 
-- Your name, email, or contact information
-- Your location
-- Your Apple ID or any account identifiers
-- Photos, contacts, or any other personal data
+- No names, email addresses, or contact information
+- No location data
+- No advertising identifiers or tracking pixels
+- No third-party analytics SDKs
+
+Your player name (used for the local leaderboard) is stored only on your device and is never transmitted.
 
 ## How We Use the Data
 
@@ -32,25 +37,20 @@ Gameplay data is used exclusively to understand how the game is played so we can
 
 ## Data Storage
 
-Analytics data is stored in a Supabase PostgreSQL database. Data is transmitted over HTTPS. Games played offline are queued locally and submitted when connectivity is restored.
+Analytics data is stored on servers provided by [Supabase](https://supabase.com) (hosted on AWS). Data is transmitted over HTTPS. Games played offline are queued locally and submitted when connectivity is restored. Data is retained indefinitely for game-balancing analysis. Because the data contains no personal information, it cannot be used to identify you.
 
 ## Children's Privacy
 
-Blitz Box does not knowingly collect personal information from children under 13. The optional analytics system collects only anonymous gameplay data and does not identify individual users.
+Blitz Box is a family game suitable for all ages. We do not knowingly collect personal information from anyone, including children under 13. Analytics data, when opted in, is fully anonymous and contains no personal identifiers.
 
-## Third-Party Services
+## Data Deletion
 
-Blitz Box does not include any third-party advertising, tracking, or analytics SDKs. The only external service is our own Supabase database for opt-in gameplay telemetry.
-
-## Your Choices
-
-- **Opt out of analytics** at any time in Settings
-- **Delete your data** by contacting us at the email below
+You can turn off analytics at any time in Settings to stop future data collection. To request deletion of previously collected anonymous data, contact us at [blitzboxgame@gmail.com](mailto:blitzboxgame@gmail.com) with the subject "Data Deletion Request" and we will remove records associated with your device identifier.
 
 ## Changes to This Policy
 
-If we make changes to this policy, we will update the date at the top of this page.
+If we update this policy, the revised version will be available in the app and at this page. We will update the effective date at the top.
 
 ## Contact
 
-If you have questions about this privacy policy, contact us at [sean.r.moran@gmail.com](mailto:sean.r.moran@gmail.com).
+Questions or concerns? Reach us at [blitzboxgame@gmail.com](mailto:blitzboxgame@gmail.com).
