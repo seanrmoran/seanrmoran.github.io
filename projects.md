@@ -13,7 +13,7 @@ title: Projects
   </a>
   <a href="https://canonum.app" class="project-item">
     <div class="project-item-inner">
-      <h3>Canonum.app</h3>
+      <h3>Canonum</h3>
       <p class="project-desc">A tier list creation and sharing platform. Rate, rank, and compare anything with shareable tier lists.</p>
       <span class="project-tag">Web App</span>
     </div>
@@ -27,7 +27,7 @@ title: Projects
   </div>
   <div class="project-item">
     <div class="project-item-inner">
-      <h3>HomeschoolLeap.com</h3>
+      <h3>HomeschoolLeap</h3>
       <p class="project-desc">A step-by-step compliance tool that walks families through everything they need to start homeschooling legally in their state.</p>
       <span class="project-tag">Web App</span>
     </div>
@@ -48,7 +48,7 @@ title: Projects
   </a>
   <a href="https://sunder.fm" class="project-item">
     <div class="project-item-inner">
-      <h3>Sunder.fm</h3>
+      <h3>Sunder</h3>
       <p class="project-desc">A gamified music discovery app that guides you through the history of music, one genre at a time.</p>
       <span class="project-tag">iOS App</span>
     </div>
