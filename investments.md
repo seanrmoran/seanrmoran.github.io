@@ -23,7 +23,7 @@ title: Investments
     <span class="inv-dash"></span>
     <span class="inv-desc">Technology to unlock elite investing</span>
   </a>
-  <a href="https://www.framer.com" class="inv-item">
+  <a href="https://framer.com" class="inv-item">
     <span class="inv-name">Framer</span>
     <span class="inv-dash"></span>
     <span class="inv-desc">Design and publish professional sites</span>
@@ -49,12 +49,12 @@ title: Investments
 <h2 class="project-section-heading">Growth</h2>
 
 <div class="inv-list">
-  <a href="https://www.angellist.com" class="inv-item">
+  <a href="https://angellist.com" class="inv-item">
     <span class="inv-name">AngelList</span>
     <span class="inv-dash"></span>
     <span class="inv-desc">Platform for startups, investors, and fund managers</span>
   </a>
-  <a href="https://www.cresta.com" class="inv-item">
+  <a href="https://cresta.com" class="inv-item">
     <span class="inv-name">Cresta</span>
     <span class="inv-dash"></span>
     <span class="inv-desc">AI for enterprise contact centers</span>
@@ -74,12 +74,12 @@ title: Investments
     <span class="inv-dash"></span>
     <span class="inv-desc">AI-powered software development platform</span>
   </a>
-  <a href="https://www.snapdocs.com" class="inv-item">
+  <a href="https://snapdocs.com" class="inv-item">
     <span class="inv-name">Snapdocs</span>
     <span class="inv-dash"></span>
     <span class="inv-desc">Digital closing platform for mortgages</span>
   </a>
-  <a href="https://www.synthesis.is" class="inv-item">
+  <a href="https://synthesis.is" class="inv-item">
     <span class="inv-name">Synthesis</span>
     <span class="inv-dash"></span>
     <span class="inv-desc">Collaborative learning platform for kids</span>
@@ -94,7 +94,7 @@ title: Investments
     <span class="inv-dash"></span>
     <span class="inv-desc">Portfolios of top-performing, access-constrained venture funds</span>
   </a>
-  <a href="https://autopilot.fund/" class="inv-item">
+  <a href="https://autopilot.fund" class="inv-item">
     <span class="inv-name">Autopilot Fund</span>
     <span class="inv-dash"></span>
     <span class="inv-desc">Early stage fund led by the founders of AbstractOps</span>
@@ -109,12 +109,12 @@ title: Investments
     <span class="inv-dash"></span>
     <span class="inv-desc">Institutional venture capital focused on early-stage investments</span>
   </a>
-  <a href="https://www.mkt1.co/capital" class="inv-item">
+  <a href="https://mkt1.co/capital" class="inv-item">
     <span class="inv-name">MKT1 Capital</span>
     <span class="inv-dash"></span>
     <span class="inv-desc">Seed and Series A SaaS investing led by marketing leaders</span>
   </a>
-  <a href="https://www.storyhousevc.com/" class="inv-item">
+  <a href="https://storyhousevc.com" class="inv-item">
     <span class="inv-name">StoryHouse Ventures</span>
     <span class="inv-dash"></span>
     <span class="inv-desc">Early stage venture fund</span>
