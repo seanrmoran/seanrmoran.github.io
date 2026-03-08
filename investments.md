@@ -7,88 +7,121 @@ title: Investments
 
 <h2 class="project-section-heading">Seed</h2>
 
-<div class="project-list">
-  <a href="https://allocate.co" class="project-item">
-    <div class="project-item-inner">
-      <h3>Allocate</h3>
-      <p class="project-desc">A new way to access top-tier venture capital.</p>
-    </div>
+<div class="inv-list">
+  <a href="https://allocate.co" class="inv-item">
+    <span class="inv-name">Allocate</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">A new way to access top-tier venture capital</span>
   </a>
-  <a href="https://altoira.com" class="project-item">
-    <div class="project-item-inner">
-      <h3>AltoIRA</h3>
-      <p class="project-desc">Self-directed IRAs for investing retirement dollars in alternative assets.</p>
-    </div>
+  <a href="https://altoira.com" class="inv-item">
+    <span class="inv-name">AltoIRA</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">Self-directed IRAs for investing in alternative assets</span>
   </a>
-  <a href="https://equi.com" class="project-item">
-    <div class="project-item-inner">
-      <h3>Equi</h3>
-      <p class="project-desc">Technology to unlock elite investing. A portfolio to rival the most sophisticated family offices.</p>
-    </div>
+  <a href="https://equi.com" class="inv-item">
+    <span class="inv-name">Equi</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">Technology to unlock elite investing</span>
   </a>
-  <a href="https://grasshopperkids.com" class="project-item">
-    <div class="project-item-inner">
-      <h3>Grasshopper Kids</h3>
-      <p class="project-desc">Helping kids discover their passions through hands-on learning experiences.</p>
-    </div>
+  <a href="https://www.framer.com" class="inv-item">
+    <span class="inv-name">Framer</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">Design and publish professional sites</span>
   </a>
-  <a href="https://icapitalnetwork.com" class="project-item">
-    <div class="project-item-inner">
-      <h3>Passthrough</h3>
-      <p class="project-desc">Organizing and structuring investor identity information. Acquired by iCapital.</p>
-    </div>
+  <a href="https://grasshopperkids.com" class="inv-item">
+    <span class="inv-name">Grasshopper Kids</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">Hands-on learning experiences for kids</span>
   </a>
-  <a href="https://protocol.ai" class="project-item">
-    <div class="project-item-inner">
-      <h3>Protocol Labs</h3>
-      <p class="project-desc">Open-source research, development, and deployment laboratory. Projects include IPFS, Filecoin, and libp2p.</p>
-    </div>
+  <a href="https://icapitalnetwork.com" class="inv-item">
+    <span class="inv-name">Passthrough</span>
+    <span class="inv-note">Acquired by iCapital</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">Organizing investor identity information</span>
+  </a>
+  <a href="https://protocol.ai" class="inv-item">
+    <span class="inv-name">Protocol Labs</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">Open-source R&D lab behind IPFS, Filecoin, and libp2p</span>
+  </a>
+</div>
+
+<h2 class="project-section-heading">Growth</h2>
+
+<div class="inv-list">
+  <a href="https://www.angellist.com" class="inv-item">
+    <span class="inv-name">AngelList</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">Platform for startups, investors, and fund managers</span>
+  </a>
+  <a href="https://www.cresta.com" class="inv-item">
+    <span class="inv-name">Cresta</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">AI for enterprise contact centers</span>
+  </a>
+  <a href="https://overtime.tv" class="inv-item">
+    <span class="inv-name">Overtime</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">Next-generation sports media company</span>
+  </a>
+  <a href="https://primer.com" class="inv-item">
+    <span class="inv-name">Primer</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">Reimagining education for kids</span>
+  </a>
+  <a href="https://replit.com" class="inv-item">
+    <span class="inv-name">Replit</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">AI-powered software development platform</span>
+  </a>
+  <a href="https://www.snapdocs.com" class="inv-item">
+    <span class="inv-name">Snapdocs</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">Digital closing platform for mortgages</span>
+  </a>
+  <a href="https://www.synthesis.is" class="inv-item">
+    <span class="inv-name">Synthesis</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">Collaborative learning platform for kids</span>
   </a>
 </div>
 
 <h2 class="project-section-heading">Funds</h2>
 
-<div class="project-list">
-  <a href="https://allocate.co" class="project-item">
-    <div class="project-item-inner">
-      <h3>Allocate Alpha Fund</h3>
-      <p class="project-desc">Unique exposure to a portfolio of high performing, access-constrained venture funds.</p>
-    </div>
+<div class="inv-list">
+  <a href="https://allocate.co" class="inv-item">
+    <span class="inv-name">Allocate Alpha Fund & Premier Access Fund</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">Portfolios of top-performing, access-constrained venture funds</span>
   </a>
-  <a href="https://allocate.co" class="project-item">
-    <div class="project-item-inner">
-      <h3>Allocate Premier Access Fund</h3>
-      <p class="project-desc">Diversified pool of top venture capital funds across stages and sectors.</p>
-    </div>
+  <a href="https://autopilot.fund/" class="inv-item">
+    <span class="inv-name">Autopilot Fund</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">Early stage fund led by the founders of AbstractOps</span>
   </a>
-  <a href="https://autopilot.fund/" class="project-item">
-    <div class="project-item-inner">
-      <h3>Autopilot Fund</h3>
-      <p class="project-desc">An early stage fund led by the founders of AbstractOps.</p>
-    </div>
+  <a href="https://gilgameshvc.com" class="inv-item">
+    <span class="inv-name">Gilgamesh Fintech Ventures</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">Early stage venture capital focused on fintech in the Americas</span>
   </a>
-  <a href="https://gilgameshvc.com" class="project-item">
-    <div class="project-item-inner">
-      <h3>Gilgamesh Fintech Ventures</h3>
-      <p class="project-desc">Early stage venture capital focused on fintech in the Americas.</p>
-    </div>
+  <a href="https://haystack.vc" class="inv-item">
+    <span class="inv-name">Haystack</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">Institutional venture capital focused on early-stage investments</span>
   </a>
-  <a href="https://haystack.vc" class="project-item">
-    <div class="project-item-inner">
-      <h3>Haystack</h3>
-      <p class="project-desc">Institutional venture capital focused on early-stage investments.</p>
-    </div>
+  <a href="https://www.mkt1.co/capital" class="inv-item">
+    <span class="inv-name">MKT1 Capital</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">Seed and Series A SaaS investing led by marketing leaders</span>
   </a>
-  <a href="https://www.mkt1.co/capital" class="project-item">
-    <div class="project-item-inner">
-      <h3>MKT1 Capital</h3>
-      <p class="project-desc">Founded by marketing leaders. Invests in Seed and Series A SaaS startups.</p>
-    </div>
+  <a href="https://www.storyhousevc.com/" class="inv-item">
+    <span class="inv-name">StoryHouse Ventures</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">Early stage venture fund</span>
   </a>
-  <a href="https://ubiquity.vc" class="project-item">
-    <div class="project-item-inner">
-      <h3>Ubiquity Ventures</h3>
-      <p class="project-desc">Seed capital for "software beyond the screen" startups.</p>
-    </div>
+  <a href="https://ubiquity.vc" class="inv-item">
+    <span class="inv-name">Ubiquity Ventures</span>
+    <span class="inv-dash"></span>
+    <span class="inv-desc">Seed capital for "software beyond the screen" startups</span>
   </a>
 </div>
