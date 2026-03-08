@@ -97,7 +97,7 @@ title: Investments
   <a href="https://autopilot.fund" class="inv-item">
     <span class="inv-name">Autopilot Fund</span>
     <span class="inv-dash"></span>
-    <span class="inv-desc">Early stage fund led by the founders of AbstractOps</span>
+    <span class="inv-desc">Investing in AI-powered software that automates large chunks of work</span>
   </a>
   <a href="https://gilgameshvc.com" class="inv-item">
     <span class="inv-name">Gilgamesh Fintech Ventures</span>
@@ -117,7 +117,7 @@ title: Investments
   <a href="https://storyhousevc.com" class="inv-item">
     <span class="inv-name">StoryHouse Ventures</span>
     <span class="inv-dash"></span>
-    <span class="inv-desc">Early stage venture fund</span>
+    <span class="inv-desc">Early stage venture firm for Claremont's most daring founders</span>
   </a>
   <a href="https://ubiquity.vc" class="inv-item">
     <span class="inv-name">Ubiquity Ventures</span>
