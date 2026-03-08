@@ -67,7 +67,7 @@ title: Investments
       <p class="project-desc">Early stage venture capital focused on fintech in the Americas.</p>
     </div>
   </a>
-  <a href="https://autopilotfund.com" class="project-item">
+  <a href="https://autopilot.fund/" class="project-item">
     <div class="project-item-inner">
       <h3>Autopilot Fund</h3>
       <p class="project-desc">An early stage fund led by the founders of AbstractOps.</p>
@@ -85,7 +85,7 @@ title: Investments
       <p class="project-desc">Diversified pool of top venture capital funds across stages and sectors.</p>
     </div>
   </a>
-  <a href="https://mkt1.co/capital" class="project-item">
+  <a href="https://www.mkt1.co/capital" class="project-item">
     <div class="project-item-inner">
       <h3>MKT1 Capital</h3>
       <p class="project-desc">Founded by marketing leaders. Invests in Seed and Series A SaaS startups.</p>
