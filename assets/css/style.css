@@ -835,6 +835,23 @@ main {
    Projects Page
    ======================================== */
 
+.project-section-heading {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--color-text-muted);
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.project-section-heading:first-of-type {
+  margin-top: 0;
+}
+
 .project-list {
   display: flex;
   flex-direction: column;
@@ -844,7 +861,6 @@ main {
 .project-item {
   display: block;
   text-decoration: none;
-  padding: var(--spacing-md);
   border: 1px solid var(--color-border);
   transition: all 0.2s ease;
   position: relative;
@@ -861,15 +877,46 @@ main {
   background: var(--color-accent);
   transition: width 0.2s ease;
   box-shadow: 0 0 10px var(--color-accent-glow);
+  z-index: 1;
 }
 
-.project-item:hover::before {
+a.project-item:hover::before {
   width: 3px;
 }
 
-.project-item:hover {
+a.project-item:hover {
   border-color: var(--color-border-light);
-  background: linear-gradient(90deg, var(--color-bg-elevated), transparent 80%);
+}
+
+.project-logo-wrap {
+  width: 100%;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.project-logo {
+  max-height: 72px;
+  max-width: 80%;
+  object-fit: contain;
+}
+
+.project-logo--wide {
+  max-height: 56px;
+  max-width: 85%;
+}
+
+.project-logo--icon {
+  max-height: 80px;
+  max-width: 80px;
+  border-radius: 16px;
+}
+
+.project-item-inner {
+  padding: var(--spacing-md);
 }
 
 .project-item h3 {
@@ -881,7 +928,7 @@ main {
   transition: all 0.2s ease;
 }
 
-.project-item:hover h3 {
+a.project-item:hover h3 {
   color: var(--color-accent);
   text-shadow: 0 0 10px var(--color-accent-glow);
 }
@@ -890,17 +937,27 @@ main {
   font-size: 0.875rem;
   color: var(--color-text-secondary);
   line-height: 1.6;
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: 0;
 }
 
-.project-tag {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  color: var(--color-cyan);
-  border: 1px solid var(--color-cyan-dim);
-  padding: 0.125rem 0.5rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+@media (max-width: 640px) {
+  .project-logo-wrap {
+    height: 100px;
+  }
+
+  .project-logo {
+    max-height: 56px;
+  }
+
+  .project-logo--wide {
+    max-height: 44px;
+  }
+
+  .project-logo--icon {
+    max-height: 64px;
+    max-width: 64px;
+    border-radius: 14px;
+  }
 }
 
 /* ========================================

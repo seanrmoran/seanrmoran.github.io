@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#0a0a0f"/>
+  <!-- Crown: 3 points (outer points at edges), shallow notches -->
+  <polygon points="96,215 96,105 176,145 256,105 336,145 416,105 416,215" fill="#00f5ff"/>
+  <!-- Bar 1 -->
+  <rect x="96" y="231" width="320" height="48" fill="#00f5ff"/>
+  <!-- Bar 2 -->
+  <rect x="96" y="295" width="320" height="48" fill="#00f5ff"/>
+  <!-- Bar 3 -->
+  <rect x="96" y="359" width="320" height="48" fill="#00f5ff"/>
+</svg>
