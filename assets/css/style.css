@@ -832,8 +832,14 @@ main {
 }
 
 /* ========================================
-   Projects Page
+   Projects & Investments Pages
    ======================================== */
+
+.investments-intro {
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
 
 .project-section-heading {
   font-family: var(--font-mono);

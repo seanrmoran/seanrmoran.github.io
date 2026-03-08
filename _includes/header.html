@@ -4,6 +4,7 @@
     <nav class="site-nav">
       <a href="{{ '/about' | relative_url }}" {% if page.url == '/about/' %}class="active"{% endif %}>About</a>
       <a href="{{ '/projects' | relative_url }}" {% if page.url == '/projects/' or page.url == '/blitz-box/' %}class="active"{% endif %}>Projects</a>
+      <a href="{{ '/investments' | relative_url }}" {% if page.url == '/investments/' %}class="active"{% endif %}>Investments</a>
       <a href="{{ '/writing' | relative_url }}" {% if page.url contains '/writing' %}class="active"{% endif %}>Writing</a>
     </nav>
   </div>
