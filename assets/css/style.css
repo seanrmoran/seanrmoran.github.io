@@ -859,7 +859,7 @@ main {
 }
 
 .inv-item:last-child {
-  border-bottom: none;
+  border-bottom: 1px solid transparent;
 }
 
 .inv-item:hover {
