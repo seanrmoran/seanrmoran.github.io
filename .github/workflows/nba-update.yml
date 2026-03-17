@@ -2,7 +2,7 @@ name: NBA Playoff Predictor Update
 
 on:
   schedule:
-    # Run at 6:30 AM UTC (1:30 AM ET) - after last NBA games typically end
+    # Run at 6:30 AM UTC (10:30 PM PT) - after last NBA games typically end
     - cron: '30 6 * * *'
   workflow_dispatch: # Manual trigger
 
@@ -32,14 +32,7 @@ jobs:
 
       - name: Clone NBA model repo
         run: |
-          git clone https://github.com/${{ github.repository_owner }}/nba.git nba-model
-        continue-on-error: true
-
-      - name: Copy model code (fallback if no separate repo)
-        if: failure()
-        run: |
-          mkdir -p nba-model/src
-          echo "Model code not available - using cached data"
+          git clone https://${{ secrets.NBA_REPO_TOKEN }}@github.com/seanrmoran/nba.git nba-model
 
       - name: Generate static JSON
         run: |
