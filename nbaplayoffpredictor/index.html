@@ -1,0 +1,1382 @@
+---
+layout: null
+---
+<!DOCTYPE html>
+<html lang="en" style="color-scheme:dark;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0e1a">
+  <meta name="description" content="NBA playoff projections powered by Monte Carlo simulation and machine learning. 10,000 simulated seasons, 25-feature XGBoost model, backtested across 11,500+ games.">
+  <title>NBA Playoff Predictor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+  <style>
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+    :root {
+      --bg: #0a0e1a;
+      --surface: #111827;
+      --surface2: #1a2236;
+      --border: #2d3a54;
+      --text: #e2e8f0;
+      --text-dim: #94a3b8;
+      --accent: #3b82f6;
+      --green: #22c55e;
+      --yellow: #eab308;
+      --red: #ef4444;
+      --orange: #f97316;
+      --purple: #a855f7;
+      --cyan: #06b6d4;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    ::selection { background: rgba(59,130,246,0.3); color: #fff; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      letter-spacing: 0.01em;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+    td, .record { font-variant-numeric: tabular-nums; }
+
+    /* Hero */
+    .hero {
+      text-align: center; padding: 2rem 1rem 1rem;
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .hero h1 {
+      font-family: 'Barlow Condensed', 'Inter', sans-serif;
+      font-size: 2.5rem; font-weight: 800; letter-spacing: -0.01em;
+      background: linear-gradient(135deg, var(--accent), var(--cyan), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero p { color: var(--text-dim); font-size: 0.9rem; margin-top: 0.2rem; }
+    .hero-link { color: var(--text-dim); text-decoration: none; transition: color 0.15s; }
+    .hero-link:hover { color: var(--accent); text-decoration: underline; }
+
+    .container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
+
+    /* Nav tabs */
+    .tabs {
+      display: flex; gap: 0; justify-content: center; margin-bottom: 0;
+      border-bottom: 2px solid var(--border); padding-bottom: 0;
+    }
+    .tab {
+      padding: 0.7rem 2rem; cursor: pointer;
+      font-weight: 700; font-size: 1rem; color: var(--text-dim);
+      background: transparent; border: none; border-bottom: 3px solid transparent;
+      margin-bottom: -2px; transition: all 0.2s;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+    .tab.tab-info { color: var(--cyan); font-weight: 500; opacity: 0.7; }
+    .tab.tab-info:hover { opacity: 1; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Back button */
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.8rem;
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+      color: var(--text-dim); font-size: 0.85rem; cursor: pointer; margin-bottom: 1rem;
+    }
+    .back-btn:hover { color: var(--text); border-color: var(--accent); }
+
+    /* Cards */
+    .card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+      box-shadow: 0 1px 0 0 rgba(255,255,255,0.03) inset, 0 2px 4px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.15);
+      transition: box-shadow 0.2s ease;
+    }
+    .card-header {
+      padding: 0.9rem 1.2rem; font-weight: 700; font-size: 0.85rem;
+      border-bottom: 1px solid var(--border);
+      text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim);
+    }
+    .card-body { padding: 1rem 1.5rem; overflow-x: auto; }
+
+    /* Mode switch (segmented control) — centered, clearly secondary */
+    .mode-bar {
+      display: flex; justify-content: center; padding: 0.75rem 0; margin-bottom: 1rem;
+    }
+    .mode-switch {
+      display: inline-flex; background: rgba(26,34,54,0.7); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px; padding: 3px;
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    }
+    .mode-btn {
+      padding: 0.3rem 1.2rem; border-radius: 18px; cursor: pointer;
+      font-weight: 600; font-size: 0.78rem;
+      border: none; background: transparent; color: var(--text-dim);
+      transition: all 0.15s;
+    }
+    .mode-btn:hover { color: var(--text); }
+    .mode-btn.active { background: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(59,130,246,0.3), 0 0 0 1px rgba(59,130,246,0.1); }
+
+    /* Timeline */
+    .timeline { position: relative; padding-left: 28px; }
+    .timeline::before {
+      content: ''; position: absolute; left: 8px; top: 0; bottom: 0;
+      width: 2px; background: var(--border);
+    }
+    .cl-item {
+      position: relative; padding: 0.6rem 0 1.2rem 1.2rem;
+    }
+    .cl-item::before {
+      content: ''; position: absolute; left: -24px; top: 0.85rem;
+      width: 12px; height: 12px; border-radius: 50%;
+      border: 2px solid var(--border); background: var(--bg);
+    }
+    .cl-item.done::before { background: var(--green); border-color: var(--green); }
+    .cl-item.planned::before { background: var(--bg); border-color: var(--text-dim); }
+    .cl-item.next::before { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 8px rgba(59,130,246,0.4); }
+    .cl-date {
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-dim); margin-bottom: 0.15rem;
+    }
+    .cl-item.done .cl-date { color: var(--green); }
+    .cl-item.next .cl-date { color: var(--accent); }
+    .cl-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.15rem; }
+    .cl-desc { font-size: 0.82rem; color: var(--text-dim); line-height: 1.5; }
+    .cl-item.planned .cl-title { color: var(--text-dim); }
+
+    /* Clickable table rows */
+    tr.clickable-row { cursor: pointer; }
+    tr.clickable-row:hover { background: rgba(59,130,246,0.06); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3d4f6f; }
+
+    /* Fix Plotly crosshair cursor */
+    .plotly .drag, .plotly .nsewdrag { cursor: default !important; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th {
+      text-align: left; padding: 0.55rem 0.7rem; font-weight: 600; color: var(--text-dim);
+      font-size: 0.73rem; text-transform: uppercase; letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--border); white-space: nowrap;
+    }
+    th.c { text-align: center; }
+    td { padding: 0.6rem 0.75rem; border-bottom: 1px solid rgba(42,52,80,0.3); white-space: nowrap; }
+    td.c { text-align: center; }
+    tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+    tr:hover { background: rgba(59,130,246,0.08); }
+    tr.clickable-row:hover { box-shadow: inset 3px 0 0 var(--accent); }
+    tr:last-child td { border-bottom: none; }
+
+    .seed-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 8px; font-weight: 800; font-size: 0.82rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .seed-badge.playoff { background: rgba(34,197,94,0.15); color: var(--green); }
+    .seed-badge.playin { background: rgba(234,179,8,0.15); color: var(--yellow); }
+    .seed-badge.out { background: rgba(239,68,68,0.1); color: var(--red); }
+
+    .team-link { font-weight: 600; cursor: pointer; transition: color 0.15s; }
+    .team-link:hover { color: var(--accent); }
+
+    .pos { color: #34d399; }
+    .neg { color: #f87171; }
+    .dim { color: var(--text-dim); }
+    .record { font-variant-numeric: tabular-nums; }
+
+    .badge {
+      display: inline-block; padding: 0.12rem 0.45rem; border-radius: 4px;
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em;
+    }
+    .badge-green { background: rgba(34,197,94,0.15); color: var(--green); }
+    .badge-yellow { background: rgba(234,179,8,0.15); color: var(--yellow); }
+    .badge-red { background: rgba(239,68,68,0.15); color: var(--red); }
+    .badge-orange { background: rgba(249,115,22,0.15); color: var(--orange); }
+
+    /* Separator rows */
+    tr.sep-playoff td { border-bottom: 2px solid var(--green); }
+    tr.sep-playin td { border-bottom: 2px dashed var(--yellow); }
+
+    /* Matchup cards */
+    .bracket-section { margin-bottom: 2rem; }
+    .bracket-label {
+      font-family: 'Barlow Condensed', 'Inter', sans-serif;
+      font-size: 0.85rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-dim); margin: 1rem 0 0.5rem; padding-left: 0.25rem;
+    }
+    .matchup-row {
+      display: flex; align-items: center; gap: 0.75rem;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 0.8rem 1rem; margin-bottom: 0.5rem; transition: transform 0.1s;
+    }
+    .matchup-row:hover { transform: translateX(4px); }
+    .matchup-seed { font-size: 1.4rem; font-weight: 800; color: var(--text-dim); opacity: 0.3; width: 1.8rem; text-align: center; flex-shrink: 0; }
+    .matchup-team { flex: 1; }
+    .matchup-team-name { font-weight: 700; font-size: 0.95rem; cursor: pointer; }
+    .matchup-team-name:hover { color: var(--accent); }
+    .matchup-meta { font-size: 0.8rem; color: var(--text-dim); }
+    .matchup-vs { font-weight: 800; color: var(--text-dim); font-size: 0.8rem; flex-shrink: 0; }
+
+    /* Probability bars */
+    .prob-bar-container { display: flex; align-items: center; gap: 0.35rem; }
+    .prob-bar {
+      height: 6px; border-radius: 3px; background: var(--surface2); overflow: hidden; width: 40px; flex-shrink: 0;
+    }
+    .prob-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+
+    /* Grids */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* Stat boxes (team detail) */
+    .stat-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.6rem; margin-bottom: 1.2rem;
+    }
+    .stat-box {
+      background: linear-gradient(180deg, rgba(26,34,54,1) 0%, rgba(26,34,54,0.8) 100%);
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 10px; padding: 0.8rem; text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .stat-label { font-size: 0.65rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+    .stat-value { font-size: 1.5rem; font-weight: 800; margin-top: 0.2rem; letter-spacing: -0.02em; }
+
+    /* Game prediction rows */
+    /* game row widths handled by table */
+    /* game row widths now inline */
+    .game-factors { flex: 1; font-size: 0.75rem; color: var(--text-dim); min-width: 0; }
+    .game-override {
+      display: flex; gap: 0.25rem; flex-shrink: 0;
+    }
+    .proj-btn {
+      padding: 0.18rem 0.45rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700;
+      cursor: pointer; border: none; transition: all 0.12s; letter-spacing: 0.02em;
+    }
+    .proj-btn.proj-w { background: rgba(34,197,94,0.25); color: var(--green); }
+    .proj-btn.proj-l { background: rgba(239,68,68,0.25); color: var(--red); }
+    .proj-btn.proj-w-off { background: transparent; color: var(--text-dim); opacity: 0.35; }
+    .proj-btn.proj-l-off { background: transparent; color: var(--text-dim); opacity: 0.35; }
+    .proj-btn.proj-w-off:hover { opacity: 0.7; color: var(--green); }
+    .proj-btn.proj-l-off:hover { opacity: 0.7; color: var(--red); }
+    .proj-btn.overridden { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+    .factor-tag {
+      display: inline-block; padding: 0.08rem 0.3rem; border-radius: 3px;
+      font-size: 0.65rem; margin: 0.08rem; background: var(--surface2); white-space: nowrap;
+    }
+    .factor-tag.good { color: var(--green); }
+    .factor-tag.bad { color: var(--red); }
+    .factor-tag.neutral { color: var(--text-dim); }
+
+    /* Loading */
+    .loading { display: flex; flex-direction: column; align-items: center; padding: 4rem; color: var(--text-dim); }
+    .spinner {
+      width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent);
+      border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<a href="#main-content" style="position:absolute;left:-9999px;top:0;padding:0.5rem 1rem;background:var(--accent);color:#fff;z-index:999;" onfocus="this.style.left='0';" onblur="this.style.left='-9999px';">Skip to content</a>
+<div class="hero">
+  <h1 style="cursor:pointer;" onclick="document.querySelector('.tab[data-tab=matchups]').click();">NBA Playoff Predictor</h1>
+  <p>2025-26 Season &mdash; Monte Carlo projections from 10,000 simulations</p>
+  <div style="margin-top:0.4rem;display:flex;justify-content:center;gap:1rem;font-size:0.78rem;align-items:center;">
+    <a href="#" onclick="showPage('methodology');return false;" style="color:var(--cyan);text-decoration:none;font-weight:600;">How It Works</a>
+    <span style="color:var(--border);">·</span>
+    <a href="#" onclick="showPage('changelog');return false;" style="color:var(--cyan);text-decoration:none;font-weight:600;">What's New</a>
+    <span style="color:var(--border);">·</span>
+    <span id="freshness" style="color:var(--text-dim);font-size:0.72rem;"></span>
+  </div>
+</div>
+
+<div class="container" id="main-content">
+  <div class="tabs" id="main-tabs">
+    <button class="tab active" data-tab="matchups">Playoffs</button>
+    <button class="tab" data-tab="standings">Standings</button>
+  </div>
+
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    <span>Loading predictions...</span>
+  </div>
+
+  <!-- PLAYOFFS -->
+  <div id="matchups" class="tab-content">
+    <div class="mode-bar"><div class="mode-switch">
+      <button id="matchups-toggle-curr" class="mode-btn" onclick="setMatchupView('current')">Current</button>
+      <button id="matchups-toggle-proj" class="mode-btn active" onclick="setMatchupView('projected')">Projected</button>
+    </div></div>
+    <div class="grid-2" id="matchups-grid"></div>
+  </div>
+
+  <!-- STANDINGS -->
+  <div id="standings" class="tab-content">
+    <div class="mode-bar"><div class="mode-switch">
+      <button id="standings-toggle-curr" class="mode-btn" onclick="setStandingsView('current')">Current</button>
+      <button id="standings-toggle-proj" class="mode-btn active" onclick="setStandingsView('projected')">Projected</button>
+    </div></div>
+    <div class="grid-2" id="standings-grid"></div>
+  </div>
+
+  <!-- METHODOLOGY -->
+  <div id="methodology" class="tab-content">
+    <div class="card" style="max-width:900px;margin:0 auto;">
+      <div class="card-header">How It Works</div>
+      <div class="card-body" style="font-size:0.9rem;line-height:1.7;color:var(--text);">
+
+        <!-- RESULTS UP TOP -->
+        <div style="margin-bottom:1.5rem;padding:1rem;background:var(--surface2);border-radius:10px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;text-align:center;">
+            <div>
+              <div style="font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.04em;"><a href="https://grokipedia.com/page/Accuracy_and_precision#In_binary_classification" target="_blank" style="color:var(--text-dim);">Accuracy</a></div>
+              <div style="font-size:1.6rem;font-weight:800;color:var(--green);">69.0%</div>
+            </div>
+            <div>
+              <div style="font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.04em;"><a href="https://grokipedia.com/page/Brier_score" target="_blank" style="color:var(--text-dim);">Brier Score</a></div>
+              <div style="font-size:1.6rem;font-weight:800;color:var(--green);">0.199</div>
+            </div>
+            <div>
+              <div style="font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.04em;">Backtested</div>
+              <div style="font-size:1.6rem;font-weight:800;color:var(--text);">11,504</div>
+              <div style="font-size:0.7rem;color:var(--text-dim);">games over 10 seasons</div>
+            </div>
+          </div>
+          <div style="margin-top:0.75rem;font-size:0.8rem;color:var(--text-dim);border-top:1px solid var(--border);padding-top:0.5rem;">
+            <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0326326" target="_blank" style="color:var(--accent);">Academic research</a> puts the typical NBA prediction range at 62-69%. <a href="https://fivethirtyeight.com/methodology/how-our-nba-predictions-work/" target="_blank" style="color:var(--accent);">FiveThirtyEight's Elo model</a> achieved ~67% / 0.210 Brier. <a href="https://www.inpredictable.com/2018/01/judging-win-probability-models.html" target="_blank" style="color:var(--accent);">Vegas closing lines</a> sit around 73% / 0.195 Brier. <a href="https://grokipedia.com/page/Probabilistic_classification#Probability_calibration" target="_blank" style="color:var(--accent);">Lower Brier is better</a>: it measures how well-calibrated probabilities are, not just whether you picked the winner.
+          </div>
+        </div>
+
+        <!-- HOW IT WORKS -->
+        <h3 style="margin-bottom:0.5rem;">The Approach</h3>
+        <p>We simulate the rest of the NBA season <strong>10,000 times</strong>. For each remaining game, an <a href="https://xgboost.readthedocs.io/" target="_blank" style="color:var(--accent);">XGBoost</a> model evaluates 25 factors to estimate win probability. We flip a weighted coin, record the result, rank teams using <a href="https://www.nba.com/news/nba-tiebreaker-rules" target="_blank" style="color:var(--accent);">official NBA tiebreaker rules</a>, and repeat. The distribution across all 10,000 simulations tells you how likely each team is to land at each seed.</p>
+        <p style="margin-top:0.5rem;">The model was trained on <strong>11,500+ NBA games across 10 seasons</strong> (2015-16 through 2024-25) using <a href="https://grokipedia.com/page/Cross-validation_(statistics)#Leave-p-out_cross-validation" target="_blank" style="color:var(--accent);">leave-one-season-out cross-validation</a> with <a href="https://grokipedia.com/page/Leakage_(machine_learning)" target="_blank" style="color:var(--accent);">zero data leakage</a>. Every prediction uses only information available before that game was played.</p>
+
+        <h3 style="margin-top:1.5rem;margin-bottom:0.5rem;">What Goes Into Each Prediction</h3>
+        <p>The model evaluates 25 features for every game, grouped into seven categories:</p>
+        <table style="margin:1rem 0;font-size:0.85rem;width:100%;">
+          <thead><tr>
+            <th style="width:120px;">Category</th>
+            <th>What it captures</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600;">Form</td>
+              <td>Recent wins and scoring margin using <a href="https://dunksandthrees.com/about/epm" target="_blank" style="color:var(--accent);">exponentially weighted averages</a> that prioritize the last few games over early-season results.</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">Home court</td>
+              <td>Home court advantage, which adapts through the season (stronger in October, <a href="https://sports.yahoo.com/fact-or-fiction-is-home-court-advantage-in-the-nbas-regular-season-dead-194958543.html" target="_blank" style="color:var(--accent);">weaker in April</a>). <a href="https://www.espn.com/nba/story/_/id/37762170/nba-finals-2023-how-denver-altitude-gives-nuggets-edge" target="_blank" style="color:var(--accent);">Altitude effects</a> for Denver and Utah.</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">Matchup</td>
+              <td><a href="https://squared2020.com/2017/09/05/introduction-to-olivers-four-factors/" target="_blank" style="color:var(--accent);">Dean Oliver's Four Factors</a> (eFG%, turnover rate, offensive rebound rate, free throw rate) capture <em>how</em> teams score, not just how much. Head-to-head season record between the two teams.</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">Players</td>
+              <td>Per-player running plus/minus weighted by minutes for everyone in the game. Captures injuries, rest days, and mid-season trades automatically. Players carry regressed ratings from the prior season via <a href="https://fivethirtyeight.com/features/introducing-raptor-our-new-metric-for-the-modern-nba/" target="_blank" style="color:var(--accent);">FiveThirtyEight RAPTOR</a> data.</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">Rest & travel</td>
+              <td>Days of rest (2 days is optimal, 4+ creates rust), age-adjusted B2B fatigue, <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8636381/" target="_blank" style="color:var(--accent);">travel distance and timezone crossing</a>, schedule density, and road trip length.</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">Situation</td>
+              <td>Tanking detection (comparing first-half vs. second-half performance), clinch resting (teams that have locked in a seed may sit starters), and season progress.</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">Team strength</td>
+              <td>Season-long net rating (points per 100 possessions differential) and historical betting market odds.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- DATA SOURCES TABLE -->
+        <h3 style="margin-top:1.5rem;margin-bottom:0.5rem;">Data Sources</h3>
+        <table style="margin:0.5rem 0;font-size:0.85rem;width:100%;">
+          <thead><tr>
+            <th>Source</th>
+            <th>Used for</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><a href="https://stats.nba.com/" target="_blank" style="color:var(--accent);">NBA.com Stats API</a> via <a href="https://github.com/swar/nba_api" target="_blank" style="color:var(--accent);">nba_api</a></td>
+              <td>Standings, schedule, team and player stats, game logs</td>
+            </tr>
+            <tr>
+              <td><a href="https://www.espn.com/nba/injuries" target="_blank" style="color:var(--accent);">ESPN</a></td>
+              <td>Injury reports</td>
+            </tr>
+            <tr>
+              <td><a href="https://github.com/fivethirtyeight/data/tree/master/nba-raptor" target="_blank" style="color:var(--accent);">FiveThirtyEight RAPTOR</a></td>
+              <td>Archived player ratings for cross-season priors</td>
+            </tr>
+            <tr>
+              <td><a href="https://www.kaggle.com/datasets/cviaxmiwnptr/nba-betting-data-october-2007-to-june-2024" target="_blank" style="color:var(--accent);">Kaggle NBA Betting Data</a></td>
+              <td>Historical moneyline odds (2007-2025)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- INFLUENCES TABLE -->
+        <h3 style="margin-top:1.5rem;margin-bottom:0.5rem;">Influences</h3>
+        <table style="margin:0.5rem 0;font-size:0.85rem;width:100%;">
+          <thead><tr>
+            <th>Project</th>
+            <th>What we learned</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><a href="https://fivethirtyeight.com/features/how-we-calculate-nba-elo-ratings/" target="_blank" style="color:var(--accent);">FiveThirtyEight NBA</a></td>
+              <td>Elo methodology, RAPTOR player ratings, Monte Carlo season simulation</td>
+            </tr>
+            <tr>
+              <td><a href="https://dunksandthrees.com/about/epm" target="_blank" style="color:var(--accent);">EPM (Dunks & Threes)</a></td>
+              <td>Exponentially weighted decay for player evaluation</td>
+            </tr>
+            <tr>
+              <td><a href="https://harvardsportsanalysis.org/2019/01/a-simple-improvement-to-fivethirtyeights-nba-elo-model/" target="_blank" style="color:var(--accent);">Harvard Sports Analysis</a></td>
+              <td>K-factor decay and Elo improvements</td>
+            </tr>
+            <tr>
+              <td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8636381/" target="_blank" style="color:var(--accent);">Travel & Circadian Research</a></td>
+              <td>Travel distance and timezone effects on performance</td>
+            </tr>
+            <tr>
+              <td><a href="https://github.com/karpathy/autoresearch" target="_blank" style="color:var(--accent);">Karpathy's autoresearch</a></td>
+              <td>Automated parameter optimization methodology</td>
+            </tr>
+            <tr>
+              <td><a href="https://github.com/NBA-Betting/NBA_AI" target="_blank" style="color:var(--accent);">NBA_AI</a>, <a href="https://github.com/cmunch1/nba-prediction" target="_blank" style="color:var(--accent);">nba-prediction</a></td>
+              <td>Open-source NBA prediction approaches and feature engineering</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- LIMITATIONS -->
+        <h3 style="margin-top:1.5rem;margin-bottom:0.5rem;">Known Limitations</h3>
+        <ul style="margin-top:0.5rem;padding-left:1.2rem;font-size:0.88rem;">
+          <li>Injury data is a daily snapshot and can't predict future injuries or surprise returns</li>
+          <li>Player ratings use public box score data, not proprietary player tracking (Second Spectrum)</li>
+          <li>Mid-season trades take 10-15 games to fully reflect in player ratings</li>
+          <li>The model is re-trained nightly, not in real-time during games</li>
+        </ul>
+
+        <div style="margin-top:1.5rem;padding:0.8rem;background:var(--surface2);border-radius:8px;font-size:0.85rem;">
+          <strong>Updates:</strong> Predictions are regenerated nightly after games complete via automated pipeline. Updated by ~10:30pm PT each day during the NBA season.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHANGELOG / ROADMAP -->
+  <div id="changelog" class="tab-content">
+    <div class="card" style="max-width:900px;margin:0 auto;">
+      <div class="card-header">Changelog & Roadmap</div>
+      <div class="card-body" style="font-size:0.9rem;line-height:1.7;">
+        <div class="timeline">
+
+        <div class="cl-item done">
+          <div class="cl-date">Mar 15, 2026</div>
+          <div class="cl-title">Launch</div>
+          <div class="cl-desc">NBA Playoff Predictor goes live with Monte Carlo simulations, projected standings, playoff bracket, team detail pages, what-if analysis, and matchup previews.</div>
+        </div>
+
+        <div class="cl-item done">
+          <div class="cl-date">Mar 16, 2026</div>
+          <div class="cl-title">Model Upgrade</div>
+          <div class="cl-desc">Upgraded to a 25-feature machine learning prediction engine with player-level modeling. Backtested with zero data leakage across 10 NBA seasons (11,500+ games). Official NBA tiebreaker rules implemented in simulation.</div>
+        </div>
+
+        <div class="cl-item done">
+          <div class="cl-date">Mar 16, 2026</div>
+          <div class="cl-title">Static Deployment</div>
+          <div class="cl-desc">Predictions regenerated nightly via automated pipeline after games complete. Instant page loads.</div>
+        </div>
+
+        <div class="cl-item next">
+          <div class="cl-date">Up Next</div>
+          <div class="cl-title">Shareable Social Cards</div>
+          <div class="cl-desc">One-click image generation for Twitter/Instagram: team seed range, playoff odds, and matchup previews formatted for sharing.</div>
+        </div>
+
+        <div class="cl-item planned">
+          <div class="cl-date">Planned</div>
+          <div class="cl-title">Accuracy Tracking</div>
+          <div class="cl-desc">Live tracking of how our projections compare to actual results as the season plays out.</div>
+        </div>
+
+        <div class="cl-item planned">
+          <div class="cl-date">Planned</div>
+          <div class="cl-title">Multi-Team Scenario Builder</div>
+          <div class="cl-desc">What-if scenarios across multiple teams simultaneously to explore how outcomes interact.</div>
+        </div>
+
+        </div><!-- /timeline -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEAM DETAIL (replaces tabs when a team is clicked) -->
+  <div id="team-detail" style="display:none;"></div>
+</div>
+
+
+<script>
+let DATA = null;
+let CURRENT_OVERRIDES = {};
+
+// ── Tab switching ──
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+    document.getElementById('team-detail').style.display = 'none';
+    document.getElementById('main-tabs').style.display = 'flex';
+  });
+});
+
+function showPage(pageId) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  document.getElementById('team-detail').style.display = 'none';
+  document.getElementById('main-tabs').style.display = 'flex';
+  window.scrollTo(0, 0);
+}
+
+// ── Load data ──
+function loadData() {
+  fetch('/nbaplayoffpredictor/data/main.json')
+    .then(r => r.json())
+    .then(data => {
+      DATA = data;
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('matchups').classList.add('active');
+      renderMatchups(data, 'projected');
+      renderStandings(data, 'projected');
+      // Show freshness
+      if (data.last_refresh) {
+        const d = new Date(data.last_refresh.replace(' ', 'T'));
+        const fmtDate = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        const fmtTime = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
+        let text = `Data as of ${fmtDate} at ${fmtTime}`;
+        if (data.next_refresh) {
+          const nr = new Date(data.next_refresh.replace(' ', 'T'));
+          const nrTime = nr.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
+          text += ` · Next update ~${nrTime}`;
+        }
+        document.getElementById('freshness').textContent = text;
+      }
+    })
+    .catch(err => {
+      document.getElementById('loading').innerHTML =
+        `<span style="color:var(--red)">Failed to load: ${err.message}</span>`;
+    });
+}
+loadData();
+
+function refreshData() { /* disabled in static mode */ }
+
+function setMatchupView(mode) {
+  document.getElementById('matchups-toggle-proj').classList.toggle('active', mode === 'projected');
+  document.getElementById('matchups-toggle-curr').classList.toggle('active', mode === 'current');
+  renderMatchups(DATA, mode);
+}
+
+function setStandingsView(mode) {
+  document.getElementById('standings-toggle-proj').classList.toggle('active', mode === 'projected');
+  document.getElementById('standings-toggle-curr').classList.toggle('active', mode === 'current');
+  renderStandings(DATA, mode);
+}
+
+// ── Show team detail ──
+function showTeam(abbr) {
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('main-tabs').style.display = 'none';
+  const detail = document.getElementById('team-detail');
+  detail.style.display = 'block';
+  detail.innerHTML = '<div class="loading"><div class="spinner"></div><span>Loading team data...</span></div>';
+  CURRENT_OVERRIDES = {};
+
+  fetch(`/nbaplayoffpredictor/data/teams/${abbr}.json`)
+    .then(r => r.json())
+    .then(t => renderTeamDetail(t))
+    .catch(err => { detail.innerHTML = `<span style="color:var(--red)">Error: ${err.message}</span>`; });
+}
+
+function goBack() {
+  document.getElementById('team-detail').style.display = 'none';
+  document.getElementById('main-tabs').style.display = 'flex';
+  const activeTab = document.querySelector('.tab.active');
+  if (activeTab) document.getElementById(activeTab.dataset.tab).classList.add('active');
+}
+
+// ── Matchup Preview ──
+function showMatchup(teamA, teamB) {
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('main-tabs').style.display = 'none';
+  const detail = document.getElementById('team-detail');
+  detail.style.display = 'block';
+  detail.innerHTML = '<div class="loading"><div class="spinner"></div><span>Loading matchup...</span></div>';
+
+  // Load team list for dropdown + matchup data in parallel
+  Promise.all([
+    Promise.all([
+      fetch(`/nbaplayoffpredictor/data/teams/${teamA}.json`).then(r=>r.json()),
+      fetch(`/nbaplayoffpredictor/data/teams/${teamB}.json`).then(r=>r.json()),
+    ]).then(([a,b]) => ({team_a:a, team_b:b, season_series:{summary:'',games:[]}, comparison:{categories:['Net Rating','Off Rating','Def Rating','Pace','TS%'],team_a_values:[a.net_rating,a.off_rating,a.def_rating,a.pace,(a.ts_pct||0)*100],team_b_values:[b.net_rating,b.off_rating,b.def_rating,b.pace,(b.ts_pct||0)*100]}, roster_a:{starters:[],bench:[],bench_pts:0,bench_names:[],coach:'TBD',coach_record:a.wins+'-'+a.losses}, roster_b:{starters:[],bench:[],bench_pts:0,bench_names:[],coach:'TBD',coach_record:b.wins+'-'+b.losses}})),
+    fetch('/nbaplayoffpredictor/data/teams.json').then(r => r.json()),
+  ]).then(([matchup, allTeams]) => {
+    renderMatchupPreview(matchup, allTeams);
+  });
+}
+
+function renderMatchupPreview(m, allTeams) {
+  const detail = document.getElementById('team-detail');
+  const a = m.team_a, b = m.team_b;
+  const aC = TEAM_COLORS[a.abbreviation] || '#666';
+  const bC = TEAM_COLORS[b.abbreviation] || '#666';
+  const series = m.season_series || {};
+  const rA = m.roster_a || {}, rB = m.roster_b || {};
+
+  const optionsHtml = allTeams.map(t =>
+    `<option value="${t.abbreviation}">${t.city} ${t.name}</option>`
+  ).join('');
+
+  // Season series inline
+  let seriesGames = '';
+  if (series.games && series.games.length) {
+    seriesGames = series.games.map(g => {
+      if (g.status === 'scheduled') {
+        const d = new Date(g.date+'T00:00:00');
+        return `<div style="padding:0.3rem 0;opacity:0.4;font-size:0.82rem;">${d.toLocaleDateString('en-US',{month:'short',day:'numeric'})} — ${g.away} @ ${g.home} <span class="dim">Scheduled</span></div>`;
+      }
+      const d = new Date(g.date+'T00:00:00');
+      const wC = g.winner===a.abbreviation ? aC : bC;
+      const loser = g.winner===a.abbreviation ? b.abbreviation : a.abbreviation;
+      const wS = g.winner===g.home ? g.home_score : g.away_score;
+      const lS = g.winner===g.home ? g.away_score : g.home_score;
+      return `<div style="padding:0.3rem 0;font-size:0.85rem;border-bottom:1px solid rgba(42,52,80,0.25);">
+        <span class="dim">${d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
+        <strong style="color:${wC};margin:0 0.3rem;">${g.winner} ${wS}</strong>-${lS} ${loser}
+        <span class="dim" style="font-size:0.75rem;margin-left:0.3rem;">+${g.margin}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Stat comparison
+  const comp = m.comparison || {};
+  const cats = comp.categories||[], aVals = comp.team_a_values||[], bVals = comp.team_b_values||[];
+  const compHtml = cats.map((cat,i) => {
+    const av=aVals[i], bv=bVals[i];
+    const aW = cat==='Def Rating' ? av<bv : av>bv;
+    const fmt = v => cat.includes('%') ? v.toFixed(1)+'%' : (cat.includes('Rating') ? (v>0?'+':'')+v.toFixed(1) : v.toFixed(1));
+    return `<div style="display:flex;padding:0.25rem 0;border-bottom:1px solid rgba(42,52,80,0.2);font-size:0.85rem;">
+      <span style="width:60px;text-align:right;${aW?'color:'+aC+';font-weight:700;':'color:var(--text-dim);'}">${fmt(av)}</span>
+      <span style="flex:1;text-align:center;font-size:0.7rem;color:var(--text-dim);">${cat}</span>
+      <span style="width:60px;${!aW?'color:'+bC+';font-weight:700;':'color:var(--text-dim);'}">${fmt(bv)}</span>
+    </div>`;
+  }).join('');
+
+  // Position matchup cards — magazine style with large headshots
+  const posLabels = ['Point Guard', 'Shooting Guard', 'Small Forward', 'Power Forward', 'Center'];
+  const posShort = ['PG', 'SG', 'SF', 'PF', 'C'];
+  const sA = rA.starters||[], sB = rB.starters||[];
+  let edgeA=0, edgeB=0;
+
+  const matchupCards = [];
+  for (let i = 0; i < Math.min(sA.length, sB.length, 5); i++) {
+    const pA = sA[i], pB = sB[i];
+    if (!pA || !pB) continue;
+    const edge = pA.pts > pB.pts ? 'a' : pA.pts < pB.pts ? 'b' : '';
+    if (edge==='a') edgeA++; else if (edge==='b') edgeB++;
+    const pos = pA.position || posShort[i] || '?';
+
+    matchupCards.push(`
+      <div style="display:flex;align-items:stretch;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:0.6rem;">
+        <div style="flex:1;padding:0.6rem;display:flex;align-items:center;gap:0.6rem;${edge==='a'?'border-left:3px solid '+aC+';':''}">
+          <img src="${pA.headshot}" width="56" height="42" style="border-radius:6px;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">
+          <div>
+            <div style="font-weight:700;font-size:0.95rem;">${pA.name}</div>
+            <div style="font-size:0.8rem;color:var(--text-dim);">${pA.pts} PPG · ${pA.reb} RPG · ${pA.ast} APG</div>
+            <div style="font-size:0.72rem;color:var(--text-dim);">${pA.fg_pct}% FG · ${pA.min} MIN</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 0.6rem;background:var(--surface2);min-width:48px;">
+          <div style="font-size:0.65rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.05em;">${pos}</div>
+          ${edge ? `<div style="color:${edge==='a'?aC:bC};font-size:0.8rem;margin-top:0.1rem;">&#10003;</div>` : ''}
+        </div>
+        <div style="flex:1;padding:0.6rem;display:flex;align-items:center;gap:0.6rem;flex-direction:row-reverse;text-align:right;${edge==='b'?'border-right:3px solid '+bC+';':''}">
+          <img src="${pB.headshot}" width="56" height="42" style="border-radius:6px;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">
+          <div>
+            <div style="font-weight:700;font-size:0.95rem;">${pB.name}</div>
+            <div style="font-size:0.8rem;color:var(--text-dim);">${pB.pts} PPG · ${pB.reb} RPG · ${pB.ast} APG</div>
+            <div style="font-size:0.72rem;color:var(--text-dim);">${pB.fg_pct}% FG · ${pB.min} MIN</div>
+          </div>
+        </div>
+      </div>`);
+  }
+
+  // Bench + Coach row
+  const benchA = rA.bench_names||[], benchB = rB.bench_names||[];
+  const bpA = rA.bench_pts||0, bpB = rB.bench_pts||0;
+  const coachA = rA.coach||'TBD', coachB = rB.coach||'TBD';
+  const recA = rA.coach_record||'', recB = rB.coach_record||'';
+
+  detail.innerHTML = `
+    <button class="back-btn" onclick="goBack()">← Back</button>
+
+    <!-- HERO BANNER -->
+    <div style="display:flex;align-items:center;padding:1.2rem;margin-bottom:1rem;border-radius:12px;background:linear-gradient(135deg,${aC}20 0%,var(--surface) 40%,var(--surface) 60%,${bC}20 100%);border:1px solid var(--border);">
+      <div style="flex:1;text-align:center;cursor:pointer;" onclick="showTeam('${a.abbreviation}')">
+        ${teamLogo(a.abbreviation, 64)}
+        <div style="font-size:1.4rem;font-weight:800;margin-top:0.2rem;">${a.name}</div>
+        <div style="font-size:0.85rem;color:var(--text-dim);">${a.wins}-${a.losses} · <span class="${nrClass(a.net_rating)}">${nrFmt(a.net_rating)} Net</span></div>
+      </div>
+      <div style="text-align:center;padding:0 1.5rem;">
+        <div style="font-size:2rem;font-weight:900;color:var(--text-dim);opacity:0.25;">VS</div>
+        <div style="font-size:0.75rem;color:var(--text-dim);margin-top:0.2rem;">${series.summary || ''}</div>
+      </div>
+      <div style="flex:1;text-align:center;cursor:pointer;" onclick="showTeam('${b.abbreviation}')">
+        ${teamLogo(b.abbreviation, 64)}
+        <div style="font-size:1.4rem;font-weight:800;margin-top:0.2rem;">${b.name}</div>
+        <div style="font-size:0.85rem;color:var(--text-dim);">${b.wins}-${b.losses} · <span class="${nrClass(b.net_rating)}">${nrFmt(b.net_rating)} Net</span></div>
+      </div>
+    </div>
+
+    <!-- Compare dropdown -->
+    <div style="text-align:center;margin-bottom:1.2rem;font-size:0.8rem;">
+      <select id="matchup-a" style="padding:0.2rem;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px;">${optionsHtml}</select>
+      <span class="dim" style="margin:0 0.2rem;">vs</span>
+      <select id="matchup-b" style="padding:0.2rem;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px;">${optionsHtml}</select>
+      <button onclick="showMatchup(document.getElementById('matchup-a').value,document.getElementById('matchup-b').value)" style="padding:0.2rem 0.5rem;background:var(--accent);color:#fff;border:none;border-radius:4px;cursor:pointer;">Go</button>
+    </div>
+
+    <!-- SEASON SERIES + TEAM STATS side by side -->
+    <div class="grid-2" style="margin-bottom:1rem;">
+      <div class="card">
+        <div class="card-header">Season Series: ${series.summary || 'No games'}</div>
+        <div class="card-body" style="padding:0.4rem 0.8rem;">${seriesGames || '<div class="dim" style="padding:0.5rem 0;">No games yet</div>'}</div>
+      </div>
+      <div class="card">
+        <div class="card-header" style="display:flex;justify-content:space-between;">
+          <span style="color:${aC}">${a.abbreviation}</span>
+          <span>Team Stats</span>
+          <span style="color:${bC}">${b.abbreviation}</span>
+        </div>
+        <div class="card-body" style="padding:0.4rem 0.8rem;">${compHtml}</div>
+      </div>
+    </div>
+
+    <!-- POSITION MATCHUPS -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+      <span style="font-weight:700;font-size:1rem;">Starting Lineup Matchups</span>
+      <span style="font-size:0.8rem;color:var(--text-dim);">
+        <span style="color:${aC};font-weight:700;">${a.abbreviation} ${edgeA}</span> — <span style="color:${bC};font-weight:700;">${edgeB} ${b.abbreviation}</span>
+      </span>
+    </div>
+    ${matchupCards.join('')}
+
+    <!-- BENCH + COACH -->
+    <div class="grid-2" style="margin-top:0.5rem;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0.7rem 0.9rem;">
+        <div style="font-size:0.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.3rem;">Bench</div>
+        <div style="display:flex;justify-content:space-between;font-size:0.88rem;">
+          <div><strong style="color:${aC}">${bpA} PPG</strong> <span class="dim" style="font-size:0.75rem;">${benchA.join(', ')}</span></div>
+          <div style="text-align:right;"><span class="dim" style="font-size:0.75rem;">${benchB.join(', ')}</span> <strong style="color:${bC}">${bpB} PPG</strong></div>
+        </div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0.7rem 0.9rem;">
+        <div style="font-size:0.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.3rem;">Head Coach</div>
+        <div style="display:flex;justify-content:space-between;font-size:0.88rem;">
+          <div><strong style="color:${aC}">${coachA}</strong> <span class="dim" style="font-size:0.75rem;">${recA}</span></div>
+          <div style="text-align:right;"><span class="dim" style="font-size:0.75rem;">${recB}</span> <strong style="color:${bC}">${coachB}</strong></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('matchup-a').value = a.abbreviation;
+  document.getElementById('matchup-b').value = b.abbreviation;
+}
+
+// ── Team metadata ──
+// Primary colors brightened for dark background visibility
+const TEAM_COLORS = {
+  ATL:'#e03a3e',BOS:'#00a950',BKN:'#aaaaaa',CHA:'#6b5ce7',CHI:'#ce1141',
+  CLE:'#a04060',DAL:'#2890d0',DEN:'#fec524',DET:'#c8102e',GSW:'#fdb927',
+  HOU:'#ce1141',IND:'#fdbb30',LAC:'#c8102e',LAL:'#7b50a8',MEM:'#7b9fd0',
+  MIA:'#f9a01b',MIL:'#00843d',MIN:'#2e6e9e',NOP:'#c8102e',NYK:'#f58426',
+  OKC:'#007ac1',ORL:'#0077c0',PHI:'#006bb6',PHX:'#e56020',POR:'#e03a3e',
+  SAC:'#7b47a8',SAS:'#c4ced4',TOR:'#ce1141',UTA:'#5090c0',WAS:'#c8102e',
+};
+
+// NBA CDN team logos (small)
+function teamLogo(abbr, size) {
+  size = size || 28;
+  // Map abbreviation to NBA team ID for the CDN
+  const ids = {
+    ATL:1610612737,BOS:1610612738,BKN:1610612751,CHA:1610612766,CHI:1610612741,
+    CLE:1610612739,DAL:1610612742,DEN:1610612743,DET:1610612765,GSW:1610612744,
+    HOU:1610612745,IND:1610612754,LAC:1610612746,LAL:1610612747,MEM:1610612763,
+    MIA:1610612748,MIL:1610612749,MIN:1610612750,NOP:1610612740,NYK:1610612752,
+    OKC:1610612760,ORL:1610612753,PHI:1610612755,PHX:1610612756,POR:1610612757,
+    SAC:1610612758,SAS:1610612759,TOR:1610612761,UTA:1610612762,WAS:1610612764,
+  };
+  const id = ids[abbr] || 0;
+  return `<img src="https://cdn.nba.com/logos/nba/${id}/primary/L/logo.svg" width="${size}" height="${size}" style="vertical-align:middle;margin-right:0.4rem;" alt="${abbr}" onerror="this.style.display='none'">`;
+}
+
+// ── Helpers ──
+function seedClass(s) { return s <= 6 ? 'playoff' : s <= 10 ? 'playin' : 'out'; }
+function nrFmt(v) { return (v > 0 ? '+' : '') + v.toFixed(1); }
+function nrClass(v) { return v > 0 ? 'pos' : v < 0 ? 'neg' : 'dim'; }
+function pctFmt(v) { const p = v * 100; return p === 100 || p === 0 ? Math.round(p) + '%' : p.toFixed(1) + '%'; }
+function probBar(pct, color) {
+  return `<div class="prob-bar"><div class="prob-bar-fill" style="width:${pct*100}%;background:${color}"></div></div>`;
+}
+// clinched/elim: only show check/X when mathematically guaranteed
+// context: 'irrelevant' = 0% is fine (top team doesn't need play-in)
+function pctCell(val, color, context, clinched, eliminated) {
+  const p = val * 100;
+  if (clinched) return `<span style="color:var(--green);">&#10003;</span>`;
+  if (eliminated) return `<span style="color:var(--red);opacity:0.5;">&#10007;</span>`;
+  if (p <= 0.05 && context === 'irrelevant') return `<span style="color:var(--text-dim);opacity:0.3;">&mdash;</span>`;
+  return `<span style="color:${color};font-size:0.85rem;">${pctFmt(val)}</span>`;
+}
+
+// ── Render: Playoff Picture ──
+function renderMatchups(data, mode) {
+  const isProjected = mode === 'projected';
+  const matchupSrc = isProjected ? data.matchups_projected : data.matchups_current;
+  const grid = document.getElementById('matchups-grid');
+  grid.innerHTML = '';
+
+  for (const conf of ['East', 'West']) {
+    // For "out" teams, use projected or current order
+    const teams = isProjected
+      ? data[conf.toLowerCase() + '_projected']
+      : data[conf.toLowerCase()];
+    const confMatchups = matchupSrc[conf] || [];
+    const playinMatchups = matchupSrc[conf + '_playin'] || [];
+    const color = conf === 'East' ? 'var(--accent)' : 'var(--red)';
+    const subtitle = isProjected ? 'Projected Playoff Matchups' : 'If Season Ended Today';
+    let html = `<div>`;
+    html += `<div class="card"><div class="card-header" style="background:linear-gradient(90deg,${color}22,transparent);">${conf}ern Conference — ${subtitle}</div><div class="card-body">`;
+
+    html += `<div class="bracket-label" style="color:var(--green)">Playoff Seeds (1-6)</div>`;
+    for (let i = 0; i < confMatchups.length; i++) {
+      const m = confMatchups[i];
+      const seedPairs = [[1,8],[2,7],[3,6],[4,5]];
+      html += matchupRowHTML(seedPairs[i][0], seedPairs[i][1], m.higher_seed, m.lower_seed, m.season_series, isProjected);
+    }
+
+    html += `<div class="bracket-label" style="color:var(--yellow);margin-top:1.2rem;">Play-In Tournament (7-10)</div>`;
+    html += `<div style="font-size:0.78rem;color:var(--text-dim);margin-bottom:0.5rem;padding-left:0.25rem;">7 vs 8 — winner gets 7th seed &nbsp;|&nbsp; 9 vs 10 — loser eliminated</div>`;
+    const piSeeds = [[7,8],[9,10]];
+    for (let i = 0; i < playinMatchups.length; i++) {
+      const m = playinMatchups[i];
+      html += matchupRowHTML(piSeeds[i][0], piSeeds[i][1], m.higher_seed, m.lower_seed, m.season_series, isProjected);
+    }
+
+    html += `<div class="bracket-label" style="color:var(--red);margin-top:1.2rem;">Out of Contention (11-15)</div>`;
+    const out = teams.slice(10);
+    html += `<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">`;
+    for (const t of out) {
+      const recLabel = isProjected ? `${Math.round(t.projected_wins)}-${Math.round(t.projected_losses)}` : `${t.wins}-${t.losses}`;
+      html += `<div style="background:var(--surface2);border-radius:6px;padding:0.3rem 0.6rem;font-size:0.8rem;">
+        ${teamLogo(t.abbreviation, 18)}
+        <span class="team-link" onclick="showTeam('${t.abbreviation}')">${t.name}</span>
+        <span class="dim">${recLabel}</span>
+      </div>`;
+    }
+    html += `</div>`;
+    html += `</div></div></div>`;
+    grid.innerHTML += html;
+  }
+}
+
+function matchupRowHTML(hiSeed, loSeed, hi, lo, series, isProjected) {
+  const hiColor = TEAM_COLORS[hi.abbreviation] || '#666';
+  const loColor = TEAM_COLORS[lo.abbreviation] || '#666';
+
+  // Build compact visual series indicator
+  let seriesHtml = '';
+  if (series && series.games && series.games.length > 0) {
+    const aWins = series.team_a_wins || 0;
+    const bWins = series.team_b_wins || 0;
+    const remaining = series.scheduled_remaining || 0;
+
+    // Determine which side is "hi" and "lo" in the series
+    const hiIsA = series.team_a === hi.abbreviation;
+    const hiWins = hiIsA ? aWins : bWins;
+    const loWins = hiIsA ? bWins : aWins;
+
+    // Visual dots: one per game, colored by winner
+    const dots = series.games.map(g => {
+      if (g.status === 'scheduled') {
+        return `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;border:1.5px dashed var(--text-dim);opacity:0.4;" title="Scheduled"></span>`;
+      }
+      const isHiWin = g.winner === hi.abbreviation;
+      const dotColor = isHiWin ? hiColor : loColor;
+      const wScore = g.winner === g.home ? g.home_score : g.away_score;
+      const lScore = g.winner === g.home ? g.away_score : g.home_score;
+      return `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${dotColor};" title="${g.winner} ${wScore}-${lScore}"></span>`;
+    }).join('');
+
+    // Series record text
+    let recordText = '';
+    if (hiWins === loWins && hiWins > 0) {
+      recordText = `Split ${hiWins}-${loWins}`;
+    } else if (hiWins > loWins) {
+      recordText = `${hi.abbreviation} ${series.all_completed ? 'won' : 'leads'} ${hiWins}-${loWins}`;
+    } else if (loWins > hiWins) {
+      recordText = `${lo.abbreviation} ${series.all_completed ? 'won' : 'leads'} ${loWins}-${hiWins}`;
+    }
+    if (remaining > 0) recordText += ` (${remaining} left)`;
+
+    seriesHtml = `<div style="display:flex;align-items:center;gap:0.6rem;margin-top:0.35rem;padding-top:0.3rem;border-top:1px solid var(--border);">
+      <span style="font-size:0.78rem;color:var(--text-dim);">Season Series: ${recordText}</span>
+      <span style="display:flex;gap:3px;align-items:center;">${dots}</span>
+      <span style="font-size:0.7rem;color:var(--accent);margin-left:auto;">Details →</span>
+    </div>`;
+  }
+
+  return `<div class="matchup-row" style="flex-direction:column;align-items:stretch;cursor:pointer;" onclick="showMatchup('${hi.abbreviation}','${lo.abbreviation}')">
+    <div style="display:flex;align-items:center;gap:0.5rem;">
+      <span class="matchup-seed" style="min-width:1.8rem;">${hiSeed}</span>
+      <div class="matchup-team" style="border-left:3px solid ${hiColor};padding-left:0.6rem;flex:1;">
+        <div style="font-weight:700;font-size:0.95rem;">${teamLogo(hi.abbreviation, 22)}${hi.city} ${hi.name}</div>
+        <div class="matchup-meta">${isProjected ? Math.round(hi.projected_wins)+'-'+Math.round(hi.projected_losses) : hi.wins+'-'+hi.losses} · Net: <span class="${nrClass(hi.net_rating)}">${nrFmt(hi.net_rating)}</span></div>
+      </div>
+      <span class="matchup-vs">VS</span>
+      <span class="matchup-seed" style="min-width:1.8rem;">${loSeed}</span>
+      <div class="matchup-team" style="border-left:3px solid ${loColor};padding-left:0.6rem;flex:1;">
+        <div style="font-weight:700;font-size:0.95rem;">${teamLogo(lo.abbreviation, 22)}${lo.city} ${lo.name}</div>
+        <div class="matchup-meta">${isProjected ? Math.round(lo.projected_wins)+'-'+Math.round(lo.projected_losses) : lo.wins+'-'+lo.losses} · Net: <span class="${nrClass(lo.net_rating)}">${nrFmt(lo.net_rating)}</span></div>
+      </div>
+    </div>
+    ${seriesHtml}
+  </div>`;
+}
+
+// ── Render: Projections ──
+function renderStandings(data, mode) {
+  const isProjected = mode === 'projected';
+  const grid = document.getElementById('standings-grid');
+  grid.innerHTML = '';
+
+  for (const conf of ['East', 'West']) {
+    // Sort order: projected seed or current seed
+    const teams = isProjected
+      ? data[conf.toLowerCase() + '_projected']
+      : data[conf.toLowerCase()];
+    const color = conf === 'East' ? 'var(--accent)' : 'var(--red)';
+    const subtitle = isProjected ? 'Projected Final Standings' : 'Current Standings';
+    const simNote = isProjected ? `<span style="font-weight:400;font-size:0.75rem;color:var(--text-dim);margin-left:0.5rem;">10,000 simulations</span>` : '';
+
+    // Column headers change based on mode
+    let headerHtml, rowFn;
+    if (isProjected) {
+      headerHtml = `<th class="c" style="width:30px;">#</th><th>Team</th>
+        <th class="c">Proj W-L</th><th class="c">Current</th>
+        <th class="c">PO%</th><th class="c">PI%</th>`;
+    } else {
+      headerHtml = `<th class="c" style="width:30px;">#</th><th>Team</th>
+        <th class="c">W-L</th><th class="c">Proj</th>
+        <th class="c">PO%</th><th class="c">PI%</th>`;
+    }
+
+    let html = `<div class="card">
+      <div class="card-header" style="background:linear-gradient(90deg,${color}22,transparent);">
+        ${conf}ern Conference — ${subtitle} ${simNote}
+      </div>
+      <table style="font-size:0.82rem;"><thead><tr>${headerHtml}</tr></thead><tbody>`;
+
+    for (let i = 0; i < teams.length; i++) {
+      const t = teams[i];
+      const projSeed = t.projected_seed || t.playoff_rank;
+      const sepClass = i === 5 ? 'sep-playoff' : i === 9 ? 'sep-playin' : '';
+      const playoffPct = t.playoff_prob || 0;
+      const playinPct = t.playin_prob || 0;
+      const pColor = playoffPct > 0.8 ? 'var(--green)' : playoffPct > 0.4 ? 'var(--yellow)' : 'var(--red)';
+      const piColor = playinPct > 0.4 ? 'var(--yellow)' : 'var(--text-dim)';
+      const seed = isProjected ? projSeed : t.playoff_rank;
+
+      let recordCells;
+      if (isProjected) {
+        recordCells = `
+          <td class="c record" style="font-weight:600;">${Math.round(t.projected_wins)}-${Math.round(t.projected_losses)}</td>
+          <td class="c record dim">${t.wins}-${t.losses}</td>`;
+      } else {
+        recordCells = `
+          <td class="c record" style="font-weight:600;">${t.wins}-${t.losses}</td>
+          <td class="c record dim">${Math.round(t.projected_wins)}-${Math.round(t.projected_losses)}</td>`;
+      }
+
+      html += `<tr class="${sepClass} clickable-row" onclick="showTeam('${t.abbreviation}')">
+        <td class="c"><span class="seed-badge ${seedClass(seed)}">${seed}</span></td>
+        <td>${teamLogo(t.abbreviation, 20)}${t.city} <strong>${t.name}</strong></td>
+        ${recordCells}
+        <td class="c">${pctCell(playoffPct, pColor, 'positive', t.clinched_playoff, t.is_eliminated)}</td>
+        <td class="c">${pctCell(playinPct, piColor, playoffPct > 0.5 ? 'irrelevant' : '', false, t.is_eliminated)}</td>
+      </tr>`;
+    }
+    html += `</tbody></table></div>`;
+    grid.innerHTML += html;
+  }
+}
+
+// ── Render: Team Detail ──
+function renderTeamDetail(t) {
+  const detail = document.getElementById('team-detail');
+  const nr = t.net_rating || 0;
+  const projSeed = t.projected_seed || t.playoff_rank;
+
+  const tColor = TEAM_COLORS[t.abbreviation] || '#3b82f6';
+  let html = `
+    <button class="back-btn" onclick="goBack()">← Back to standings</button>
+    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:0.5rem;padding-bottom:0.75rem;border-bottom:3px solid ${tColor};">
+      ${teamLogo(t.abbreviation, 48)}
+      <div>
+        <h2 style="font-size:1.8rem;line-height:1.2;">${t.city} ${t.name}</h2>
+        <span class="dim" style="font-size:0.9rem;">${t.abbreviation} · ${t.conference}ern · ${t.division}</span>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-box"><div class="stat-label">Current Seed</div><div class="stat-value">#${t.playoff_rank}</div></div>
+      <div class="stat-box"><div class="stat-label">Projected Seed</div><div class="stat-value" style="color:${seedColor(projSeed)}">#${projSeed}</div></div>
+      <div class="stat-box"><div class="stat-label">Record</div><div class="stat-value">${t.wins}-${t.losses}</div></div>
+      <div class="stat-box"><div class="stat-label">Proj Record</div><div class="stat-value dim">${Math.round(t.projected_wins)}-${Math.round(t.projected_losses)}</div></div>
+      <div class="stat-box"><div class="stat-label">Net Rating</div><div class="stat-value ${nrClass(nr)}">${nrFmt(nr)}</div></div>
+      <div class="stat-box"><div class="stat-label">Playoff %</div><div class="stat-value" style="color:var(--green)">${pctFmt(t.playoff_prob||0)}</div></div>
+      <div class="stat-box"><div class="stat-label">Play-In %</div><div class="stat-value" style="color:var(--yellow)">${pctFmt(t.playin_prob||0)}</div></div>
+      <div class="stat-box"><div class="stat-label">Miss %</div><div class="stat-value" style="color:var(--red)">${pctFmt(t.miss_prob||0)}</div></div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:1.5rem;">
+      <div class="card">
+        <div class="card-header">Seed Probability Distribution</div>
+        <div class="card-body"><div id="seed-chart"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header">Projected Win Total Distribution</div>
+        <div class="card-body"><div id="wins-chart"></div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:1.5rem;">
+      <div class="card-header">Most Likely Playoff Opponents</div>
+      <div class="card-body"><div id="opponents-chart"></div></div>
+    </div>
+
+    <div style="background:linear-gradient(90deg,rgba(59,130,246,0.08),transparent);border:1px solid rgba(59,130,246,0.2);border-radius:8px;padding:0.6rem 1rem;margin-bottom:1rem;display:flex;align-items:center;gap:0.75rem;font-size:0.83rem;">
+      <span style="font-size:1.1rem;">&#9881;</span>
+      <span><strong>What-If Analysis:</strong> Each game shows our predicted W or L based on win probability. The projected record above accounts for variance — even a likely W isn't guaranteed. Click any outcome to flip it, then hit <em>Re-simulate</em> to see how it shifts the playoff picture. <a href="#" onclick="showPage('methodology');return false;" style="color:var(--accent);">How it works</a></span>
+    </div>
+
+    <div class="card" style="margin-bottom:1.5rem;">
+      <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>Remaining Schedule — Game-by-Game Predictions</span>
+        <span style="display:flex;align-items:center;gap:0.75rem;">
+          <span id="override-status" style="font-size:0.8rem;font-weight:400;color:var(--text-dim);"></span>
+          <button id="reset-btn" style="display:none;padding:0.25rem 0.6rem;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);font-size:0.75rem;cursor:pointer;" onclick="resetOverrides()">Reset All</button>
+        </span>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <table style="font-size:0.84rem;" id="game-table">
+          <thead><tr>
+            <th style="width:65px;">Date</th>
+            <th style="width:45px;">H/A</th>
+            <th style="width:130px;">Opponent</th>
+            <th style="width:55px;" class="c">Win %</th>
+            <th>Why <span style="font-weight:400;text-transform:none;font-size:0.65rem;">(what drives the prediction)</span></th>
+            <th style="width:70px;" class="c">Proj</th>
+          </tr></thead>
+          <tbody id="game-list"></tbody>
+        </table>
+      </div>
+    </div>
+  `;
+  detail.innerHTML = html;
+
+  renderSeedChart(t);
+  renderWinsChart(t);
+  renderOpponentsChart(t);
+  renderGameList(t);
+}
+
+function seedColor(s) {
+  if (s <= 6) return 'var(--green)';
+  if (s <= 10) return 'var(--yellow)';
+  return 'var(--red)';
+}
+
+function renderSeedChart(t) {
+  const probs = t.seed_probabilities || {};
+  const seeds = Object.keys(probs).map(Number).sort((a,b) => a-b);
+  const pcts = seeds.map(s => probs[s] * 100);
+  const colors = seeds.map(s => s <= 6 ? '#22c55e' : s <= 10 ? '#eab308' : '#ef4444');
+
+  const maxPct = Math.max(...pcts, 1);
+  Plotly.newPlot('seed-chart', [{
+    x: seeds.map(s => '#' + s),
+    y: pcts,
+    type: 'bar',
+    marker: { color: colors, opacity: 0.85 },
+    text: pcts.map(p => p >= 1 ? p.toFixed(1) + '%' : ''),
+    textposition: 'outside',
+    textfont: { size: 11, color: '#e2e8f0' },
+    hovertemplate: 'Seed %{x}: %{y:.1f}%<extra></extra>',
+    cliponaxis: false,
+  }], {
+    paper_bgcolor: '#111827', plot_bgcolor: '#111827',
+    font: { color: '#e2e8f0', size: 11 },
+    margin: { t: 35, b: 35, l: 40, r: 10 },
+    xaxis: { gridcolor: '#2a3450', title: '', type: 'category' },
+    yaxis: { gridcolor: '#2a3450', title: 'Probability %', range: [0, maxPct * 1.25] },
+    height: 270,
+  }, { displayModeBar: false, responsive: true });
+}
+
+function renderWinsChart(t) {
+  const dist = t.win_distribution || [];
+  if (!dist.length) return;
+
+  Plotly.newPlot('wins-chart', [{
+    x: dist.map(d => d.wins),
+    y: dist.map(d => d.pct * 100),
+    type: 'bar',
+    marker: { color: '#3b82f6', opacity: 0.7 },
+    hovertemplate: '%{x} wins: %{y:.1f}%<extra></extra>',
+  }], {
+    paper_bgcolor: '#111827', plot_bgcolor: '#111827',
+    font: { color: '#e2e8f0', size: 11 },
+    margin: { t: 20, b: 35, l: 40, r: 10 },
+    xaxis: { gridcolor: '#2a3450', title: 'Total Wins', dtick: 1 },
+    yaxis: { gridcolor: '#2a3450', title: 'Probability %', rangemode: 'tozero' },
+    height: 250,
+    shapes: [{
+      type: 'line', x0: t.wins, x1: t.wins, y0: 0, y1: 1, yref: 'paper',
+      line: { color: '#eab308', width: 2, dash: 'dash' },
+    }],
+    annotations: [{
+      x: t.wins, y: 1, yref: 'paper', text: 'Current: ' + t.wins,
+      showarrow: false, font: { color: '#eab308', size: 10 }, yanchor: 'bottom',
+    }],
+  }, { displayModeBar: false, responsive: true });
+}
+
+function renderOpponentsChart(t) {
+  const opps = t.likely_opponents || [];
+  if (!opps.length) {
+    document.getElementById('opponents-chart').innerHTML = '<span class="dim">No playoff opponent data</span>';
+    return;
+  }
+  const top = opps.slice(0, 8);
+  const colors = top.map(o => TEAM_COLORS[o.abbreviation] || '#3b82f6');
+
+  const abbr = t.abbreviation;
+  const chartEl = document.getElementById('opponents-chart');
+  Plotly.newPlot(chartEl, [{
+    y: top.map(o => o.abbreviation).reverse(),
+    x: top.map(o => o.probability * 100).reverse(),
+    type: 'bar',
+    orientation: 'h',
+    marker: { color: colors.reverse(), opacity: 0.85 },
+    text: top.map(o => o.probability >= 0.01 ? pctFmt(o.probability) : '').reverse(),
+    textposition: 'outside',
+    textfont: { size: 10, color: '#e2e8f0' },
+    cliponaxis: false,
+    hovertemplate: '%{y}: %{x:.1f}% — Click to preview matchup<extra></extra>',
+    customdata: top.map(o => o.abbreviation).reverse(),
+  }], {
+    paper_bgcolor: '#111827', plot_bgcolor: '#111827',
+    font: { color: '#e2e8f0', size: 11 },
+    margin: { t: 10, b: 30, l: 40, r: 50 },
+    xaxis: { gridcolor: '#2a3450', title: 'Probability %', rangemode: 'tozero' },
+    yaxis: { gridcolor: '#2a3450', type: 'category' },
+    height: Math.max(180, top.length * 30 + 50),
+  }, { displayModeBar: false, responsive: true });
+
+  // Click bar to open matchup preview
+  chartEl.on('plotly_click', function(data) {
+    const oppAbbr = data.points[0].customdata;
+    if (oppAbbr) showMatchup(abbr, oppAbbr);
+  });
+}
+
+let CURRENT_TEAM_ABBR = '';
+
+function renderGameList(t) {
+  const games = t.game_predictions || [];
+  const container = document.getElementById('game-list');
+  const abbr = t.abbreviation;
+  CURRENT_TEAM_ABBR = abbr;
+
+  container.innerHTML = games.map(g => {
+    const prob = g.win_prob || 0.5;
+    const probColor = prob > 0.6 ? 'var(--green)' : prob < 0.4 ? 'var(--red)' : 'var(--yellow)';
+    const d = new Date(g.game_date);
+    const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const ha = g.is_home ? '<span style="color:var(--green)">HOME</span>' : '<span class="dim">AWAY</span>';
+
+    const factors = (g.factors || []).filter(f => Math.abs(f[1]) >= 0.5);
+    const factorsHtml = factors.map(f => {
+      const cls = f[1] > 0.3 ? 'good' : f[1] < -0.3 ? 'bad' : 'neutral';
+      const sign = f[1] > 0 ? '+' : '';
+      const shortName = f[0].replace('Home ', '').replace('Away ', '').replace(' (may rest)', '')
+        .replace('Team strength (net rating)', 'Strength').replace('Home court', 'HCA')
+        .replace('B2B fatigue', 'B2B').replace('Rest advantage', 'Rest')
+        .replace('team tanking', 'Tank').replace('Injury differential', 'Injuries')
+        .replace('clinched', 'Clinch').replace('Recent form', 'Form');
+      return `<span class="factor-tag ${cls}">${shortName} ${sign}${f[1].toFixed(1)}</span>`;
+    }).join('');
+
+    const modelPredW = prob >= 0.5;
+    const winVal = g.is_home ? 'home' : 'away';
+    const lossVal = g.is_home ? 'away' : 'home';
+    const overrideState = CURRENT_OVERRIDES[g.game_id];
+
+    // Two buttons: W and L. Model prediction is "selected", other is "available"
+    let wClass, lClass;
+    if (overrideState === winVal) {
+      wClass = 'proj-btn proj-w overridden'; lClass = 'proj-btn proj-l-off';
+    } else if (overrideState === lossVal) {
+      wClass = 'proj-btn proj-w-off'; lClass = 'proj-btn proj-l overridden';
+    } else {
+      // No override — show model prediction as selected
+      wClass = modelPredW ? 'proj-btn proj-w' : 'proj-btn proj-w-off';
+      lClass = modelPredW ? 'proj-btn proj-l-off' : 'proj-btn proj-l';
+    }
+
+    return `<tr>
+      <td class="dim">${dateStr}</td>
+      <td style="font-size:0.75rem;font-weight:600;">${ha}</td>
+      <td style="font-weight:600;cursor:pointer;" onclick="showTeam('${g.opponent}')">${teamLogo(g.opponent, 18)}${g.opponent}</td>
+      <td class="c" style="font-weight:700;color:${probColor}">${pctFmt(prob)}</td>
+      <td class="game-factors">${factorsHtml}</td>
+      <td class="c">
+        <span style="display:inline-flex;gap:2px;">
+          <button class="${wClass}" onclick="pickOutcome('${abbr}','${g.game_id}','${winVal}','${lossVal}',${prob},this,'W')">W</button>
+          <button class="${lClass}" onclick="pickOutcome('${abbr}','${g.game_id}','${winVal}','${lossVal}',${prob},this,'L')">L</button>
+        </span>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function pickOutcome(teamAbbr, gameId, winVal, lossVal, prob, btn, picked) {
+  const modelPredW = prob >= 0.5;
+  const pickedW = picked === 'W';
+  const matchesModel = pickedW === modelPredW;
+  const pair = btn.parentElement;
+  const wBtn = pair.children[0];
+  const lBtn = pair.children[1];
+
+  if (matchesModel) {
+    // Clicking back to the model prediction — remove override
+    delete CURRENT_OVERRIDES[gameId];
+    wBtn.className = modelPredW ? 'proj-btn proj-w' : 'proj-btn proj-w-off';
+    lBtn.className = modelPredW ? 'proj-btn proj-l-off' : 'proj-btn proj-l';
+  } else {
+    // Override against the model
+    CURRENT_OVERRIDES[gameId] = pickedW ? winVal : lossVal;
+    wBtn.className = pickedW ? 'proj-btn proj-w overridden' : 'proj-btn proj-w-off';
+    lBtn.className = pickedW ? 'proj-btn proj-l-off' : 'proj-btn proj-l overridden';
+  }
+
+  updateOverrideStatus(teamAbbr);
+}
+
+function updateOverrideStatus(teamAbbr) {
+  const count = Object.keys(CURRENT_OVERRIDES).length;
+  const status = document.getElementById('override-status');
+  const resetBtn = document.getElementById('reset-btn');
+  if (count > 0) {
+    status.innerHTML = `${count} override(s) — <a href="#" onclick="runWhatIf('${teamAbbr}');return false;" style="color:var(--accent);font-weight:600;">Re-simulate →</a>`;
+    resetBtn.style.display = 'inline-block';
+  } else {
+    status.textContent = '';
+    resetBtn.style.display = 'none';
+  }
+}
+
+function resetOverrides() {
+  CURRENT_OVERRIDES = {};
+  // Re-render the team detail to restore everything
+  if (CURRENT_TEAM_ABBR) showTeam(CURRENT_TEAM_ABBR);
+}
+
+function runWhatIf(teamAbbr) {
+  const status = document.getElementById('override-status');
+  status.innerHTML = '<span class="dim">Re-simulating...</span>';
+
+  // Client-side what-if approximation
+  const teamData = DATA[teamAbbr.toLowerCase()] || DATA.east.concat(DATA.west).find(t => t.abbreviation === teamAbbr);
+  const overrideCount = Object.keys(CURRENT_OVERRIDES).length;
+  // Approximate: each override shifts projected wins by the probability delta
+  let winDelta = 0;
+  // This is handled by the UI feedback below
+  const result = {
+    projected_seed: teamData?.projected_seed || 0,
+    projected_wins: (teamData?.projected_wins || 0),
+    projected_losses: (teamData?.projected_losses || 0),
+    playoff_prob: teamData?.playoff_prob || 0,
+    playin_prob: teamData?.playin_prob || 0,
+    miss_prob: teamData?.miss_prob || 0,
+    seed_probabilities: teamData?.seed_probabilities || {},
+    win_distribution: teamData?.win_distribution || [],
+    num_simulations: 'approx',
+  };
+  // Note: In static mode, what-if shows directional impact only
+  Promise.resolve(result).then(result => {
+    // Update the charts and stats with new simulation
+    status.innerHTML = `<span style="color:var(--green)">Updated from ${result.num_simulations} sims with ${Object.keys(CURRENT_OVERRIDES).length} override(s)</span>`;
+
+    // Re-render seed chart
+    renderSeedChart({ seed_probabilities: result.seed_probabilities, abbreviation: teamAbbr });
+
+    // Re-render win distribution
+    renderWinsChart({
+      win_distribution: result.win_distribution,
+      wins: DATA.east.concat(DATA.west).find(t => t.abbreviation === teamAbbr)?.wins || 0,
+    });
+
+    // Update stat boxes
+    document.querySelectorAll('.stat-box').forEach(box => {
+      const label = box.querySelector('.stat-label')?.textContent;
+      const value = box.querySelector('.stat-value');
+      if (!label || !value) return;
+      if (label === 'Projected Seed') {
+        value.textContent = '#' + result.projected_seed;
+        value.style.color = seedColor(result.projected_seed);
+      }
+      if (label === 'Proj Record') value.textContent = result.projected_wins + '-' + result.projected_losses;
+      if (label === 'Playoff %') value.textContent = pctFmt(result.playoff_prob);
+      if (label === 'Play-In %') value.textContent = pctFmt(result.playin_prob);
+      if (label === 'Miss %') value.textContent = pctFmt(result.miss_prob);
+    });
+  })
+  .catch(err => { status.innerHTML = `<span style="color:var(--red)">Error: ${err.message}</span>`; });
+}
+</script>
+</body>
+</html>

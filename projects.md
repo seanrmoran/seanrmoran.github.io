@@ -33,6 +33,15 @@ title: Projects
       <p class="project-desc">A local family guide to Sonoma County with activity reviews, camp guides, and tips from a family of five exploring Santa Rosa and beyond.</p>
     </div>
   </a>
+  <a href="/nbaplayoffpredictor" class="project-item">
+    <div class="project-logo-wrap" style="background:#0a0e1a">
+      <span style="font-size:2rem;">&#127936;</span>
+    </div>
+    <div class="project-item-inner">
+      <h3>NBA Playoff Predictor</h3>
+      <p class="project-desc">Monte Carlo playoff projections powered by a 25-feature XGBoost model backtested across 10,000+ games. Matchup previews, what-if scenarios, and real-time standings.</p>
+    </div>
+  </a>
   <a href="https://apps.apple.com/us/app/blitz-box/id6759346152" class="project-item">
     <div class="project-logo-wrap" style="background:#151525">
       <img src="/assets/images/projects/blitzbox-icon.png" alt="Blitz Box app icon" class="project-logo project-logo--icon">
