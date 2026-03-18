@@ -11,6 +11,15 @@ layout: null
   <title>NBA Playoff Predictor 2025-26 | Playoff Projections & Bracket Simulator</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🏀%3C/text%3E%3C/svg%3E">
   <link rel="shortcut icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🏀%3C/text%3E%3C/svg%3E">
+  <!-- Social sharing cards -->
+  <meta property="og:title" content="NBA Playoff Predictor 2025-26">
+  <meta property="og:description" content="Interactive playoff projections powered by 10,000 Monte Carlo simulations. Explore bracket scenarios, what-if analysis, and game predictions with live Vegas odds.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.seanrmoran.com/nbaplayoffpredictor/">
+  <meta property="og:image" content="https://cdn.nba.com/logos/nba/1610612738/primary/L/logo.svg">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="NBA Playoff Predictor 2025-26">
+  <meta name="twitter:description" content="10,000 simulations. Vegas odds. What-if scenarios. The best free NBA playoff prediction tool since FiveThirtyEight.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <!-- Plotly loaded on demand when charts are needed -->
@@ -642,7 +651,7 @@ layout: null
         <!-- TL;DR -->
         <div class="meth-tldr">
           <div class="meth-tldr-title">TL;DR</div>
-          <div class="meth-tldr-body">We simulate the rest of the NBA season 10,000 times using a machine learning model that looks at 25 factors for every game. We get about <strong>7 out of 10</strong> picks right, which is close to what FiveThirtyEight achieved and a few games behind Vegas. Predictions update every night after games finish.</div>
+          <div class="meth-tldr-body">We simulate the rest of the NBA season 10,000 times using a machine learning model that looks at 25 factors for every game. We get about <strong>7 out of 10</strong> picks right, similar to FiveThirtyEight's model. Vegas gets about 7.3 out of 10. Predictions update every night after games finish.</div>
         </div>
 
         <!-- RESULTS UP TOP -->
@@ -806,31 +815,25 @@ layout: null
         <div class="cl-item done">
           <div class="cl-date">Mar 15, 2026</div>
           <div class="cl-title">Launch</div>
-          <div class="cl-desc">NBA Playoff Predictor goes live with Monte Carlo simulations, projected standings, playoff bracket, team detail pages, what-if analysis, and matchup previews.</div>
+          <div class="cl-desc">Playoff projections, bracket simulator, team detail pages, what-if analysis, and matchup previews.</div>
         </div>
 
         <div class="cl-item done">
           <div class="cl-date">Mar 16, 2026</div>
-          <div class="cl-title">Model Upgrade</div>
-          <div class="cl-desc">Upgraded to a 25-feature machine learning prediction engine with player-level modeling. Backtested with zero data leakage across 10 NBA seasons (11,500+ games). Official NBA tiebreaker rules implemented in simulation.</div>
-        </div>
-
-        <div class="cl-item done">
-          <div class="cl-date">Mar 16, 2026</div>
-          <div class="cl-title">Static Deployment</div>
-          <div class="cl-desc">Predictions regenerated nightly via automated pipeline after games complete. Instant page loads.</div>
+          <div class="cl-title">25-Feature Prediction Model</div>
+          <div class="cl-desc">Machine learning model with player-level impact, rest/travel fatigue, tanking detection, and more. 69% accuracy across 11,500+ backtested games.</div>
         </div>
 
         <div class="cl-item done">
           <div class="cl-date">Mar 18, 2026</div>
-          <div class="cl-title">Share & Polish</div>
-          <div class="cl-desc">Share button on team pages (native share or copy to clipboard). Net Rating tier labels (Elite/Contender/Above Avg/Average/Below Avg/Rebuilding). L10 record display. Inline style cleanup.</div>
+          <div class="cl-title">Vegas Odds & Accuracy Tracking</div>
+          <div class="cl-desc">Live Vegas spreads alongside model predictions so you can see where they disagree. Season accuracy tracker with calibration chart showing how honest the probabilities are.</div>
         </div>
 
         <div class="cl-item done">
           <div class="cl-date">Mar 18, 2026</div>
-          <div class="cl-title">Accuracy Tracking & Vegas Odds</div>
-          <div class="cl-desc">Live season accuracy tracking with Brier score and calibration chart. Vegas spreads and moneylines from The Odds API shown alongside model predictions with edge highlighting.</div>
+          <div class="cl-title">Mobile, Search & Sharing</div>
+          <div class="cl-desc">Responsive design for phones. Team search bar. Share button on team pages. Deep links so you can send someone directly to a team or matchup.</div>
         </div>
 
         <div class="cl-item planned">
@@ -846,7 +849,7 @@ layout: null
   </div>
 
   <!-- TEAM DETAIL (replaces tabs when a team is clicked) -->
-  <div id="team-detail" style="display:none;"></div>
+  <div id="team-detail" style="display:none;padding:0 0.5rem;"></div>
 </div>
 </main>
 
@@ -1440,13 +1443,13 @@ function matchupRowHTML(hiSeed, loSeed, hi, lo, series, isProjected) {
       <span class="matchup-seed" style="min-width:1.8rem;">${hiSeed}</span>
       <div class="matchup-team" style="border-left:3px solid ${hiColor};padding-left:0.6rem;flex:1;">
         <div class="fw-700" style="font-size:0.95rem;"><span class="matchup-team-name" onclick="event.stopPropagation();showTeam('${hi.abbreviation}')">${teamLogo(hi.abbreviation, 22)}${hi.city} ${hi.name}</span></div>
-        <div class="matchup-meta">${isProjected ? Math.round(hi.projected_wins)+'-'+Math.round(hi.projected_losses) : hi.wins+'-'+hi.losses} · <span class="${nrClass(hi.net_rating)}">${nrTier(hi.net_rating)}</span></div>
+        <div class="matchup-meta">${isProjected ? Math.round(hi.projected_wins)+'-'+Math.round(hi.projected_losses) : hi.wins+'-'+hi.losses} · <span class="${nrClass(hi.net_rating)}">${nrFmt(hi.net_rating)}</span> <span class="dim">${nrTier(hi.net_rating)}</span></div>
       </div>
       <span class="matchup-vs">VS</span>
       <span class="matchup-seed" style="min-width:1.8rem;">${loSeed}</span>
       <div class="matchup-team" style="border-left:3px solid ${loColor};padding-left:0.6rem;flex:1;">
         <div class="fw-700" style="font-size:0.95rem;"><span class="matchup-team-name" onclick="event.stopPropagation();showTeam('${lo.abbreviation}')">${teamLogo(lo.abbreviation, 22)}${lo.city} ${lo.name}</span></div>
-        <div class="matchup-meta">${isProjected ? Math.round(lo.projected_wins)+'-'+Math.round(lo.projected_losses) : lo.wins+'-'+lo.losses} · <span class="${nrClass(lo.net_rating)}">${nrTier(lo.net_rating)}</span></div>
+        <div class="matchup-meta">${isProjected ? Math.round(lo.projected_wins)+'-'+Math.round(lo.projected_losses) : lo.wins+'-'+lo.losses} · <span class="${nrClass(lo.net_rating)}">${nrFmt(lo.net_rating)}</span> <span class="dim">${nrTier(lo.net_rating)}</span></div>
       </div>
     </div>
     ${seriesHtml}
@@ -1671,7 +1674,8 @@ function ensurePlotly() {
 
 function renderSeedChart(t) {
   const probs = t.seed_probabilities || {};
-  const seeds = Object.keys(probs).map(Number).sort((a,b) => a-b);
+  // Filter out seeds with 0% probability
+  const seeds = Object.keys(probs).map(Number).filter(s => probs[s] > 0.001).sort((a,b) => a-b);
   const pcts = seeds.map(s => probs[s] * 100);
   const colors = seeds.map(s => s <= 6 ? '#22c55e' : s <= 10 ? '#eab308' : '#ef4444');
 
@@ -1938,17 +1942,47 @@ function runWhatIf(teamAbbr) {
   confTeams.sort((a, b) => b.projW - a.projW);
   const newSeed = confTeams.findIndex(t => t.abbr === teamAbbr) + 1;
 
-  // Compute playoff/playin/miss by shifting original probabilities
+  // Compute shifted seed probabilities using fractional win-delta shift.
+  // Each win is worth roughly 0.4-0.6 seed positions. We estimate this from
+  // the actual win gap between the team and its neighbors in the conference.
   const origSeedProbs = teamData.seed_probabilities || {};
-  const seedDelta = (teamData.projected_seed || newSeed) - newSeed;
-  let newPlayoff = 0, newPlayin = 0, newMiss = 0;
-  const shiftedSeedProbs = {};
-  for (let s = 1; s <= 15; s++) shiftedSeedProbs[s] = 0;
-  for (const [seedStr, prob] of Object.entries(origSeedProbs)) {
-    const origSeed = Number(seedStr);
-    const shifted = Math.max(1, Math.min(15, origSeed - seedDelta));
-    shiftedSeedProbs[shifted] = (shiftedSeedProbs[shifted] || 0) + prob;
+  const origSeed = teamData.projected_seed || newSeed;
+
+  // Estimate wins-per-seed from conference standings
+  const sortedConfWins = confTeams.map(t => t.projW).sort((a, b) => b - a);
+  let winsPerSeed = 2.0; // default
+  if (sortedConfWins.length >= 2) {
+    const gaps = [];
+    for (let i = 0; i < sortedConfWins.length - 1; i++) {
+      const gap = sortedConfWins[i] - sortedConfWins[i + 1];
+      if (gap > 0) gaps.push(gap);
+    }
+    if (gaps.length) winsPerSeed = Math.max(0.5, gaps.reduce((a, b) => a + b, 0) / gaps.length);
   }
+
+  // Fractional seed shift from win delta (negative winDelta = shift toward worse seeds)
+  const fracShift = winDelta / winsPerSeed;
+
+  const shiftedSeedProbs = {};
+  for (const [seedStr, prob] of Object.entries(origSeedProbs)) {
+    if (prob <= 0) continue;
+    const s = Number(seedStr);
+    // Shift this seed's probability fractionally
+    const newPos = s - fracShift; // negative fracShift means seed gets worse (higher number)
+    const lo = Math.floor(newPos);
+    const hi = lo + 1;
+    const hiFrac = newPos - lo;
+    const loFrac = 1 - hiFrac;
+    // Distribute to adjacent integer seeds
+    const loSeed = Math.max(1, Math.min(15, lo));
+    const hiSeed = Math.max(1, Math.min(15, hi));
+    shiftedSeedProbs[loSeed] = (shiftedSeedProbs[loSeed] || 0) + prob * loFrac;
+    if (loSeed !== hiSeed) {
+      shiftedSeedProbs[hiSeed] = (shiftedSeedProbs[hiSeed] || 0) + prob * hiFrac;
+    }
+  }
+
+  let newPlayoff = 0, newPlayin = 0, newMiss = 0;
   for (let s = 1; s <= 15; s++) {
     const p = shiftedSeedProbs[s] || 0;
     if (s <= 6) newPlayoff += p;
@@ -1990,41 +2024,15 @@ function runWhatIf(teamAbbr) {
     });
   } catch(e) { console.error('stat box update error:', e); }
 
-  // Update opponents chart with new matchup info (with logos)
-  const oppChartEl = document.getElementById('opponents-chart');
-  if (oppChartEl) {
-    const oppSeed = seedPairings[newSeed] || 0;
-    const [mcA, mcB] = newOpponent ? getMatchupColors(teamAbbr, newOpponent) : ['#666','#666'];
-    if (newOpponent && newSeed <= 8) {
-      oppChartEl.innerHTML = `<div class="whatif-matchup">
-        <div class="up-label mb-md">What-If First Round Matchup</div>
-        <div class="whatif-teams">
-          <div class="whatif-team">
-            ${teamLogo(teamAbbr, 48)}
-            <div class="whatif-team-name">${teamAbbr}</div>
-            <div class="whatif-seed">#${newSeed} seed</div>
-          </div>
-          <div class="whatif-vs">VS</div>
-          <div class="whatif-team">
-            ${teamLogo(newOpponent, 48)}
-            <div class="whatif-team-name">${newOpponent}</div>
-            <div class="whatif-seed">#${oppSeed} seed</div>
-          </div>
-        </div>
-        <div class="whatif-link" onclick="showMatchup('${teamAbbr}','${newOpponent}')">Preview matchup →</div>
-      </div>`;
-    } else if (newSeed <= 10) {
-      oppChartEl.innerHTML = `<div class="whatif-matchup">
-        <div style="color:var(--yellow);">${teamLogo(teamAbbr, 40)}</div>
-        <div class="fw-700" style="margin-top:0.5rem;color:var(--yellow);">Play-In Tournament (#${newSeed} seed)</div>
-        <div class="whatif-seed" style="margin-top:0.3rem;">${newProjectedWinsRound} projected wins</div>
-      </div>`;
-    } else {
-      oppChartEl.innerHTML = `<div class="whatif-matchup">
-        <div style="color:var(--red);">${teamLogo(teamAbbr, 40)}</div>
-        <div class="fw-700" style="margin-top:0.5rem;color:var(--red);">Out of contention (#${newSeed})</div>
-        <div class="whatif-seed" style="margin-top:0.3rem;">${newProjectedWinsRound} projected wins</div>
-      </div>`;
+  // Update opponents chart header with what-if note (keep the original chart)
+  const oppCard = document.getElementById('opponents-chart')?.closest('.card');
+  if (oppCard) {
+    const header = oppCard.querySelector('.card-header');
+    if (header && newOpponent && newSeed <= 8) {
+      const oppSeed = seedPairings[newSeed] || 0;
+      header.innerHTML = `Most Likely Playoff Opponents <span style="font-size:0.75rem;font-weight:400;color:var(--accent);margin-left:0.5rem;">What-if: #${newSeed} vs #${oppSeed} ${newOpponent}</span>`;
+    } else if (header && newSeed <= 10) {
+      header.innerHTML = `Most Likely Playoff Opponents <span style="font-size:0.75rem;font-weight:400;color:var(--yellow);margin-left:0.5rem;">What-if: Play-In (#${newSeed})</span>`;
     }
   }
 
@@ -2033,12 +2041,12 @@ function runWhatIf(teamAbbr) {
     renderSeedChart({ seed_probabilities: shiftedSeedProbs, abbreviation: teamAbbr });
   } catch(e) { console.error('seed chart update error:', e); }
 
-  // Update win distribution chart - shift by winDelta
+  // Update win distribution chart - shift by winDelta (use fractional positioning)
   try {
     const origDist = teamData.win_distribution || [];
     if (origDist.length) {
       const shifted = origDist.map(d => ({
-        wins: Math.round(d.wins + winDelta),
+        wins: +(d.wins + winDelta).toFixed(1),
         count: d.count,
         pct: d.pct,
       }));
