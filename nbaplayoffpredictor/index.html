@@ -2451,17 +2451,20 @@ function renderBracketHTML() {
 
   html += '</div>';
 
-  // ── West half (right side, flows right-to-left) ──
+  // ── West half (right side, flows right-to-left toward center) ──
   html += '<div class="bracket-half bracket-west">';
   html += '<div style="display:flex;flex-direction:column;flex:1;">';
   html += '<div class="bracket-conf-header bracket-conf-header-west">Western Conference</div>';
   html += '<div style="display:flex;flex-direction:row-reverse;flex:1;">';
 
-  // West R3: 1 matchup (conf finals) - shown first because flex-direction is row-reverse
-  html += '<div class="bracket-col bracket-cf">';
-  html += '<div class="bracket-col-label">Conf Finals</div>';
+  // West columns in DOM order: R1, R2, R3 -- row-reverse flips display to R3, R2, R1
+  // So visually: Conf Finals (closest to center) | Semis | First Round (far right)
+
+  // West R1: 4 matchups
+  html += '<div class="bracket-col bracket-r1">';
+  html += '<div class="bracket-col-label">First Round</div>';
   html += '<div class="bracket-col-matches">';
-  html += bmatchHTML('west-r3-0');
+  for (let i = 0; i < 4; i++) html += bmatchHTML(`west-r1-${i}`);
   html += '</div></div>';
 
   // West R2: 2 matchups (conf semis)
@@ -2471,11 +2474,11 @@ function renderBracketHTML() {
   for (let i = 0; i < 2; i++) html += bmatchHTML(`west-r2-${i}`);
   html += '</div></div>';
 
-  // West R1: 4 matchups
-  html += '<div class="bracket-col bracket-r1">';
-  html += '<div class="bracket-col-label">First Round</div>';
+  // West R3: 1 matchup (conf finals)
+  html += '<div class="bracket-col bracket-cf">';
+  html += '<div class="bracket-col-label">Conf Finals</div>';
   html += '<div class="bracket-col-matches">';
-  for (let i = 0; i < 4; i++) html += bmatchHTML(`west-r1-${i}`);
+  html += bmatchHTML('west-r3-0');
   html += '</div></div>';
 
   html += '</div></div>'; // end inner flex + conf wrapper
