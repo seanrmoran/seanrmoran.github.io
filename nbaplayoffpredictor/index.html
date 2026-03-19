@@ -382,7 +382,7 @@ layout: null
     .bracket-series-team.clickable-pick { cursor: pointer; border-radius: 6px; padding: 0.2rem 0.4rem; transition: all 0.15s; }
     .bracket-series-team.clickable-pick:hover { background: rgba(245,166,35,0.1); }
     .bracket-series.user-override { border-color: var(--purple); box-shadow: 0 0 8px rgba(168,85,247,0.2); }
-    .champ-headline { text-align: center; margin-bottom: 1rem; }
+    .champ-headline { text-align: center; margin-bottom: 1rem; padding-top: 1rem; }
     .champ-odds-bar { display: flex; gap: 0.3rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
     .champ-odds-item { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.4rem 0.7rem; text-align: center; min-width: 70px; }
     .champ-odds-pct { font-weight: 800; font-size: 1.1rem; }
@@ -491,6 +491,7 @@ layout: null
     .meth-h2 { margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.1rem; }
     .meth-p { margin-top: 0.5rem; }
     .meth-table { margin: 0.5rem 0; font-size: 0.85rem; width: 100%; }
+    .meth-table td { white-space: normal; }
     .meth-results { margin-bottom: 1.5rem; padding: 1rem; background: var(--surface2); border-radius: 10px; }
     .meth-results-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; text-align: center; }
     .meth-results-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.04em; }
@@ -2422,6 +2423,7 @@ function renderCalibrationChart(acc) {
   const el = document.getElementById('calibration-chart');
   if (!cal || cal.length < 3) return; // Need at least a few buckets
 
+  el.innerHTML = ''; // Clear placeholder text
   ensurePlotly().then(() => {
     const buckets = cal.map(c => c.bucket);
     const predicted = cal.map(c => c.predicted_avg * 100);
