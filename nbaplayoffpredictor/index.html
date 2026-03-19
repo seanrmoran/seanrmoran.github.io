@@ -1457,13 +1457,13 @@ function matchupRowHTML(hiSeed, loSeed, hi, lo, series, isProjected) {
       <span class="matchup-seed" style="min-width:1.8rem;">${hiSeed}</span>
       <div class="matchup-team" style="border-left:3px solid ${hiColor};padding-left:0.6rem;flex:1;">
         <div class="fw-700" style="font-size:0.95rem;"><span class="matchup-team-name" onclick="event.stopPropagation();showTeam('${hi.abbreviation}')">${teamLogo(hi.abbreviation, 22)}${hi.city} ${hi.name}</span></div>
-        <div class="matchup-meta">${isProjected ? Math.round(hi.projected_wins)+'-'+Math.round(hi.projected_losses) : hi.wins+'-'+hi.losses} · <span class="${nrClass(hi.net_rating)}">${nrFmt(hi.net_rating)}</span> <span class="dim">${nrTier(hi.net_rating)}</span></div>
+        <div class="matchup-meta">${isProjected ? Math.round(hi.projected_wins)+'-'+Math.round(hi.projected_losses) : hi.wins+'-'+hi.losses} · <span class="stat-tip" data-tip="Net Rating: points per 100 possessions vs opponent"><span class="${nrClass(hi.net_rating)}">${nrFmt(hi.net_rating)}</span> ${nrTier(hi.net_rating)}</span></div>
       </div>
       <span class="matchup-vs">VS</span>
       <span class="matchup-seed" style="min-width:1.8rem;">${loSeed}</span>
       <div class="matchup-team" style="border-left:3px solid ${loColor};padding-left:0.6rem;flex:1;">
         <div class="fw-700" style="font-size:0.95rem;"><span class="matchup-team-name" onclick="event.stopPropagation();showTeam('${lo.abbreviation}')">${teamLogo(lo.abbreviation, 22)}${lo.city} ${lo.name}</span></div>
-        <div class="matchup-meta">${isProjected ? Math.round(lo.projected_wins)+'-'+Math.round(lo.projected_losses) : lo.wins+'-'+lo.losses} · <span class="${nrClass(lo.net_rating)}">${nrFmt(lo.net_rating)}</span> <span class="dim">${nrTier(lo.net_rating)}</span></div>
+        <div class="matchup-meta">${isProjected ? Math.round(lo.projected_wins)+'-'+Math.round(lo.projected_losses) : lo.wins+'-'+lo.losses} · <span class="stat-tip" data-tip="Net Rating: points per 100 possessions vs opponent"><span class="${nrClass(lo.net_rating)}">${nrFmt(lo.net_rating)}</span> ${nrTier(lo.net_rating)}</span></div>
       </div>
     </div>
     ${seriesHtml}
