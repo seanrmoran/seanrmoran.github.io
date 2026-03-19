@@ -268,7 +268,7 @@ layout: null
       td { padding: 0.5rem 0.5rem; }
       .game-card { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
       .game-card-implication { font-size: 0.72rem; }
-      .bracket-series { padding: 0.5rem 0.6rem; gap: 0.3rem; }
+      /* bracket tree handled above */
     }
 
     @media (max-width: 600px) {
@@ -304,7 +304,7 @@ layout: null
       .stat-box { padding: 0.5rem; }
       .stat-value { font-size: 1rem; }
       .back-btn { font-size: 0.78rem; padding: 0.35rem 0.6rem; }
-      .bracket-series { flex-wrap: wrap; justify-content: center; }
+      /* bracket tree handled above */
     }
 
     /* Stat boxes (team detail) */
@@ -366,22 +366,226 @@ layout: null
     .bracket-btn-reveal { background:var(--accent);color:#fff;border:none; }
     .bracket-btn-reset { background:var(--surface);color:var(--text-dim);border:1px solid var(--border);font-weight:400; }
 
-    /* Bracket */
-    .bracket-round { margin-bottom:1.5rem; }
-    .bracket-round-title { font-size:0.85rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-dim);margin-bottom:0.5rem;padding-left:0.25rem; }
-    .bracket-series { display:flex;align-items:center;gap:0.5rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0.6rem 0.8rem;margin-bottom:0.4rem;opacity:0;transform:translateY(10px);transition:all 0.5s ease; }
-    .bracket-series.visible { opacity:1;transform:translateY(0); }
-    .bracket-series.winner { border-color:var(--accent);box-shadow:0 0 12px rgba(245,166,35,0.15); }
-    .bracket-series-team { display:flex;align-items:center;gap:0.4rem;flex:1; }
-    .bracket-series-team.loser { opacity:0.35; }
-    .bracket-series-team.advancing { font-weight:700; }
-    .bracket-series-prob { font-size:0.75rem;color:var(--text-dim);min-width:3rem;text-align:center; }
-    .bracket-series-vs { font-size:0.7rem;font-weight:800;color:var(--text-dim);opacity:0.3; }
+    /* Bracket Tree Layout */
+    .bracket-tree {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      overflow-x: auto;
+      padding: 1rem 0;
+      min-height: 520px;
+    }
+    .bracket-half {
+      display: flex;
+      flex: 1;
+    }
+    .bracket-east { flex-direction: row; }
+    .bracket-west { flex-direction: row-reverse; }
+    .bracket-col {
+      display: flex;
+      flex-direction: column;
+      justify-content: stretch;
+      padding: 0 0.35rem;
+      min-width: 145px;
+      position: relative;
+    }
+    .bracket-col-matches {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      flex: 1;
+    }
+    .bracket-finals-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0 0.5rem;
+      min-width: 155px;
+    }
 
-    /* Interactive bracket picks */
-    .bracket-series-team.clickable-pick { cursor: pointer; border-radius: 6px; padding: 0.2rem 0.4rem; transition: all 0.15s; }
-    .bracket-series-team.clickable-pick:hover { background: rgba(245,166,35,0.1); }
-    .bracket-series.user-override { border-color: var(--purple); box-shadow: 0 0 8px rgba(168,85,247,0.2); }
+    /* Bracket matchup card - compact for tree layout */
+    .bmatch {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin: 0.35rem 0;
+      font-size: 0.8rem;
+      overflow: visible;
+      transition: all 0.15s;
+      position: relative;
+    }
+    .bmatch.user-override { border-color: var(--purple); box-shadow: 0 0 6px rgba(168,85,247,0.2); }
+    .bmatch.winner-known { border-color: var(--accent); }
+
+    /* Each team row inside a matchup */
+    .bmatch-team {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.35rem 0.5rem;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .bmatch-team:first-child { border-bottom: 1px solid var(--border); }
+    .bmatch-team:hover { background: rgba(245,166,35,0.08); }
+    .bmatch-team.picked { background: rgba(245,166,35,0.12); font-weight: 700; }
+    .bmatch-team.faded { opacity: 0.35; }
+    .bmatch-seed { font-size: 0.68rem; color: var(--text-dim); min-width: 16px; text-align: center; }
+    .bmatch-name { font-weight: 600; font-size: 0.78rem; white-space: nowrap; }
+    .bmatch-logo { flex-shrink: 0; }
+    .bmatch-pct { margin-left: auto; font-size: 0.72rem; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+
+    /* Connector lines using CSS borders */
+    /* East side: right border connects to next round */
+    .bracket-east .bracket-r1 .bracket-col-matches > .bmatch::after {
+      content: '';
+      position: absolute;
+      right: -0.35rem;
+      top: 50%;
+      width: 0.35rem;
+      border-top: 2px solid var(--border);
+    }
+    .bracket-east .bracket-r2 .bracket-col-matches > .bmatch::after {
+      content: '';
+      position: absolute;
+      right: -0.35rem;
+      top: 50%;
+      width: 0.35rem;
+      border-top: 2px solid var(--border);
+    }
+    .bracket-east .bracket-cf .bracket-col-matches > .bmatch::after {
+      content: '';
+      position: absolute;
+      right: -0.5rem;
+      top: 50%;
+      width: 0.5rem;
+      border-top: 2px solid var(--border);
+    }
+
+    /* West side: left border connects (mirrored) */
+    .bracket-west .bracket-r1 .bracket-col-matches > .bmatch::after {
+      content: '';
+      position: absolute;
+      left: -0.35rem;
+      top: 50%;
+      width: 0.35rem;
+      border-top: 2px solid var(--border);
+    }
+    .bracket-west .bracket-r2 .bracket-col-matches > .bmatch::after {
+      content: '';
+      position: absolute;
+      left: -0.35rem;
+      top: 50%;
+      width: 0.35rem;
+      border-top: 2px solid var(--border);
+    }
+    .bracket-west .bracket-cf .bracket-col-matches > .bmatch::after {
+      content: '';
+      position: absolute;
+      left: -0.5rem;
+      top: 50%;
+      width: 0.5rem;
+      border-top: 2px solid var(--border);
+    }
+
+    /* Vertical connectors between paired matchups (East) */
+    .bracket-east .bracket-r1 .bracket-col-matches > .bmatch:nth-child(odd)::before {
+      content: '';
+      position: absolute;
+      right: -0.35rem;
+      top: 50%;
+      height: calc(100% + 0.7rem);
+      border-right: 2px solid var(--border);
+    }
+    .bracket-east .bracket-r2 .bracket-col-matches > .bmatch:nth-child(odd)::before {
+      content: '';
+      position: absolute;
+      right: -0.35rem;
+      top: 50%;
+      height: calc(100% + 0.7rem);
+      border-right: 2px solid var(--border);
+    }
+
+    /* Vertical connectors between paired matchups (West, mirrored) */
+    .bracket-west .bracket-r1 .bracket-col-matches > .bmatch:nth-child(odd)::before {
+      content: '';
+      position: absolute;
+      left: -0.35rem;
+      top: 50%;
+      height: calc(100% + 0.7rem);
+      border-left: 2px solid var(--border);
+    }
+    .bracket-west .bracket-r2 .bracket-col-matches > .bmatch:nth-child(odd)::before {
+      content: '';
+      position: absolute;
+      left: -0.35rem;
+      top: 50%;
+      height: calc(100% + 0.7rem);
+      border-left: 2px solid var(--border);
+    }
+
+    /* Finals connector lines */
+    .bracket-finals-center .bmatch::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: -0.5rem;
+      width: 0.5rem;
+      border-top: 2px solid var(--border);
+    }
+    .bracket-finals-center .bmatch::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: -0.5rem;
+      width: 0.5rem;
+      border-top: 2px solid var(--border);
+    }
+
+    /* Round labels */
+    .bracket-col-label {
+      text-align: center;
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      padding: 0.25rem 0;
+      margin-bottom: 0.2rem;
+    }
+    .bracket-east .bracket-col-label { color: var(--accent); }
+    .bracket-west .bracket-col-label { color: var(--red); }
+    .bracket-finals-label {
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+    }
+    .bracket-finals-trophy {
+      text-align: center;
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    /* Mobile: stack vertically */
+    @media (max-width: 900px) {
+      .bracket-tree { flex-direction: column; min-height: auto; }
+      .bracket-half { flex-direction: row !important; }
+      .bracket-col { min-width: 110px; }
+      .bracket-finals-center { padding: 0.5rem 0; justify-content: center; }
+    }
+    @media (max-width: 600px) {
+      .bracket-tree { overflow-x: auto; }
+      .bracket-col { min-width: 100px; }
+      .bmatch-team { padding: 0.25rem 0.35rem; }
+      .bmatch-name { font-size: 0.72rem; }
+      .bmatch-seed { font-size: 0.62rem; }
+      .bmatch-pct { font-size: 0.65rem; }
+    }
     .champ-headline { text-align: center; margin-bottom: 1rem; padding-top: 1rem; }
     .champ-odds-bar { display: flex; gap: 0.3rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
     .champ-odds-item { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.4rem 0.7rem; text-align: center; min-width: 70px; }
@@ -2209,42 +2413,70 @@ function renderBracketHeadline(data) {
 
 function renderBracketHTML() {
   const container = document.getElementById('bracket-container');
-  let html = '<div class="grid-2">';
 
-  for (const [conf, label] of [['east','Eastern Conference'],['west','Western Conference']]) {
-    html += `<div>`;
+  // Build the bracket tree: East (L-to-R) | Finals (center) | West (R-to-L)
+  let html = '<div class="bracket-tree">';
 
-    // First Round
-    html += `<div class="bracket-round">`;
-    html += `<div class="bracket-round-title" style="color:${conf==='east'?'var(--accent)':'var(--red)'}">${label} - First Round</div>`;
-    for (let i = 0; i < 4; i++) {
-      html += bracketSeriesCardHTML(`${conf}-r1-${i}`);
-    }
-    html += `</div>`;
+  // ── East half (left side, flows left-to-right) ──
+  html += '<div class="bracket-half bracket-east">';
 
-    // Semis
-    html += `<div class="bracket-round">`;
-    html += `<div class="bracket-round-title" style="color:${conf==='east'?'var(--accent)':'var(--red)'}">${label} - Conf Semifinals</div>`;
-    for (let i = 0; i < 2; i++) {
-      html += bracketSeriesCardHTML(`${conf}-r2-${i}`);
-    }
-    html += `</div>`;
+  // East R1: 4 matchups
+  html += '<div class="bracket-col bracket-r1">';
+  html += '<div class="bracket-col-label">First Round</div>';
+  html += '<div class="bracket-col-matches">';
+  for (let i = 0; i < 4; i++) html += bmatchHTML(`east-r1-${i}`);
+  html += '</div></div>';
 
-    // Conf Finals
-    html += `<div class="bracket-round">`;
-    html += `<div class="bracket-round-title" style="color:${conf==='east'?'var(--accent)':'var(--red)'}">${label} - Conf Finals</div>`;
-    html += bracketSeriesCardHTML(`${conf}-r3-0`);
-    html += `</div>`;
+  // East R2: 2 matchups (conf semis)
+  html += '<div class="bracket-col bracket-r2">';
+  html += '<div class="bracket-col-label">Conf Semis</div>';
+  html += '<div class="bracket-col-matches">';
+  for (let i = 0; i < 2; i++) html += bmatchHTML(`east-r2-${i}`);
+  html += '</div></div>';
 
-    html += `</div>`;
-  }
+  // East R3: 1 matchup (conf finals)
+  html += '<div class="bracket-col bracket-cf">';
+  html += '<div class="bracket-col-label">Conf Finals</div>';
+  html += '<div class="bracket-col-matches">';
+  html += bmatchHTML('east-r3-0');
+  html += '</div></div>';
+
+  html += '</div>'; // end bracket-east
+
+  // ── Finals (center) ──
+  html += '<div class="bracket-finals-center">';
+  html += '<div class="bracket-finals-trophy">&#127942;</div>';
+  html += '<div class="bracket-finals-label">NBA Finals</div>';
+  html += bmatchHTML('finals-0');
   html += '</div>';
 
-  // NBA Finals
-  html += `<div class="bracket-round" style="max-width:500px;margin:0 auto;">`;
-  html += `<div class="bracket-round-title" style="color:var(--accent);text-align:center;font-size:1rem;">NBA Finals</div>`;
-  html += bracketSeriesCardHTML('finals-0');
-  html += `</div>`;
+  // ── West half (right side, flows right-to-left) ──
+  html += '<div class="bracket-half bracket-west">';
+
+  // West R3: 1 matchup (conf finals) - shown first because flex-direction is row-reverse
+  html += '<div class="bracket-col bracket-cf">';
+  html += '<div class="bracket-col-label">Conf Finals</div>';
+  html += '<div class="bracket-col-matches">';
+  html += bmatchHTML('west-r3-0');
+  html += '</div></div>';
+
+  // West R2: 2 matchups (conf semis)
+  html += '<div class="bracket-col bracket-r2">';
+  html += '<div class="bracket-col-label">Conf Semis</div>';
+  html += '<div class="bracket-col-matches">';
+  for (let i = 0; i < 2; i++) html += bmatchHTML(`west-r2-${i}`);
+  html += '</div></div>';
+
+  // West R1: 4 matchups
+  html += '<div class="bracket-col bracket-r1">';
+  html += '<div class="bracket-col-label">First Round</div>';
+  html += '<div class="bracket-col-matches">';
+  for (let i = 0; i < 4; i++) html += bmatchHTML(`west-r1-${i}`);
+  html += '</div></div>';
+
+  html += '</div>'; // end bracket-west
+
+  html += '</div>'; // end bracket-tree
 
   container.innerHTML = html;
 }
@@ -2253,14 +2485,13 @@ function getSeriesWinner(seriesId) {
   return BRACKET_STATE.userPicks[seriesId] || BRACKET_STATE.modelPicks[seriesId];
 }
 
-function bracketSeriesCardHTML(seriesId) {
+function bmatchHTML(seriesId) {
   const sd = BRACKET_STATE.seriesData[seriesId];
   if (!sd || !sd.higher || !sd.lower) {
     // Placeholder for TBD series
-    return `<div class="bracket-series visible" id="bs-${seriesId}" style="opacity:0.4;">
-      <div class="bracket-series-team" style="padding-left:0.4rem;"><span class="dim">TBD</span></div>
-      <div style="text-align:center;min-width:60px;"><div class="bracket-series-vs">VS</div></div>
-      <div class="bracket-series-team" style="padding-left:0.4rem;"><span class="dim">TBD</span></div>
+    return `<div class="bmatch" id="bs-${seriesId}" style="opacity:0.4;">
+      <div class="bmatch-team"><span class="bmatch-seed">?</span><span class="bmatch-name dim">TBD</span></div>
+      <div class="bmatch-team"><span class="bmatch-seed">?</span><span class="bmatch-name dim">TBD</span></div>
     </div>`;
   }
 
@@ -2269,33 +2500,38 @@ function bracketSeriesCardHTML(seriesId) {
   const higherPct = sd.higherPct;
   const winner = getSeriesWinner(seriesId);
   const isUserOverride = BRACKET_STATE.userPicks[seriesId] != null;
-  const [cA, cB] = getMatchupColors(higher, lower);
   const pctH = Math.round(higherPct * 100);
   const pctL = 100 - pctH;
-  const seedH = BRACKET_STATE.seeds[higher];
-  const seedL = BRACKET_STATE.seeds[lower];
-  const seedHtml = s => s ? `<span class="dim" style="font-size:0.75rem;margin-right:0.2rem;">(${s})</span>` : '';
+  const seedH = BRACKET_STATE.seeds[higher] || '';
+  const seedL = BRACKET_STATE.seeds[lower] || '';
 
   const higherIsWinner = winner === higher;
   const lowerIsWinner = winner === lower;
   const overrideClass = isUserOverride ? ' user-override' : '';
-  const winnerBorder = winner ? ' winner' : '';
+  const winnerClass = winner ? ' winner-known' : '';
 
-  return `<div class="bracket-series visible${overrideClass}${winnerBorder}" id="bs-${seriesId}">
-    <div class="bracket-series-team clickable-pick${higherIsWinner ? ' advancing' : (lowerIsWinner ? ' loser' : '')}"
-         onclick="pickBracketWinner('${seriesId}','${higher}')"
-         style="border-left:3px solid ${cA};padding-left:0.4rem;">
-      ${teamLogo(higher, 24)}${seedHtml(seedH)}<span class="fw-700">${higher}</span>
+  // Higher seed team row (top)
+  let hClass = 'bmatch-team';
+  if (higherIsWinner) hClass += ' picked';
+  else if (lowerIsWinner) hClass += ' faded';
+
+  // Lower seed team row (bottom)
+  let lClass = 'bmatch-team';
+  if (lowerIsWinner) lClass += ' picked';
+  else if (higherIsWinner) lClass += ' faded';
+
+  return `<div class="bmatch${overrideClass}${winnerClass}" id="bs-${seriesId}">
+    <div class="${hClass}" onclick="pickBracketWinner('${seriesId}','${higher}')">
+      <span class="bmatch-seed">${seedH}</span>
+      <span class="bmatch-logo">${teamLogo(higher, 18)}</span>
+      <span class="bmatch-name">${higher}</span>
+      <span class="bmatch-pct">${pctH}%</span>
     </div>
-    <div style="text-align:center;min-width:60px;">
-      <div class="bracket-series-prob">${pctH}%</div>
-      <div class="bracket-series-vs">VS</div>
-      <div class="bracket-series-prob">${pctL}%</div>
-    </div>
-    <div class="bracket-series-team clickable-pick${lowerIsWinner ? ' advancing' : (higherIsWinner ? ' loser' : '')}"
-         onclick="pickBracketWinner('${seriesId}','${lower}')"
-         style="border-left:3px solid ${cB};padding-left:0.4rem;">
-      ${teamLogo(lower, 24)}${seedHtml(seedL)}<span class="fw-700">${lower}</span>
+    <div class="${lClass}" onclick="pickBracketWinner('${seriesId}','${lower}')">
+      <span class="bmatch-seed">${seedL}</span>
+      <span class="bmatch-logo">${teamLogo(lower, 18)}</span>
+      <span class="bmatch-name">${lower}</span>
+      <span class="bmatch-pct">${pctL}%</span>
     </div>
   </div>`;
 }
