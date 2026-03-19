@@ -378,11 +378,15 @@ layout: null
     .bracket-series-prob { font-size:0.75rem;color:var(--text-dim);min-width:3rem;text-align:center; }
     .bracket-series-vs { font-size:0.7rem;font-weight:800;color:var(--text-dim);opacity:0.3; }
 
-    /* Celebration */
-    @keyframes confetti-fall { 0% { transform:translateY(-100vh) rotate(0deg); opacity:1; } 100% { transform:translateY(100vh) rotate(720deg); opacity:0; } }
-    .confetti-piece { position:fixed;width:10px;height:10px;top:-10px;z-index:9999;animation:confetti-fall 3s ease-in forwards; }
-    .celebration-banner { text-align:center;padding:2rem;margin:1rem 0;border-radius:12px;animation:pulse-glow 2s ease-in-out infinite; }
-    @keyframes pulse-glow { 0%,100% { box-shadow:0 0 20px rgba(245,166,35,0.2); } 50% { box-shadow:0 0 40px rgba(245,166,35,0.5); } }
+    /* Interactive bracket picks */
+    .bracket-series-team.clickable-pick { cursor: pointer; border-radius: 6px; padding: 0.2rem 0.4rem; transition: all 0.15s; }
+    .bracket-series-team.clickable-pick:hover { background: rgba(245,166,35,0.1); }
+    .bracket-series.user-override { border-color: var(--purple); box-shadow: 0 0 8px rgba(168,85,247,0.2); }
+    .champ-headline { text-align: center; margin-bottom: 1rem; }
+    .champ-odds-bar { display: flex; gap: 0.3rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+    .champ-odds-item { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.4rem 0.7rem; text-align: center; min-width: 70px; }
+    .champ-odds-pct { font-weight: 800; font-size: 1.1rem; }
+    .champ-odds-team { font-size: 0.72rem; color: var(--text-dim); }
 
     /* Games tab */
     .game-card { background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0.8rem 1rem;margin-bottom:0.5rem;display:flex;align-items:center;gap:1rem; }
@@ -619,16 +623,15 @@ layout: null
 
   <!-- BRACKET SIMULATOR -->
   <div id="bracket" class="tab-content">
+    <div id="bracket-headline" class="champ-headline"></div>
+    <div id="bracket-odds-bar" class="champ-odds-bar"></div>
     <div class="text-center mb-md">
-      <div class="fs-sm mb-sm" style="color:var(--text-dim);">Simulate the entire playoffs based on model predictions</div>
+      <div class="fs-sm mb-sm" style="color:var(--text-dim);">Click any team to override the model pick. Purple border = your pick.</div>
       <div class="flex-center gap-sm flex-wrap">
-        <button id="bracket-step" class="bracket-btn bracket-btn-step" onclick="bracketStep()">Next Round</button>
-        <button class="bracket-btn bracket-btn-reveal" onclick="bracketReveal()">Reveal Champion</button>
-        <button class="bracket-btn bracket-btn-reset" onclick="bracketReset()">Reset</button>
+        <button class="bracket-btn bracket-btn-reset" onclick="resetBracket()">Reset to Model Picks</button>
       </div>
     </div>
     <div id="bracket-container"></div>
-    <div id="bracket-celebration" style="display:none;"></div>
   </div>
 
   <!-- GAMES -->
@@ -1334,6 +1337,17 @@ function probBar(pct, color) {
 }
 // clinched/elim: only show check/X when mathematically guaranteed
 // context: 'irrelevant' = 0% is fine (top team doesn't need play-in)
+function champOddsCell(val) {
+  if (val == null || val <= 0) return '<span class="dim" style="opacity:0.3;">-</span>';
+  const p = val * 100;
+  return `<span style="font-size:0.85rem;">${p < 1 ? '<1%' : pctFmt(val)}</span>`;
+}
+function champOddsCellHighlight(val) {
+  if (val == null || val <= 0) return '<span class="dim" style="opacity:0.3;">-</span>';
+  const p = val * 100;
+  const color = p > 15 ? 'var(--green)' : p > 5 ? 'var(--yellow)' : 'var(--text-dim)';
+  return `<span style="font-size:0.85rem;color:${color};font-weight:700;">${p < 1 ? '<1%' : pctFmt(val)}</span>`;
+}
 function pctCell(val, color, context, clinched, eliminated) {
   const p = val * 100;
   if (clinched) return `<span style="color:var(--green);">&#10003;</span>`;
@@ -1491,13 +1505,18 @@ function renderStandings(data, mode) {
       <th class="c" style="width:40px;"><span class="stat-tip" data-tip="Games behind first place">GB</span></th>
       <th class="c" style="width:40px;"><span class="stat-tip" data-tip="Elimination number: combo of wins/losses needed to be eliminated">E#</span></th>
       <th class="c" style="cursor:help;" title="Probability of making playoffs (top 6 seed)"><span class="full-header">Playoff %</span><span class="short-header">PO%</span></th>
-      <th class="c" style="cursor:help;" title="Probability of making play-in tournament (7-10 seed)"><span class="full-header">Play-In %</span><span class="short-header">PI%</span></th>`;
+      <th class="c" style="cursor:help;" title="Probability of making play-in tournament (7-10 seed)"><span class="full-header">Play-In %</span><span class="short-header">PI%</span></th>
+      <th class="c"><span class="stat-tip" data-tip="Conference Semifinals probability"><span class="full-header">Semis %</span><span class="short-header">Sem%</span></span></th>
+      <th class="c"><span class="stat-tip" data-tip="Conference Finals probability"><span class="full-header">Conf Finals %</span><span class="short-header">CF%</span></span></th>
+      <th class="c"><span class="stat-tip" data-tip="NBA Finals probability"><span class="full-header">Finals %</span><span class="short-header">Fin%</span></span></th>
+      <th class="c"><span class="stat-tip" data-tip="Championship probability"><span class="full-header">Champ %</span><span class="short-header">Ch%</span></span></th>`;
 
     let html = `<div class="card">
       <div class="card-header" style="background:linear-gradient(90deg,${color}22,transparent);">
         ${conf}ern Conference
       </div>
-      <table class="fs-sm"><thead><tr>${headerHtml}</tr></thead><tbody>`;
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+      <table class="fs-sm" style="min-width:800px;"><thead><tr>${headerHtml}</tr></thead><tbody>`;
 
     // GB relative to leader in current sort
     const leader = teams[0];
@@ -1549,9 +1568,13 @@ function renderStandings(data, mode) {
         <td class="c">${elimNum}</td>
         <td class="c">${pctCell(playoffPct, pColor, 'positive', t.clinched_playoff, t.is_eliminated)}</td>
         <td class="c">${pctCell(playinPct, piColor, playoffPct > 0.5 ? 'irrelevant' : '', false, t.is_eliminated)}</td>
+        <td class="c">${champOddsCell(t.conf_semis_prob)}</td>
+        <td class="c">${champOddsCell(t.conf_finals_prob)}</td>
+        <td class="c">${champOddsCell(t.finals_prob)}</td>
+        <td class="c">${champOddsCellHighlight(t.champion_prob)}</td>
       </tr>`;
     }
-    html += `</tbody></table></div>`;
+    html += `</tbody></table></div></div>`;
     grid.innerHTML += html;
   }
 }
@@ -2064,223 +2087,298 @@ function runWhatIf(teamAbbr) {
   if (prompt) prompt.style.display = 'none';
 }
 
-// ── Bracket Simulator ──
-let BRACKET_STATE = { round: 0, data: null };
+// ── Bracket Simulator (Interactive) ──
+let BRACKET_STATE = { modelPicks: {}, userPicks: {}, seriesData: {}, pairwiseProbs: {}, seeds: {} };
+
+// Bracket tree: maps each series to its downstream series and slot
+const BRACKET_TREE = {
+  'east-r1-0': { next: 'east-r2-0', slot: 'higher' },
+  'east-r1-3': { next: 'east-r2-0', slot: 'lower' },
+  'east-r1-1': { next: 'east-r2-1', slot: 'higher' },
+  'east-r1-2': { next: 'east-r2-1', slot: 'lower' },
+  'east-r2-0': { next: 'east-r3-0', slot: 'higher' },
+  'east-r2-1': { next: 'east-r3-0', slot: 'lower' },
+  'east-r3-0': { next: 'finals-0', slot: 'higher' },
+  'west-r1-0': { next: 'west-r2-0', slot: 'higher' },
+  'west-r1-3': { next: 'west-r2-0', slot: 'lower' },
+  'west-r1-1': { next: 'west-r2-1', slot: 'higher' },
+  'west-r1-2': { next: 'west-r2-1', slot: 'lower' },
+  'west-r2-0': { next: 'west-r3-0', slot: 'higher' },
+  'west-r2-1': { next: 'west-r3-0', slot: 'lower' },
+  'west-r3-0': { next: 'finals-0', slot: 'lower' },
+};
 
 function renderBracket(data) {
   const b = data.bracket_simulation;
   if (!b) return;
-  BRACKET_STATE.data = b;
-  BRACKET_STATE.round = 0;
 
+  // Reset state
+  BRACKET_STATE = { modelPicks: {}, userPicks: {}, seriesData: {}, pairwiseProbs: {}, seeds: {} };
+
+  // Store pairwise probs
+  BRACKET_STATE.pairwiseProbs = data.pairwise_series_probs || {};
+
+  // Build seed lookup from first round data
+  for (const conf of ['east', 'west']) {
+    const bracket = b[conf];
+    if (!bracket) continue;
+    const seedPairs = [[1,8],[4,5],[2,7],[3,6]];
+    bracket.first_round.forEach((m, i) => {
+      BRACKET_STATE.seeds[m.higher] = seedPairs[i][0];
+      BRACKET_STATE.seeds[m.lower] = seedPairs[i][1];
+    });
+  }
+
+  // Populate seriesData and modelPicks from bracket_simulation
+  for (const conf of ['east', 'west']) {
+    const bracket = b[conf];
+    if (!bracket) continue;
+    // First round: indices 0=1v8, 1=2v7, 2=3v6, 3=4v5
+    bracket.first_round.forEach((m, i) => {
+      const id = `${conf}-r1-${i}`;
+      BRACKET_STATE.seriesData[id] = { higher: m.higher, lower: m.lower, higherPct: m.higher_wins_pct || 0.5 };
+      BRACKET_STATE.modelPicks[id] = m.predicted_winner;
+    });
+    // Conf semis
+    bracket.conf_semis.forEach((m, i) => {
+      const id = `${conf}-r2-${i}`;
+      BRACKET_STATE.seriesData[id] = { higher: m.higher, lower: m.lower, higherPct: m.higher_wins_pct || 0.5 };
+      BRACKET_STATE.modelPicks[id] = m.predicted_winner;
+    });
+    // Conf finals
+    const cf = bracket.conf_finals;
+    const cfId = `${conf}-r3-0`;
+    BRACKET_STATE.seriesData[cfId] = { higher: cf.higher, lower: cf.lower, higherPct: cf.higher_wins_pct || 0.5 };
+    BRACKET_STATE.modelPicks[cfId] = cf.predicted_winner;
+  }
+  // Finals
+  if (b.finals) {
+    BRACKET_STATE.seriesData['finals-0'] = {
+      higher: b.finals.east, lower: b.finals.west,
+      higherPct: b.finals.east_wins_pct || 0.5,
+    };
+    BRACKET_STATE.modelPicks['finals-0'] = b.finals.predicted_champion;
+  }
+
+  // Render championship headline
+  renderBracketHeadline(data);
+
+  // Render bracket HTML
+  renderBracketHTML();
+}
+
+function renderBracketHeadline(data) {
+  const headlineEl = document.getElementById('bracket-headline');
+  const oddsBarEl = document.getElementById('bracket-odds-bar');
+  const champOdds = data.championship_odds || {};
+
+  // Find top team
+  let topTeam = null, topPct = 0;
+  for (const [team, odds] of Object.entries(champOdds)) {
+    const cp = odds.champion || 0;
+    if (cp > topPct) { topPct = cp; topTeam = team; }
+  }
+
+  if (topTeam && topPct > 0) {
+    const tColor = TEAM_COLORS[topTeam] || 'var(--accent)';
+    headlineEl.innerHTML = `<div style="font-size:1.3rem;font-weight:800;margin-bottom:0.3rem;">
+      ${teamLogo(topTeam, 36)}
+      <span style="color:${tColor};">Model predicts ${topTeam} to win the title</span>
+      <span style="color:var(--text-dim);font-weight:600;">(${(topPct * 100).toFixed(1)}% probability)</span>
+    </div>`;
+  } else {
+    headlineEl.innerHTML = '';
+  }
+
+  // Top 5 championship odds bar
+  const sorted = Object.entries(champOdds)
+    .map(([team, odds]) => ({ team, pct: odds.champion || 0 }))
+    .filter(x => x.pct > 0)
+    .sort((a, b) => b.pct - a.pct)
+    .slice(0, 5);
+
+  oddsBarEl.innerHTML = sorted.map(x => {
+    const tColor = TEAM_COLORS[x.team] || 'var(--text)';
+    return `<div class="champ-odds-item">
+      <div class="champ-odds-pct" style="color:${tColor};">${(x.pct * 100).toFixed(1)}%</div>
+      <div class="champ-odds-team">${x.team}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderBracketHTML() {
   const container = document.getElementById('bracket-container');
   let html = '<div class="grid-2">';
 
   for (const [conf, label] of [['east','Eastern Conference'],['west','Western Conference']]) {
-    const bracket = b[conf];
-    if (!bracket) continue;
-
     html += `<div>`;
+
     // First Round
-    html += `<div class="bracket-round" id="bracket-${conf}-r1">`;
+    html += `<div class="bracket-round">`;
     html += `<div class="bracket-round-title" style="color:${conf==='east'?'var(--accent)':'var(--red)'}">${label} - First Round</div>`;
-    bracket.first_round.forEach((m, i) => {
-      html += bracketSeriesHTML(m, `${conf}-r1-${i}`);
-    });
+    for (let i = 0; i < 4; i++) {
+      html += bracketSeriesCardHTML(`${conf}-r1-${i}`);
+    }
     html += `</div>`;
 
     // Semis
-    html += `<div class="bracket-round" id="bracket-${conf}-r2">`;
-    html += `<div class="bracket-round-title" style="color:${conf==='east'?'var(--accent)':'var(--red)'}">${label} - Conference Semifinals</div>`;
-    bracket.conf_semis.forEach((m, i) => {
-      html += bracketSeriesHTML(m, `${conf}-r2-${i}`);
-    });
+    html += `<div class="bracket-round">`;
+    html += `<div class="bracket-round-title" style="color:${conf==='east'?'var(--accent)':'var(--red)'}">${label} - Conf Semifinals</div>`;
+    for (let i = 0; i < 2; i++) {
+      html += bracketSeriesCardHTML(`${conf}-r2-${i}`);
+    }
     html += `</div>`;
 
-    // Finals
-    html += `<div class="bracket-round" id="bracket-${conf}-r3">`;
-    html += `<div class="bracket-round-title" style="color:${conf==='east'?'var(--accent)':'var(--red)'}">${label} - Conference Finals</div>`;
-    html += bracketSeriesHTML(bracket.conf_finals, `${conf}-r3-0`);
+    // Conf Finals
+    html += `<div class="bracket-round">`;
+    html += `<div class="bracket-round-title" style="color:${conf==='east'?'var(--accent)':'var(--red)'}">${label} - Conf Finals</div>`;
+    html += bracketSeriesCardHTML(`${conf}-r3-0`);
     html += `</div>`;
+
     html += `</div>`;
   }
   html += '</div>';
 
   // NBA Finals
-  html += `<div class="bracket-round" id="bracket-finals" style="max-width:500px;margin:0 auto;">`;
+  html += `<div class="bracket-round" style="max-width:500px;margin:0 auto;">`;
   html += `<div class="bracket-round-title" style="color:var(--accent);text-align:center;font-size:1rem;">NBA Finals</div>`;
-  if (b.finals) {
-    html += bracketSeriesHTML({
-      higher: b.finals.east, lower: b.finals.west,
-      higher_wins_pct: b.finals.east_wins_pct,
-      predicted_winner: b.finals.predicted_champion,
-    }, 'finals-0');
-  }
+  html += bracketSeriesCardHTML('finals-0');
   html += `</div>`;
 
   container.innerHTML = html;
-
-  // Show first round immediately
-  setTimeout(() => showBracketRound(0), 100);
 }
 
-function bracketSeriesHTML(m, id) {
-  const [cA, cB] = getMatchupColors(m.higher, m.lower);
-  const pct = Math.round((m.higher_wins_pct || 0.5) * 100);
-  return `<div class="bracket-series" id="bs-${id}" data-winner="${m.predicted_winner}" data-higher="${m.higher}" data-lower="${m.lower}">
-    <div class="bracket-series-team" data-team="${m.higher}" style="border-left:3px solid ${cA};padding-left:0.4rem;">
-      ${teamLogo(m.higher, 24)}<span class="fw-700">${m.higher}</span>
+function getSeriesWinner(seriesId) {
+  return BRACKET_STATE.userPicks[seriesId] || BRACKET_STATE.modelPicks[seriesId];
+}
+
+function bracketSeriesCardHTML(seriesId) {
+  const sd = BRACKET_STATE.seriesData[seriesId];
+  if (!sd || !sd.higher || !sd.lower) {
+    // Placeholder for TBD series
+    return `<div class="bracket-series visible" id="bs-${seriesId}" style="opacity:0.4;">
+      <div class="bracket-series-team" style="padding-left:0.4rem;"><span class="dim">TBD</span></div>
+      <div style="text-align:center;min-width:60px;"><div class="bracket-series-vs">VS</div></div>
+      <div class="bracket-series-team" style="padding-left:0.4rem;"><span class="dim">TBD</span></div>
+    </div>`;
+  }
+
+  const higher = sd.higher;
+  const lower = sd.lower;
+  const higherPct = sd.higherPct;
+  const winner = getSeriesWinner(seriesId);
+  const isUserOverride = BRACKET_STATE.userPicks[seriesId] != null;
+  const [cA, cB] = getMatchupColors(higher, lower);
+  const pctH = Math.round(higherPct * 100);
+  const pctL = 100 - pctH;
+  const seedH = BRACKET_STATE.seeds[higher];
+  const seedL = BRACKET_STATE.seeds[lower];
+  const seedHtml = s => s ? `<span class="dim" style="font-size:0.75rem;margin-right:0.2rem;">(${s})</span>` : '';
+
+  const higherIsWinner = winner === higher;
+  const lowerIsWinner = winner === lower;
+  const overrideClass = isUserOverride ? ' user-override' : '';
+  const winnerBorder = winner ? ' winner' : '';
+
+  return `<div class="bracket-series visible${overrideClass}${winnerBorder}" id="bs-${seriesId}">
+    <div class="bracket-series-team clickable-pick${higherIsWinner ? ' advancing' : (lowerIsWinner ? ' loser' : '')}"
+         onclick="pickBracketWinner('${seriesId}','${higher}')"
+         style="border-left:3px solid ${cA};padding-left:0.4rem;">
+      ${teamLogo(higher, 24)}${seedHtml(seedH)}<span class="fw-700">${higher}</span>
     </div>
     <div style="text-align:center;min-width:60px;">
-      <div class="bracket-series-prob">${pct}%</div>
+      <div class="bracket-series-prob">${pctH}%</div>
       <div class="bracket-series-vs">VS</div>
-      <div class="bracket-series-prob">${100-pct}%</div>
+      <div class="bracket-series-prob">${pctL}%</div>
     </div>
-    <div class="bracket-series-team" data-team="${m.lower}" style="border-left:3px solid ${cB};padding-left:0.4rem;">
-      ${teamLogo(m.lower, 24)}<span class="fw-700">${m.lower}</span>
+    <div class="bracket-series-team clickable-pick${lowerIsWinner ? ' advancing' : (higherIsWinner ? ' loser' : '')}"
+         onclick="pickBracketWinner('${seriesId}','${lower}')"
+         style="border-left:3px solid ${cB};padding-left:0.4rem;">
+      ${teamLogo(lower, 24)}${seedHtml(seedL)}<span class="fw-700">${lower}</span>
     </div>
   </div>`;
 }
 
-function showBracketRound(round) {
-  const rounds = [
-    ['bracket-east-r1','bracket-west-r1'],
-    ['bracket-east-r2','bracket-west-r2'],
-    ['bracket-east-r3','bracket-west-r3'],
-    ['bracket-finals'],
-  ];
-  if (round >= rounds.length) return;
-
-  rounds[round].forEach(containerId => {
-    const el = document.getElementById(containerId);
-    if (!el) return;
-    const series = el.querySelectorAll('.bracket-series');
-    series.forEach((s, i) => {
-      setTimeout(() => {
-        s.classList.add('visible');
-        // If showing results (round > 0 means previous round resolved)
-        if (BRACKET_STATE.round > round) {
-          revealSeriesWinner(s);
-        }
-      }, i * 200);
-    });
-  });
+function lookupPairwiseProb(teamA, teamB) {
+  const probs = BRACKET_STATE.pairwiseProbs;
+  const keyAB = teamA + '-' + teamB;
+  const keyBA = teamB + '-' + teamA;
+  if (probs[keyAB] != null) return probs[keyAB]; // probability of teamA winning
+  if (probs[keyBA] != null) return 1 - probs[keyBA]; // flip
+  return 0.5; // no data, 50/50
 }
 
-function revealSeriesWinner(seriesEl) {
-  const winner = seriesEl.dataset.winner;
-  const teams = seriesEl.querySelectorAll('.bracket-series-team');
-  teams.forEach(t => {
-    if (t.dataset.team === winner) {
-      t.classList.add('advancing');
-      t.classList.remove('loser');
-    } else {
-      t.classList.add('loser');
-      t.classList.remove('advancing');
-    }
-  });
-  seriesEl.classList.add('winner');
-}
+function pickBracketWinner(seriesId, team) {
+  const sd = BRACKET_STATE.seriesData[seriesId];
+  if (!sd || !sd.higher || !sd.lower) return;
 
-function bracketStep() {
-  BRACKET_STATE.round++;
-  const round = BRACKET_STATE.round;
-
-  // Reveal winners of current round
-  const roundIds = [
-    ['bracket-east-r1','bracket-west-r1'],
-    ['bracket-east-r2','bracket-west-r2'],
-    ['bracket-east-r3','bracket-west-r3'],
-    ['bracket-finals'],
-  ];
-
-  if (round <= roundIds.length) {
-    // Reveal winners of previous round
-    const prevIds = roundIds[round - 1];
-    prevIds.forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.querySelectorAll('.bracket-series').forEach(s => revealSeriesWinner(s));
-    });
-  }
-
-  // Show next round
-  if (round < roundIds.length) {
-    setTimeout(() => showBracketRound(round), 600);
-  }
-
-  // Conference champion celebrations
-  if (round === 3) {
-    const b = BRACKET_STATE.data;
-    setTimeout(() => {
-      showCelebration(b.east.champion, 'Eastern Conference Champions', 'medium');
-      showCelebration(b.west.champion, 'Western Conference Champions', 'medium');
-    }, 1000);
-    setTimeout(() => showBracketRound(3), 1500);
-  }
-
-  // NBA Champion celebration
-  if (round === 4) {
-    const champ = BRACKET_STATE.data.finals.predicted_champion;
-    setTimeout(() => showCelebration(champ, 'NBA Champions', 'big'), 800);
-  }
-}
-
-function bracketReveal() {
-  // Fast-forward through all rounds
-  const steps = 4 - BRACKET_STATE.round;
-  for (let i = 0; i < steps; i++) {
-    setTimeout(() => bracketStep(), i * 800);
-  }
-}
-
-function bracketReset() {
-  BRACKET_STATE.round = 0;
-  document.getElementById('bracket-celebration').style.display = 'none';
-  document.getElementById('bracket-celebration').innerHTML = '';
-  // Remove confetti
-  document.querySelectorAll('.confetti-piece').forEach(p => p.remove());
-  if (DATA) renderBracket(DATA);
-}
-
-function showCelebration(teamAbbr, title, size) {
-  const cel = document.getElementById('bracket-celebration');
-  const tColor = TEAM_COLORS[teamAbbr] || '#F5A623';
-
-  if (size === 'big') {
-    // NBA Champions - big celebration with confetti
-    launchConfetti();
-    cel.innerHTML = `<div class="celebration-banner" style="background:linear-gradient(135deg,${tColor}30,var(--surface),${tColor}30);border:2px solid ${tColor};">
-      <div style="font-size:0.9rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">2025-26</div>
-      ${teamLogo(teamAbbr, 80)}
-      <div style="font-size:2rem;font-weight:900;margin:0.5rem 0;color:${tColor};">${title}</div>
-      <div style="font-size:1.2rem;font-weight:700;">${teamAbbr}</div>
-    </div>`;
+  // If clicking the current effective winner, and it's a user pick, remove the override
+  const currentWinner = getSeriesWinner(seriesId);
+  if (team === currentWinner && BRACKET_STATE.userPicks[seriesId] != null) {
+    delete BRACKET_STATE.userPicks[seriesId];
+  } else if (team === BRACKET_STATE.modelPicks[seriesId]) {
+    // Clicking model pick - remove user override if any
+    delete BRACKET_STATE.userPicks[seriesId];
   } else {
-    // Conference champs - medium celebration
-    cel.innerHTML += `<div style="text-align:center;padding:1rem;margin:0.5rem 0;border-radius:10px;background:linear-gradient(90deg,${tColor}15,transparent,${tColor}15);border:1px solid ${tColor}40;">
-      ${teamLogo(teamAbbr, 40)}
-      <span style="font-weight:700;margin-left:0.5rem;color:${tColor};">${teamAbbr} - ${title}</span>
-    </div>`;
+    // Set user override
+    BRACKET_STATE.userPicks[seriesId] = team;
   }
-  cel.style.display = 'block';
+
+  // Cascade downstream
+  cascadeBracket(seriesId);
+
+  // Re-render the entire bracket (simplest approach for consistency)
+  renderBracketHTML();
 }
 
-function launchConfetti() {
-  const colors = ['#F5A623','#22c55e','#ef4444','#3b82f6','#a855f7','#eab308','#ffffff'];
-  for (let i = 0; i < 60; i++) {
-    const piece = document.createElement('div');
-    piece.className = 'confetti-piece';
-    piece.style.left = Math.random() * 100 + 'vw';
-    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-    piece.style.animationDelay = Math.random() * 2 + 's';
-    piece.style.animationDuration = (2 + Math.random() * 2) + 's';
-    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
-    piece.style.width = (6 + Math.random() * 8) + 'px';
-    piece.style.height = (6 + Math.random() * 8) + 'px';
-    document.body.appendChild(piece);
-    setTimeout(() => piece.remove(), 5000);
+function cascadeBracket(seriesId) {
+  const tree = BRACKET_TREE[seriesId];
+  if (!tree) return; // finals-0 has no downstream
+
+  const nextId = tree.next;
+  const slot = tree.slot; // 'higher' or 'lower'
+  const winner = getSeriesWinner(seriesId);
+
+  // Get current downstream series data
+  const nextSd = BRACKET_STATE.seriesData[nextId];
+  if (!nextSd) {
+    // Initialize the downstream series
+    BRACKET_STATE.seriesData[nextId] = { higher: null, lower: null, higherPct: 0.5 };
   }
+
+  const sd = BRACKET_STATE.seriesData[nextId];
+  const oldTeam = sd[slot];
+
+  // Update the slot with the new winner
+  sd[slot] = winner || null;
+
+  // If the team changed, we need to recompute probability and possibly clear picks
+  if (oldTeam !== sd[slot]) {
+    // Recompute probability if both teams are set
+    if (sd.higher && sd.lower) {
+      const probHigher = lookupPairwiseProb(sd.higher, sd.lower);
+      sd.higherPct = probHigher;
+      // Update model pick based on probability
+      BRACKET_STATE.modelPicks[nextId] = probHigher >= 0.5 ? sd.higher : sd.lower;
+    } else {
+      sd.higherPct = 0.5;
+      BRACKET_STATE.modelPicks[nextId] = null;
+    }
+
+    // Clear user pick if it's no longer valid (the picked team is no longer in this series)
+    const userPick = BRACKET_STATE.userPicks[nextId];
+    if (userPick && userPick !== sd.higher && userPick !== sd.lower) {
+      delete BRACKET_STATE.userPicks[nextId];
+    }
+
+    // Recurse downstream
+    cascadeBracket(nextId);
+  }
+}
+
+function resetBracket() {
+  BRACKET_STATE.userPicks = {};
+  if (DATA) renderBracket(DATA);
 }
 
 // ── Games Tab ──
