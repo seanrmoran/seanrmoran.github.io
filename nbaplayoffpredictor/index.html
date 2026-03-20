@@ -431,22 +431,42 @@ layout: null
       position: relative;
       box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
-    .bmatch:hover { border-color: rgba(245,166,35,0.3); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .bmatch:hover { border-color: rgba(245,166,35,0.35); box-shadow: 0 2px 10px rgba(0,0,0,0.35), 0 0 6px rgba(245,166,35,0.06); }
     .bmatch.user-override { border-color: var(--purple); box-shadow: 0 0 8px rgba(168,85,247,0.25); }
-    .bmatch.winner-known { border-color: rgba(245,166,35,0.4); }
+    .bmatch.winner-known { border-color: rgba(245,166,35,0.4); box-shadow: 0 1px 6px rgba(245,166,35,0.06), 0 1px 3px rgba(0,0,0,0.2); }
 
-    /* Finals matchup card - bigger */
+    /* Finals matchup card - dramatic broadcast style */
     .bmatch-finals {
       padding: 0;
       min-width: 175px;
+      background: linear-gradient(135deg, var(--surface) 0%, rgba(245,166,35,0.08) 30%, rgba(245,166,35,0.04) 70%, var(--surface) 100%);
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 24px rgba(245,166,35,0.10), 0 2px 12px rgba(0,0,0,0.4);
     }
+    .bmatch-finals:hover {
+      border-color: rgba(245,166,35,0.7);
+      box-shadow: 0 0 32px rgba(245,166,35,0.18), 0 4px 16px rgba(0,0,0,0.4);
+    }
+    .bmatch-finals .bmatch-prob-bar { height: 5px; }
     .bmatch-finals .bmatch-team {
-      padding: 0.5rem 0.65rem;
+      padding: 0.55rem 0.7rem;
       gap: 0.4rem;
     }
-    .bmatch-finals .bmatch-name { font-size: 0.88rem; }
+    .bmatch-finals .bmatch-name { font-size: 0.9rem; font-weight: 700; }
     .bmatch-finals .bmatch-seed { font-size: 0.75rem; }
-    .bmatch-finals .bmatch-pct { font-size: 0.78rem; }
+    .bmatch-finals .bmatch-pct { font-size: 0.8rem; }
+
+    /* Probability tug-of-war bar at top of each matchup card */
+    .bmatch-prob-bar {
+      display: flex;
+      height: 3px;
+      overflow: hidden;
+      border-radius: 8px 8px 0 0;
+    }
+    .bmatch-prob-bar > div {
+      transition: width 0.3s ease;
+      opacity: 0.85;
+    }
 
     /* Each team row inside a matchup */
     .bmatch-team {
@@ -455,14 +475,33 @@ layout: null
       gap: 0.35rem;
       padding: 0.4rem 0.55rem;
       cursor: pointer;
-      transition: background 0.1s, border-color 0.15s;
+      transition: all 0.2s ease;
       border-left: 3px solid transparent;
     }
-    .bmatch-team:first-child { border-bottom: 1px solid var(--border); border-top-left-radius: 8px; }
+    .bmatch-team:not(:last-child) { border-bottom: 1px solid var(--border); }
     .bmatch-team:last-child { border-bottom-left-radius: 8px; }
     .bmatch-team:hover { background: rgba(245,166,35,0.08); }
     .bmatch-team.picked { font-weight: 700; }
-    .bmatch-team.faded { opacity: 0.4; }
+    .bmatch-team.picked .bmatch-name { text-shadow: 0 0 8px rgba(255,255,255,0.08); }
+    .bmatch-team.faded { opacity: 0.3; transform: scale(0.98); }
+
+    /* Advance indicator for picked team */
+    .bmatch-advance {
+      font-size: 0.6rem;
+      color: var(--accent);
+      margin-left: 0.15rem;
+      opacity: 0.9;
+      filter: drop-shadow(0 0 2px rgba(245,166,35,0.4));
+    }
+
+    /* Flash animation when a team is just picked */
+    @keyframes pick-flash {
+      0% { background: rgba(245,166,35,0.3); }
+      100% { background: rgba(245,166,35,0.15); }
+    }
+    .bmatch-team.just-picked {
+      animation: pick-flash 0.4s ease-out;
+    }
     .bmatch-seed { font-size: 0.7rem; color: var(--text-dim); min-width: 16px; text-align: center; font-weight: 700; }
     .bmatch-name { font-weight: 600; font-size: 0.8rem; white-space: nowrap; }
     .bmatch-name-full { display: inline; }
@@ -474,13 +513,15 @@ layout: null
     /* Champion callout below finals */
     .bracket-champ-callout {
       text-align: center;
+      padding: 0.9rem 1rem;
       margin-top: 0.5rem;
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      padding: 0.4rem 0.6rem;
-      border-radius: 6px;
-      background: rgba(245,166,35,0.06);
-      border: 1px solid rgba(245,166,35,0.12);
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text);
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(245,166,35,0.12), rgba(245,166,35,0.03), rgba(245,166,35,0.12));
+      border: 1.5px solid rgba(245,166,35,0.3);
+      box-shadow: 0 0 16px rgba(245,166,35,0.06);
     }
     .bracket-champ-callout strong {
       color: var(--accent);
@@ -493,12 +534,174 @@ layout: null
       to { box-shadow: 0 0 12px rgba(245,166,35,0.3); }
     }
 
-    /* Subtle column separators instead of broken connector lines */
+    /* Team record in bracket cards */
+    .bmatch-record { font-size: 0.65rem; color: var(--text-dim); margin-left: 0.15rem; font-variant-numeric: tabular-nums; }
+
+    /* Play-in matchup cards */
+    .bmatch-playin {
+      opacity: 0.55;
+      border-style: dashed;
+      font-size: 0.75rem;
+    }
+    .bmatch-playin .bmatch-team { padding: 0.25rem 0.4rem; cursor: default; }
+    .bmatch-playin .bmatch-team:hover { background: transparent; }
+    .bmatch-playin .bmatch-name { font-size: 0.7rem; }
+    .bmatch-playin .bmatch-seed { font-size: 0.6rem; }
+    .bmatch-playin .bmatch-pct { font-size: 0.62rem; }
+
+    /* Play-in column: narrower */
+    .bracket-pi { min-width: 120px; max-width: 135px; flex: 0.6; }
+    .bracket-pi .bracket-col-label { font-size: 0.6rem; }
+
+    /* No connectors from play-in column */
+    .bracket-pi .bmatch::after,
+    .bracket-pi .bmatch::before { display: none !important; }
+
+    /* Bracket pair grouping for R1 matchups */
+    .bracket-pair {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      flex: 1;
+      position: relative;
+    }
+    .bracket-pair .bmatch { margin: 0.15rem 0; }
+
+    /* Increase column padding for connector line space */
+    .bracket-col { padding: 0 1rem; }
+
+    /* ── Horizontal connector lines from matchups to next round ── */
+
+    /* East (left side): connectors go RIGHT */
+    .bracket-east .bracket-r1 .bmatch::after,
+    .bracket-east .bracket-r2 .bmatch::after,
+    .bracket-east .bracket-cf .bmatch::after {
+      content: '';
+      position: absolute;
+      right: -1rem;
+      top: 50%;
+      width: 1rem;
+      border-top: 1.5px solid var(--border);
+    }
+
+    /* West (right side): connectors go LEFT (mirrored) */
+    .bracket-west .bracket-r1 .bmatch::after,
+    .bracket-west .bracket-r2 .bmatch::after,
+    .bracket-west .bracket-cf .bmatch::after {
+      content: '';
+      position: absolute;
+      left: -1rem;
+      top: 50%;
+      width: 1rem;
+      border-top: 1.5px solid var(--border);
+    }
+
+    /* ── Vertical connector lines: join pair of R1 matchups into one feed ── */
+
+    /* East R1 pairs: vertical bar on the right */
+    .bracket-east .bracket-r1 .bracket-pair::after {
+      content: '';
+      position: absolute;
+      right: -1rem;
+      top: 25%;
+      height: 50%;
+      border-right: 1.5px solid var(--border);
+    }
+
+    /* West R1 pairs: vertical bar on the left */
+    .bracket-west .bracket-r1 .bracket-pair::after {
+      content: '';
+      position: absolute;
+      left: -1rem;
+      top: 25%;
+      height: 50%;
+      border-left: 1.5px solid var(--border);
+    }
+
+    /* ── Vertical connector lines: join pair of R2 matchups into one feed ── */
+
+    /* East R2: vertical bar connecting 2 semis matchups on the right */
+    .bracket-east .bracket-r2 .bracket-col-matches::after {
+      content: '';
+      position: absolute;
+      right: -1rem;
+      top: 25%;
+      height: 50%;
+      border-right: 1.5px solid var(--border);
+    }
+    .bracket-east .bracket-r2 .bracket-col-matches { position: relative; }
+
+    /* West R2: vertical bar connecting 2 semis matchups on the left */
+    .bracket-west .bracket-r2 .bracket-col-matches::after {
+      content: '';
+      position: absolute;
+      left: -1rem;
+      top: 25%;
+      height: 50%;
+      border-left: 1.5px solid var(--border);
+    }
+    .bracket-west .bracket-r2 .bracket-col-matches { position: relative; }
+
+    /* ── Horizontal connector from semis INTO the pair (feeder line) ── */
+    .bracket-east .bracket-r2 .bmatch::before {
+      content: '';
+      position: absolute;
+      left: -1rem;
+      top: 50%;
+      width: 1rem;
+      border-top: 1.5px solid var(--border);
+    }
+    .bracket-west .bracket-r2 .bmatch::before {
+      content: '';
+      position: absolute;
+      right: -1rem;
+      top: 50%;
+      width: 1rem;
+      border-top: 1.5px solid var(--border);
+    }
+
+    /* ── Horizontal connector from conf finals INTO (feeder line) ── */
+    .bracket-east .bracket-cf .bmatch::before {
+      content: '';
+      position: absolute;
+      left: -1rem;
+      top: 50%;
+      width: 1rem;
+      border-top: 1.5px solid var(--border);
+    }
+    .bracket-west .bracket-cf .bmatch::before {
+      content: '';
+      position: absolute;
+      right: -1rem;
+      top: 50%;
+      width: 1rem;
+      border-top: 1.5px solid var(--border);
+    }
+
+    /* ── Finals connectors: incoming lines from each conf finals ── */
+    .bracket-finals-center .bmatch::before {
+      content: '';
+      position: absolute;
+      left: -0.75rem;
+      top: 50%;
+      width: 0.75rem;
+      border-top: 1.5px solid var(--border);
+    }
+    .bracket-finals-center .bmatch::after {
+      content: '';
+      position: absolute;
+      right: -0.75rem;
+      top: 50%;
+      width: 0.75rem;
+      border-top: 1.5px solid var(--border);
+    }
+
+    /* Subtle column separators (kept as secondary visual aid) */
     .bracket-east .bracket-col:not(:last-child) {
-      border-right: 1px solid rgba(45,58,84,0.5);
+      border-right: 1px solid rgba(45,58,84,0.3);
     }
     .bracket-west .bracket-col:not(:last-child) {
-      border-left: 1px solid rgba(45,58,84,0.5);
+      border-left: 1px solid rgba(45,58,84,0.3);
     }
 
     /* Round labels */
@@ -545,23 +748,77 @@ layout: null
         -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
       }
       .bracket-half { flex-direction: row !important; flex-shrink: 0; }
-      .bracket-col { min-width: 130px; flex: 0 0 auto; }
+      .bracket-col { min-width: 130px; flex: 0 0 auto; padding: 0 0.5rem; }
       .bracket-finals-center { padding: 0.5rem 0.5rem; flex-shrink: 0; min-width: 160px; }
       .bmatch-name-full { display: none; }
       .bmatch-name-abbr { display: inline; }
       .bracket-conf-header { font-size: 0.7rem; padding: 0.3rem 0 0.5rem; }
       .bracket-east .bracket-col:not(:last-child) { border-right: none; }
       .bracket-west .bracket-col:not(:last-child) { border-left: none; }
+      /* Hide play-in columns on mobile to save space */
+      .bracket-pi { display: none !important; }
+      /* Hide all connector lines on mobile */
+      .bmatch::after, .bmatch::before,
+      .bracket-pair::after,
+      .bracket-r2 .bracket-col-matches::after { display: none !important; }
+      .bracket-finals-center .bmatch::before,
+      .bracket-finals-center .bmatch::after { display: none !important; }
     }
     @media (max-width: 600px) {
-      .bracket-col { min-width: 110px; }
-      .bmatch-team { padding: 0.3rem 0.4rem; }
-      .bmatch-name { font-size: 0.72rem; }
+      .bracket-col { min-width: 100px; padding: 0 0.3rem; }
+      .bmatch { font-size: 0.74rem; }
+      .bmatch-team { padding: 0.35rem 0.4rem; min-height: 34px; }
+      .bmatch-name { font-size: 0.74rem; }
       .bmatch-seed { font-size: 0.62rem; }
-      .bmatch-pct { font-size: 0.65rem; }
+      .bmatch-pct { font-size: 0.68rem; }
       .bmatch-finals .bmatch-team { padding: 0.4rem 0.5rem; }
       .bmatch-finals .bmatch-name { font-size: 0.78rem; }
     }
+
+    /* Full championship odds table */
+    .bracket-odds-table-toggle {
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    .bracket-odds-table-toggle a {
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .bracket-odds-table-toggle a:hover {
+      text-decoration: underline;
+    }
+    #bracket-odds-table {
+      display: none;
+      max-width: 600px;
+      margin: 0 auto 1rem;
+    }
+    #bracket-odds-table table {
+      width: 100%;
+      font-size: 0.82rem;
+    }
+    #bracket-odds-table th {
+      font-size: 0.68rem;
+      padding: 0.4rem 0.5rem;
+    }
+    #bracket-odds-table td {
+      padding: 0.35rem 0.5rem;
+    }
+    @media (max-width: 600px) {
+      #bracket-odds-table table { font-size: 0.74rem; }
+      #bracket-odds-table th { font-size: 0.62rem; padding: 0.3rem 0.35rem; }
+      #bracket-odds-table td { padding: 0.3rem 0.35rem; }
+    }
+
+    /* Mobile bracket improvements */
+    @media (max-width: 900px) {
+      .bmatch-team { padding: 0.4rem 0.5rem; min-height: 36px; }
+      .bmatch-name { font-size: 0.78rem; }
+      .bmatch-pct { font-size: 0.75rem; }
+      .bmatch-record { display: none; }
+    }
+
     .champ-headline { text-align: center; margin-bottom: 1rem; padding-top: 1rem; }
     .champ-odds-bar { display: flex; gap: 0.4rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.2rem; }
     .champ-odds-item {
@@ -577,6 +834,10 @@ layout: null
     }
     .champ-odds-pct { font-weight: 800; font-size: 1.15rem; }
     .champ-odds-team { font-size: 0.72rem; color: var(--text-dim); display: flex; align-items: center; justify-content: center; gap: 0.25rem; margin-top: 0.15rem; }
+    @media (max-width: 600px) {
+      .champ-odds-item { padding: 0.3rem 0.4rem; min-width: 55px; }
+      .champ-odds-pct { font-size: 0.9rem; }
+    }
 
     /* Games tab */
     .game-card { background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0.8rem 1rem;margin-bottom:0.5rem;display:flex;align-items:center;gap:1rem; }
@@ -816,10 +1077,12 @@ layout: null
   <div id="bracket" class="tab-content">
     <div id="bracket-headline" class="champ-headline"></div>
     <div id="bracket-odds-bar" class="champ-odds-bar"></div>
+    <div id="bracket-odds-table-wrap"></div>
     <div class="text-center mb-md">
       <div style="font-size:0.8rem;color:var(--text-dim);opacity:0.7;margin-bottom:0.5rem;">Build your own bracket -- click any team to advance them</div>
       <div class="flex-center gap-sm flex-wrap">
         <button class="bracket-btn bracket-btn-reset" onclick="resetBracket()">Reset to Model Picks</button>
+        <span id="bracket-picks-counter" style="color:var(--purple);font-weight:600;font-size:0.82rem;"></span>
       </div>
     </div>
     <div id="bracket-container"></div>
@@ -2351,6 +2614,29 @@ function renderBracket(data) {
     BRACKET_STATE.modelPicks['finals-0'] = b.finals.predicted_champion;
   }
 
+  // Play-in tournament (display-only, not interactive)
+  const matchupSrc = data.matchups_projected || {};
+  for (const conf of ['East', 'West']) {
+    const piKey = conf + '_playin';
+    const piMatchups = matchupSrc[piKey] || [];
+    const confKey = conf.toLowerCase();
+    piMatchups.forEach((m, i) => {
+      const id = `${confKey}-pi-${i}`;
+      const hi = m.higher_seed?.abbreviation;
+      const lo = m.lower_seed?.abbreviation;
+      if (hi && lo) {
+        BRACKET_STATE.seriesData[id] = {
+          higher: hi, lower: lo,
+          higherPct: 0.5,
+          isPlayin: true
+        };
+        if (!BRACKET_STATE.seeds[hi]) BRACKET_STATE.seeds[hi] = (i === 0 ? 7 : 9);
+        if (!BRACKET_STATE.seeds[lo]) BRACKET_STATE.seeds[lo] = (i === 0 ? 8 : 10);
+        BRACKET_STATE.modelPicks[id] = hi;
+      }
+    });
+  }
+
   // Render championship headline
   renderBracketHeadline(data);
 
@@ -2410,11 +2696,26 @@ function renderBracketHTML() {
   html += '<div class="bracket-conf-header bracket-conf-header-east">Eastern Conference</div>';
   html += '<div style="display:flex;flex:1;">';
 
-  // East R1: 4 matchups
+  // East Play-In column (display-only, before First Round)
+  html += '<div class="bracket-col bracket-pi">';
+  html += '<div class="bracket-col-label">Play-In</div>';
+  html += '<div class="bracket-col-matches">';
+  html += bmatchHTML('east-pi-0', false, true);
+  html += bmatchHTML('east-pi-1', false, true);
+  html += '</div></div>';
+
+  // East R1: 4 matchups in 2 pairs (pair 1: 0+3 feed semis-0, pair 2: 1+2 feed semis-1)
   html += '<div class="bracket-col bracket-r1">';
   html += '<div class="bracket-col-label">First Round</div>';
   html += '<div class="bracket-col-matches">';
-  for (let i = 0; i < 4; i++) html += bmatchHTML(`east-r1-${i}`);
+  html += '<div class="bracket-pair">';
+  html += bmatchHTML('east-r1-0');
+  html += bmatchHTML('east-r1-3');
+  html += '</div>';
+  html += '<div class="bracket-pair">';
+  html += bmatchHTML('east-r1-1');
+  html += bmatchHTML('east-r1-2');
+  html += '</div>';
   html += '</div></div>';
 
   // East R2: 2 matchups (conf semis)
@@ -2440,12 +2741,15 @@ function renderBracketHTML() {
   html += '<div class="bracket-finals-label">NBA Finals</div>';
   html += bmatchHTML('finals-0', true);
 
-  // Champion callout
+  // Champion callout - dynamic: shows user's pick when overrides exist
   const finalsWinner = getSeriesWinner('finals-0');
   if (finalsWinner) {
     const tColor = TEAM_COLORS[finalsWinner] || 'var(--accent)';
+    const hasUserPicks = Object.keys(BRACKET_STATE.userPicks).length > 0;
+    const champLabel = hasUserPicks ? 'Your pick' : 'Model predicts';
+    const champName = TEAM_CITY_MAP[finalsWinner] || finalsWinner;
     html += `<div class="bracket-champ-callout bracket-champ-glow">
-      Model picks <strong style="color:${tColor};">${finalsWinner}</strong> to win
+      ${champLabel}: <strong style="color:${tColor};">${champName}</strong> wins the title
     </div>`;
   }
 
@@ -2460,11 +2764,26 @@ function renderBracketHTML() {
   // West columns in DOM order: R1, R2, R3 -- row-reverse flips display to R3, R2, R1
   // So visually: Conf Finals (closest to center) | Semis | First Round (far right)
 
-  // West R1: 4 matchups
+  // West R1: 4 matchups in 2 pairs (pair 1: 0+3 feed semis-0, pair 2: 1+2 feed semis-1)
   html += '<div class="bracket-col bracket-r1">';
   html += '<div class="bracket-col-label">First Round</div>';
   html += '<div class="bracket-col-matches">';
-  for (let i = 0; i < 4; i++) html += bmatchHTML(`west-r1-${i}`);
+  html += '<div class="bracket-pair">';
+  html += bmatchHTML('west-r1-0');
+  html += bmatchHTML('west-r1-3');
+  html += '</div>';
+  html += '<div class="bracket-pair">';
+  html += bmatchHTML('west-r1-1');
+  html += bmatchHTML('west-r1-2');
+  html += '</div>';
+  html += '</div></div>';
+
+  // West Play-In column (display-only, outermost via row-reverse)
+  html += '<div class="bracket-col bracket-pi">';
+  html += '<div class="bracket-col-label">Play-In</div>';
+  html += '<div class="bracket-col-matches">';
+  html += bmatchHTML('west-pi-0', false, true);
+  html += bmatchHTML('west-pi-1', false, true);
   html += '</div></div>';
 
   // West R2: 2 matchups (conf semis)
@@ -2487,6 +2806,48 @@ function renderBracketHTML() {
   html += '</div>'; // end bracket-tree
 
   container.innerHTML = html;
+
+  // Update picks counter
+  const counterEl = document.getElementById('bracket-picks-counter');
+  if (counterEl) {
+    const userPickCount = Object.keys(BRACKET_STATE.userPicks).length;
+    const totalSeries = Object.keys(BRACKET_STATE.seriesData).filter(k => !k.includes('-pi-')).length;
+    counterEl.textContent = userPickCount > 0 ? `${userPickCount} of ${totalSeries} picks changed` : '';
+  }
+
+  // Populate full championship odds table
+  const oddsTableWrap = document.getElementById('bracket-odds-table-wrap');
+  if (oddsTableWrap && DATA && DATA.championship_odds) {
+    const champOdds = DATA.championship_odds;
+    const allOdds = Object.entries(champOdds)
+      .map(([team, odds]) => ({ team, ...odds }))
+      .filter(x => (x.champion || 0) > 0)
+      .sort((a, b) => (b.champion || 0) - (a.champion || 0));
+
+    let tableHtml = '<div class="bracket-odds-table-toggle">';
+    tableHtml += '<a href="#" id="bracket-odds-table-toggle" onclick="var t=document.getElementById(\'bracket-odds-table\');t.style.display=t.style.display===\'none\'?\'block\':\'none\';this.textContent=t.style.display===\'none\'?\'View all championship odds \\u25BE\':\'Hide championship odds \\u25B4\';return false;">View all championship odds \u25BE</a>';
+    tableHtml += '</div>';
+
+    tableHtml += '<div id="bracket-odds-table"><table><thead><tr>';
+    tableHtml += '<th>Team</th><th class="c">Semis</th><th class="c">Conf Finals</th><th class="c">Finals</th><th class="c">Champion</th>';
+    tableHtml += '</tr></thead><tbody>';
+
+    allOdds.forEach(function(x) {
+      const tColor = TEAM_COLORS[x.team] || 'var(--text)';
+      const champPct = ((x.champion || 0) * 100).toFixed(1);
+      const champWeight = (x.champion || 0) > 0.1 ? 'font-weight:700;' : '';
+      tableHtml += '<tr>';
+      tableHtml += '<td>' + teamLogo(x.team, 16) + ' ' + x.team + '</td>';
+      tableHtml += '<td class="c">' + ((x.conf_semis || 0) * 100).toFixed(0) + '%</td>';
+      tableHtml += '<td class="c">' + ((x.conf_finals || 0) * 100).toFixed(0) + '%</td>';
+      tableHtml += '<td class="c">' + ((x.finals || 0) * 100).toFixed(0) + '%</td>';
+      tableHtml += '<td class="c" style="color:' + tColor + ';' + champWeight + '">' + champPct + '%</td>';
+      tableHtml += '</tr>';
+    });
+
+    tableHtml += '</tbody></table></div>';
+    oddsTableWrap.innerHTML = tableHtml;
+  }
 }
 
 function getSeriesWinner(seriesId) {
@@ -2503,12 +2864,13 @@ const TEAM_CITY_MAP = {
   SAC:'Sacramento',SAS:'San Antonio',TOR:'Toronto',UTA:'Utah',WAS:'Washington',
 };
 
-function bmatchHTML(seriesId, isFinals) {
+function bmatchHTML(seriesId, isFinals, isPlayin) {
   const sd = BRACKET_STATE.seriesData[seriesId];
   if (!sd || !sd.higher || !sd.lower) {
     // Placeholder for TBD series
     const finalsClass = isFinals ? ' bmatch-finals' : '';
-    return `<div class="bmatch${finalsClass}" id="bs-${seriesId}" style="opacity:0.4;">
+    const playinClass = isPlayin ? ' bmatch-playin' : '';
+    return `<div class="bmatch${finalsClass}${playinClass}" id="bs-${seriesId}" style="opacity:0.4;">
       <div class="bmatch-team"><span class="bmatch-seed">?</span><span class="bmatch-name dim">TBD</span></div>
       <div class="bmatch-team"><span class="bmatch-seed">?</span><span class="bmatch-name dim">TBD</span></div>
     </div>`;
@@ -2529,53 +2891,100 @@ function bmatchHTML(seriesId, isFinals) {
   const overrideClass = isUserOverride ? ' user-override' : '';
   const winnerClass = winner ? ' winner-known' : '';
   const finalsClass = isFinals ? ' bmatch-finals' : '';
+  const playinClass = isPlayin ? ' bmatch-playin' : '';
 
-  // Get team colors for the winner border
-  const hColor = TEAM_COLORS[higher] || 'var(--accent)';
-  const lColor = TEAM_COLORS[lower] || 'var(--accent)';
+  // Team colors (unused directly now, getMatchupColors handles differentiation below)
 
   // Team display names: full city on desktop, abbreviation on mobile
   const hCity = TEAM_CITY_MAP[higher] || higher;
   const lCity = TEAM_CITY_MAP[lower] || lower;
 
+  // Look up team records from DATA
+  const allTeams = [...(DATA?.east || []), ...(DATA?.west || [])];
+  const hTeamData = allTeams.find(t => t.abbreviation === higher);
+  const lTeamData = allTeams.find(t => t.abbreviation === lower);
+  const hRecord = hTeamData ? `(${hTeamData.wins}-${hTeamData.losses})` : '';
+  const lRecord = lTeamData ? `(${lTeamData.wins}-${lTeamData.losses})` : '';
+
+  // Get matchup-aware colors (avoids two similar-colored teams)
+  const [colorH, colorL] = getMatchupColors(higher, lower);
+
   // Higher seed team row (top)
   let hClass = 'bmatch-team';
   let hBorderStyle = '';
-  if (higherIsWinner) {
-    hClass += ' picked';
-    hBorderStyle = `border-left-color:${hColor};`;
-  } else if (lowerIsWinner) {
-    hClass += ' faded';
+  if (!isPlayin) {
+    if (higherIsWinner) {
+      hClass += ' picked';
+      hBorderStyle = `border-left-color:${colorH};background:linear-gradient(90deg,${colorH}22,transparent 70%);`;
+    } else if (lowerIsWinner) {
+      hClass += ' faded';
+    }
   }
 
   // Lower seed team row (bottom)
   let lClass = 'bmatch-team';
   let lBorderStyle = '';
-  if (lowerIsWinner) {
-    lClass += ' picked';
-    lBorderStyle = `border-left-color:${lColor};`;
-  } else if (higherIsWinner) {
-    lClass += ' faded';
+  if (!isPlayin) {
+    if (lowerIsWinner) {
+      lClass += ' picked';
+      lBorderStyle = `border-left-color:${colorL};background:linear-gradient(90deg,${colorL}22,transparent 70%);`;
+    } else if (higherIsWinner) {
+      lClass += ' faded';
+    }
   }
+
+  // Advance arrow icon for picked winner
+  const hAdvance = (higherIsWinner && !isPlayin) ? '<span class="bmatch-advance">&#9654;</span>' : '';
+  const lAdvance = (lowerIsWinner && !isPlayin) ? '<span class="bmatch-advance">&#9654;</span>' : '';
 
   // Favored team pct gets bold
   const hPctClass = pctH >= pctL ? ' bmatch-pct-favored' : '';
   const lPctClass = pctL > pctH ? ' bmatch-pct-favored' : '';
 
-  // Logo size: bigger for finals
-  const logoSize = isFinals ? 22 : 18;
+  // Logo size: bigger for finals, smaller for play-in
+  const logoSize = isFinals ? 22 : (isPlayin ? 14 : 18);
+
+  // Play-in cards: no click handler, no win pct (single game, not a series)
+  if (isPlayin) {
+    return `<div class="bmatch${playinClass}" id="bs-${seriesId}">
+      <div class="${hClass}" style="${hBorderStyle}">
+        <span class="bmatch-seed">${seedH}</span>
+        <span class="bmatch-logo">${teamLogo(higher, logoSize)}</span>
+        <span class="bmatch-name"><span class="bmatch-name-full">${hCity}</span><span class="bmatch-name-abbr">${higher}</span></span>
+        <span class="bmatch-record">${hRecord}</span>
+      </div>
+      <div class="${lClass}" style="${lBorderStyle}">
+        <span class="bmatch-seed">${seedL}</span>
+        <span class="bmatch-logo">${teamLogo(lower, logoSize)}</span>
+        <span class="bmatch-name"><span class="bmatch-name-full">${lCity}</span><span class="bmatch-name-abbr">${lower}</span></span>
+        <span class="bmatch-record">${lRecord}</span>
+      </div>
+    </div>`;
+  }
+
+  // Click handler for interactive matchups
+  const hClick = `onclick="pickBracketWinner('${seriesId}','${higher}')"`;
+  const lClick = `onclick="pickBracketWinner('${seriesId}','${lower}')"`;
+  const hTitle = `title="${hCity} ${hRecord} - Click to advance"`;
+  const lTitle = `title="${lCity} ${lRecord} - Click to advance"`;
 
   return `<div class="bmatch${overrideClass}${winnerClass}${finalsClass}" id="bs-${seriesId}">
-    <div class="${hClass}" style="${hBorderStyle}" onclick="pickBracketWinner('${seriesId}','${higher}')">
+    <div class="bmatch-prob-bar">
+      <div style="width:${pctH}%;background:${colorH};"></div>
+      <div style="width:${pctL}%;background:${colorL};"></div>
+    </div>
+    <div class="${hClass}" style="${hBorderStyle}" ${hClick} ${hTitle}>
       <span class="bmatch-seed">${seedH}</span>
       <span class="bmatch-logo">${teamLogo(higher, logoSize)}</span>
-      <span class="bmatch-name"><span class="bmatch-name-full">${hCity}</span><span class="bmatch-name-abbr">${higher}</span></span>
+      <span class="bmatch-name"><span class="bmatch-name-full">${hCity}</span><span class="bmatch-name-abbr">${higher}</span></span>${hAdvance}
+      <span class="bmatch-record">${hRecord}</span>
       <span class="bmatch-pct${hPctClass}">${pctH}%</span>
     </div>
-    <div class="${lClass}" style="${lBorderStyle}" onclick="pickBracketWinner('${seriesId}','${lower}')">
+    <div class="${lClass}" style="${lBorderStyle}" ${lClick} ${lTitle}>
       <span class="bmatch-seed">${seedL}</span>
       <span class="bmatch-logo">${teamLogo(lower, logoSize)}</span>
-      <span class="bmatch-name"><span class="bmatch-name-full">${lCity}</span><span class="bmatch-name-abbr">${lower}</span></span>
+      <span class="bmatch-name"><span class="bmatch-name-full">${lCity}</span><span class="bmatch-name-abbr">${lower}</span></span>${lAdvance}
+      <span class="bmatch-record">${lRecord}</span>
       <span class="bmatch-pct${lPctClass}">${pctL}%</span>
     </div>
   </div>`;
@@ -2611,6 +3020,12 @@ function pickBracketWinner(seriesId, team) {
 
   // Re-render the entire bracket (simplest approach for consistency)
   renderBracketHTML();
+
+  // Flash animation on the picked team
+  setTimeout(() => {
+    const el = document.querySelector(`#bs-${seriesId} .bmatch-team.picked`);
+    if (el) { el.classList.add('just-picked'); setTimeout(() => el.classList.remove('just-picked'), 400); }
+  }, 10);
 }
 
 function cascadeBracket(seriesId) {
