@@ -3120,7 +3120,7 @@ function resetBracket() {
 }
 
 // Resize listener for SVG connectors
-window.addEventListener('resize', () => { if (document.getElementById('bracket-container')?.querySelector('.bracket-svg')) drawConnectors(); });
+window.addEventListener('resize', () => { if (document.querySelector('.bracket-tree .bracket-svg')) drawConnectors(); });
 
 function getChampionPath() {
   const path = [];
@@ -3157,19 +3157,25 @@ function getChampionPath() {
 }
 
 function drawConnectors() {
-  const container = document.getElementById('bracket-container');
-  if (!container) return;
+  // Attach SVG to the bracket-tree (the scrollable element) so it scrolls with the cards
+  const tree = document.querySelector('.bracket-tree');
+  if (!tree) return;
 
   // Remove old SVG if exists
-  const oldSvg = container.querySelector('.bracket-svg');
+  const oldSvg = tree.querySelector('.bracket-svg');
   if (oldSvg) oldSvg.remove();
 
-  const rect = container.getBoundingClientRect();
+  // Use scrollWidth/scrollHeight so SVG covers the full scrollable area
+  const rect = tree.getBoundingClientRect();
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.classList.add('bracket-svg');
-  svg.setAttribute('width', rect.width);
-  svg.setAttribute('height', rect.height);
+  svg.setAttribute('width', tree.scrollWidth);
+  svg.setAttribute('height', tree.scrollHeight);
   svg.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;z-index:1;';
+
+  // Offset: convert viewport coords to scroll-relative coords
+  const scrollLeft = tree.scrollLeft;
+  const scrollTop = tree.scrollTop;
 
   const lineColor = 'rgba(100, 120, 160, 0.45)';
   const lineWidth = 1.5;
@@ -3210,7 +3216,7 @@ function drawConnectors() {
     const destEl = document.getElementById('bs-' + destId);
     if (!destEl) continue;
     const destRect = destEl.getBoundingClientRect();
-    const destY = destRect.top + destRect.height / 2 - rect.top;
+    const destY = destRect.top + destRect.height / 2 - rect.top + scrollTop;
 
     // For each source, draw connector
     const sourceYs = [];
@@ -3220,7 +3226,7 @@ function drawConnectors() {
       const srcEl = document.getElementById('bs-' + src.id);
       if (!srcEl) return;
       const srcRect = srcEl.getBoundingClientRect();
-      const srcY = srcRect.top + srcRect.height / 2 - rect.top;
+      const srcY = srcRect.top + srcRect.height / 2 - rect.top + scrollTop;
       sourceYs.push(srcY);
       sourceIds.push(src.id);
 
@@ -3228,18 +3234,18 @@ function drawConnectors() {
 
       if (src.id.startsWith('east')) {
         // East: connect right side of source to left side of dest
-        const srcX = srcRect.right - rect.left;
-        const destX = destRect.left - rect.left;
+        const srcX = srcRect.right - rect.left + scrollLeft;
+        const destX = destRect.left - rect.left + scrollLeft;
         const midX = (srcX + destX) / 2;
         sourceXs.push(midX);
-        drawLine(srcX, srcY, midX, srcY); // horizontal from source to mid
+        drawLine(srcX, srcY, midX, srcY);
         segments.push({x1:srcX,y1:srcY,x2:midX,y2:srcY});
-        drawLine(midX, destY, destX, destY); // horizontal from mid to dest
+        drawLine(midX, destY, destX, destY);
         segments.push({x1:midX,y1:destY,x2:destX,y2:destY});
       } else {
         // West: connect left side of source to right side of dest
-        const srcX = srcRect.left - rect.left;
-        const destX = destRect.right - rect.left;
+        const srcX = srcRect.left - rect.left + scrollLeft;
+        const destX = destRect.right - rect.left + scrollLeft;
         const midX = (srcX + destX) / 2;
         sourceXs.push(midX);
         drawLine(srcX, srcY, midX, srcY);
@@ -3281,8 +3287,8 @@ function drawConnectors() {
     });
   }
 
-  container.style.position = 'relative';
-  container.appendChild(svg);
+  tree.style.position = 'relative';
+  tree.appendChild(svg);
 }
 
 // ── Games Tab ──
