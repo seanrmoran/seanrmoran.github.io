@@ -479,7 +479,16 @@ layout: null
       border-left: 3px solid transparent;
     }
     .bmatch-team:not(:last-child) { border-bottom: 1px solid var(--border); }
-    .bmatch-team:last-child { border-bottom-left-radius: 8px; }
+    .bmatch-team:last-child:not(:has(+ .bmatch-series-pred)) { border-bottom-left-radius: 8px; }
+    .bmatch-series-pred {
+      text-align: center;
+      font-size: 0.62rem;
+      color: var(--text-dim);
+      padding: 0.15rem 0;
+      border-top: 1px solid var(--border);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
     .bmatch-team:hover { background: rgba(245,166,35,0.08); }
     .bmatch-team.picked { font-weight: 700; }
     .bmatch-team.picked .bmatch-name { text-shadow: 0 0 8px rgba(255,255,255,0.08); }
@@ -553,6 +562,10 @@ layout: null
     .bracket-pi { min-width: 120px; max-width: 135px; flex: 0.6; }
     .bracket-pi .bracket-col-label { font-size: 0.6rem; }
 
+    /* SVG connector overlay */
+    .bracket-svg { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 1; }
+    .bmatch { position: relative; z-index: 2; }
+
     /* No connectors from play-in column */
     .bracket-pi .bmatch::after,
     .bracket-pi .bmatch::before { display: none !important; }
@@ -569,132 +582,6 @@ layout: null
 
     /* Increase column padding for connector line space */
     .bracket-col { padding: 0 1rem; }
-
-    /* ── Horizontal connector lines from matchups to next round ── */
-
-    /* East (left side): connectors go RIGHT */
-    .bracket-east .bracket-r1 .bmatch::after,
-    .bracket-east .bracket-r2 .bmatch::after,
-    .bracket-east .bracket-cf .bmatch::after {
-      content: '';
-      position: absolute;
-      right: -1rem;
-      top: 50%;
-      width: 1rem;
-      border-top: 1.5px solid var(--border);
-    }
-
-    /* West (right side): connectors go LEFT (mirrored) */
-    .bracket-west .bracket-r1 .bmatch::after,
-    .bracket-west .bracket-r2 .bmatch::after,
-    .bracket-west .bracket-cf .bmatch::after {
-      content: '';
-      position: absolute;
-      left: -1rem;
-      top: 50%;
-      width: 1rem;
-      border-top: 1.5px solid var(--border);
-    }
-
-    /* ── Vertical connector lines: join pair of R1 matchups into one feed ── */
-
-    /* East R1 pairs: vertical bar on the right */
-    .bracket-east .bracket-r1 .bracket-pair::after {
-      content: '';
-      position: absolute;
-      right: -1rem;
-      top: 25%;
-      height: 50%;
-      border-right: 1.5px solid var(--border);
-    }
-
-    /* West R1 pairs: vertical bar on the left */
-    .bracket-west .bracket-r1 .bracket-pair::after {
-      content: '';
-      position: absolute;
-      left: -1rem;
-      top: 25%;
-      height: 50%;
-      border-left: 1.5px solid var(--border);
-    }
-
-    /* ── Vertical connector lines: join pair of R2 matchups into one feed ── */
-
-    /* East R2: vertical bar connecting 2 semis matchups on the right */
-    .bracket-east .bracket-r2 .bracket-col-matches::after {
-      content: '';
-      position: absolute;
-      right: -1rem;
-      top: 25%;
-      height: 50%;
-      border-right: 1.5px solid var(--border);
-    }
-    .bracket-east .bracket-r2 .bracket-col-matches { position: relative; }
-
-    /* West R2: vertical bar connecting 2 semis matchups on the left */
-    .bracket-west .bracket-r2 .bracket-col-matches::after {
-      content: '';
-      position: absolute;
-      left: -1rem;
-      top: 25%;
-      height: 50%;
-      border-left: 1.5px solid var(--border);
-    }
-    .bracket-west .bracket-r2 .bracket-col-matches { position: relative; }
-
-    /* ── Horizontal connector from semis INTO the pair (feeder line) ── */
-    .bracket-east .bracket-r2 .bmatch::before {
-      content: '';
-      position: absolute;
-      left: -1rem;
-      top: 50%;
-      width: 1rem;
-      border-top: 1.5px solid var(--border);
-    }
-    .bracket-west .bracket-r2 .bmatch::before {
-      content: '';
-      position: absolute;
-      right: -1rem;
-      top: 50%;
-      width: 1rem;
-      border-top: 1.5px solid var(--border);
-    }
-
-    /* ── Horizontal connector from conf finals INTO (feeder line) ── */
-    .bracket-east .bracket-cf .bmatch::before {
-      content: '';
-      position: absolute;
-      left: -1rem;
-      top: 50%;
-      width: 1rem;
-      border-top: 1.5px solid var(--border);
-    }
-    .bracket-west .bracket-cf .bmatch::before {
-      content: '';
-      position: absolute;
-      right: -1rem;
-      top: 50%;
-      width: 1rem;
-      border-top: 1.5px solid var(--border);
-    }
-
-    /* ── Finals connectors: incoming lines from each conf finals ── */
-    .bracket-finals-center .bmatch::before {
-      content: '';
-      position: absolute;
-      left: -0.75rem;
-      top: 50%;
-      width: 0.75rem;
-      border-top: 1.5px solid var(--border);
-    }
-    .bracket-finals-center .bmatch::after {
-      content: '';
-      position: absolute;
-      right: -0.75rem;
-      top: 50%;
-      width: 0.75rem;
-      border-top: 1.5px solid var(--border);
-    }
 
     /* Subtle column separators (kept as secondary visual aid) */
     .bracket-east .bracket-col:not(:last-child) {
@@ -757,12 +644,8 @@ layout: null
       .bracket-west .bracket-col:not(:last-child) { border-left: none; }
       /* Hide play-in columns on mobile to save space */
       .bracket-pi { display: none !important; }
-      /* Hide all connector lines on mobile */
-      .bmatch::after, .bmatch::before,
-      .bracket-pair::after,
-      .bracket-r2 .bracket-col-matches::after { display: none !important; }
-      .bracket-finals-center .bmatch::before,
-      .bracket-finals-center .bmatch::after { display: none !important; }
+      /* Hide SVG connector lines on mobile */
+      .bracket-svg { display: none; }
     }
     @media (max-width: 600px) {
       .bracket-col { min-width: 100px; padding: 0 0.3rem; }
@@ -2590,19 +2473,19 @@ function renderBracket(data) {
     // First round: indices 0=1v8, 1=2v7, 2=3v6, 3=4v5
     bracket.first_round.forEach((m, i) => {
       const id = `${conf}-r1-${i}`;
-      BRACKET_STATE.seriesData[id] = { higher: m.higher, lower: m.lower, higherPct: m.higher_wins_pct || 0.5 };
+      BRACKET_STATE.seriesData[id] = { higher: m.higher, lower: m.lower, higherPct: m.higher_wins_pct || 0.5, seriesPrediction: m.series_prediction || null, seriesLength: m.series_length || null };
       BRACKET_STATE.modelPicks[id] = m.predicted_winner;
     });
     // Conf semis
     bracket.conf_semis.forEach((m, i) => {
       const id = `${conf}-r2-${i}`;
-      BRACKET_STATE.seriesData[id] = { higher: m.higher, lower: m.lower, higherPct: m.higher_wins_pct || 0.5 };
+      BRACKET_STATE.seriesData[id] = { higher: m.higher, lower: m.lower, higherPct: m.higher_wins_pct || 0.5, seriesPrediction: m.series_prediction || null, seriesLength: m.series_length || null };
       BRACKET_STATE.modelPicks[id] = m.predicted_winner;
     });
     // Conf finals
     const cf = bracket.conf_finals;
     const cfId = `${conf}-r3-0`;
-    BRACKET_STATE.seriesData[cfId] = { higher: cf.higher, lower: cf.lower, higherPct: cf.higher_wins_pct || 0.5 };
+    BRACKET_STATE.seriesData[cfId] = { higher: cf.higher, lower: cf.lower, higherPct: cf.higher_wins_pct || 0.5, seriesPrediction: cf.series_prediction || null, seriesLength: cf.series_length || null };
     BRACKET_STATE.modelPicks[cfId] = cf.predicted_winner;
   }
   // Finals
@@ -2610,6 +2493,8 @@ function renderBracket(data) {
     BRACKET_STATE.seriesData['finals-0'] = {
       higher: b.finals.east, lower: b.finals.west,
       higherPct: b.finals.east_wins_pct || 0.5,
+      seriesPrediction: b.finals.series_prediction || null,
+      seriesLength: b.finals.series_length || null,
     };
     BRACKET_STATE.modelPicks['finals-0'] = b.finals.predicted_champion;
   }
@@ -2807,6 +2692,9 @@ function renderBracketHTML() {
 
   container.innerHTML = html;
 
+  // Draw connectors after DOM is rendered
+  requestAnimationFrame(() => requestAnimationFrame(() => drawConnectors()));
+
   // Update picks counter
   const counterEl = document.getElementById('bracket-picks-counter');
   if (counterEl) {
@@ -2968,6 +2856,12 @@ function bmatchHTML(seriesId, isFinals, isPlayin) {
   const hTitle = `title="${hCity} ${hRecord} - Click to advance"`;
   const lTitle = `title="${lCity} ${lRecord} - Click to advance"`;
 
+  // Series prediction text (e.g. "DET in 5")
+  const seriesPred = sd.seriesPrediction;
+  const predHtml = (seriesPred && !isPlayin)
+    ? `<div class="bmatch-series-pred">${seriesPred}</div>`
+    : '';
+
   return `<div class="bmatch${overrideClass}${winnerClass}${finalsClass}" id="bs-${seriesId}">
     <div class="bmatch-prob-bar">
       <div style="width:${pctH}%;background:${colorH};"></div>
@@ -2987,6 +2881,7 @@ function bmatchHTML(seriesId, isFinals, isPlayin) {
       <span class="bmatch-record">${lRecord}</span>
       <span class="bmatch-pct${lPctClass}">${pctL}%</span>
     </div>
+    ${predHtml}
   </div>`;
 }
 
@@ -3013,6 +2908,16 @@ function pickBracketWinner(seriesId, team) {
   } else {
     // Set user override
     BRACKET_STATE.userPicks[seriesId] = team;
+  }
+
+  // Update series prediction for the current series
+  const sdCur = BRACKET_STATE.seriesData[seriesId];
+  const curWinner = getSeriesWinner(seriesId);
+  if (curWinner && sdCur && sdCur.higher && sdCur.lower) {
+    const winPctCur = curWinner === sdCur.higher ? sdCur.higherPct : (1 - sdCur.higherPct);
+    const lenCur = winPctCur >= 0.7 ? 5 : winPctCur >= 0.6 ? 6 : 7;
+    sdCur.seriesPrediction = `${curWinner} in ${lenCur}`;
+    sdCur.seriesLength = lenCur;
   }
 
   // Cascade downstream
@@ -3068,6 +2973,18 @@ function cascadeBracket(seriesId) {
       delete BRACKET_STATE.userPicks[nextId];
     }
 
+    // Compute series prediction for the downstream series
+    const nextWinner = getSeriesWinner(nextId);
+    if (nextWinner && sd.higher && sd.lower) {
+      const winPctNext = nextWinner === sd.higher ? sd.higherPct : (1 - sd.higherPct);
+      const lenNext = winPctNext >= 0.7 ? 5 : winPctNext >= 0.6 ? 6 : 7;
+      sd.seriesPrediction = `${nextWinner} in ${lenNext}`;
+      sd.seriesLength = lenNext;
+    } else {
+      sd.seriesPrediction = null;
+      sd.seriesLength = null;
+    }
+
     // Recurse downstream
     cascadeBracket(nextId);
   }
@@ -3076,6 +2993,94 @@ function cascadeBracket(seriesId) {
 function resetBracket() {
   BRACKET_STATE.userPicks = {};
   if (DATA) renderBracket(DATA);
+}
+
+// Resize listener for SVG connectors
+window.addEventListener('resize', () => { if (document.getElementById('bracket-container')?.querySelector('.bracket-svg')) drawConnectors(); });
+
+function drawConnectors() {
+  const container = document.getElementById('bracket-container');
+  if (!container) return;
+
+  // Remove old SVG if exists
+  const oldSvg = container.querySelector('.bracket-svg');
+  if (oldSvg) oldSvg.remove();
+
+  const rect = container.getBoundingClientRect();
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.classList.add('bracket-svg');
+  svg.setAttribute('width', rect.width);
+  svg.setAttribute('height', rect.height);
+  svg.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;z-index:1;';
+
+  const lineColor = getComputedStyle(document.documentElement).getPropertyValue('--border').trim() || '#2d3a54';
+  const lineWidth = 1.5;
+
+  function drawLine(x1, y1, x2, y2) {
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+    line.setAttribute('stroke', lineColor);
+    line.setAttribute('stroke-width', lineWidth);
+    svg.appendChild(line);
+  }
+
+  // Group bracket tree by destination to find feeder pairs
+  const feeders = {}; // nextId -> [{id, slot}]
+  for (const [id, info] of Object.entries(BRACKET_TREE)) {
+    if (!feeders[info.next]) feeders[info.next] = [];
+    feeders[info.next].push({ id, slot: info.slot });
+  }
+
+  for (const [destId, sources] of Object.entries(feeders)) {
+    const destEl = document.getElementById('bs-' + destId);
+    if (!destEl) continue;
+    const destRect = destEl.getBoundingClientRect();
+    const destY = destRect.top + destRect.height / 2 - rect.top;
+
+    // For each source, draw connector
+    const sourceYs = [];
+    const sourceXs = [];
+    sources.forEach(src => {
+      const srcEl = document.getElementById('bs-' + src.id);
+      if (!srcEl) return;
+      const srcRect = srcEl.getBoundingClientRect();
+      const srcY = srcRect.top + srcRect.height / 2 - rect.top;
+      sourceYs.push(srcY);
+
+      if (src.id.startsWith('east') || (destId === 'finals-0' && src.id.startsWith('east'))) {
+        // East: connect right side of source to left side of dest
+        const srcX = srcRect.right - rect.left;
+        const destX = destRect.left - rect.left;
+        const midX = (srcX + destX) / 2;
+        sourceXs.push(midX);
+        drawLine(srcX, srcY, midX, srcY); // horizontal from source
+        drawLine(midX, destY, destX, destY); // horizontal to dest
+      } else {
+        // West: connect left side of source to right side of dest
+        const srcX = srcRect.left - rect.left;
+        const destX = destRect.right - rect.left;
+        const midX = (srcX + destX) / 2;
+        sourceXs.push(midX);
+        drawLine(srcX, srcY, midX, srcY);
+        drawLine(midX, destY, destX, destY);
+      }
+    });
+
+    // Draw vertical connector between the two feeder sources
+    if (sourceYs.length === 2) {
+      const minY = Math.min(...sourceYs);
+      const maxY = Math.max(...sourceYs);
+      // Use the midX from the first source (both should be the same)
+      const midX = sourceXs[0];
+      if (midX != null) {
+        drawLine(midX, minY, midX, maxY);
+      }
+    }
+  }
+
+  container.style.position = 'relative';
+  container.appendChild(svg);
 }
 
 // ── Games Tab ──
