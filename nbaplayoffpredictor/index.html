@@ -988,12 +988,14 @@ layout: null
 <main id="main-content">
 <div class="container">
   <nav aria-label="Main navigation">
-  <div class="tabs" id="main-tabs">
-    <button class="tab active" data-tab="matchups">Playoffs</button>
-    <button class="tab" data-tab="bracket">Bracket</button>
-    <button class="tab" data-tab="games">Games</button>
-    <button class="tab" data-tab="standings">Standings</button>
-    <div id="team-search-wrap" style="margin-left:auto;position:relative;">
+  <div style="position:relative;">
+    <div class="tabs" id="main-tabs">
+      <button class="tab active" data-tab="matchups">Playoffs</button>
+      <button class="tab" data-tab="bracket">Bracket</button>
+      <button class="tab" data-tab="games">Games</button>
+      <button class="tab" data-tab="standings">Standings</button>
+    </div>
+    <div id="team-search-wrap" style="position:absolute;right:0;top:50%;transform:translateY(-50%);">
       <input type="text" id="team-search" placeholder="Find team..." autocomplete="off"
         style="padding:0.4rem 0.7rem;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:0.82rem;font-family:inherit;width:130px;transition:width 0.2s;"
         onfocus="this.style.width='180px'" onblur="setTimeout(()=>{this.style.width='130px';document.getElementById('team-search-results').style.display='none'},200)">
