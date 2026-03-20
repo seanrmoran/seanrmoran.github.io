@@ -563,12 +563,14 @@ layout: null
     .bmatch-playin .bmatch-pct { font-size: 0.62rem; }
 
     /* Play-in column: narrower */
-    .bracket-pi { min-width: 90px; max-width: 100px; flex: 0; flex-basis: 90px; }
+    .bracket-pi { flex: 0 0 150px; min-width: 150px; overflow: hidden; }
     .bracket-pi .bracket-col-label { font-size: 0.55rem; }
-    .bracket-pi .bmatch-team { padding: 0.2rem 0.3rem; }
-    .bracket-pi .bmatch-name { font-size: 0.65rem; }
+    .bracket-pi .bmatch-team { padding: 0.2rem 0.3rem; min-width: 0; }
+    .bracket-pi .bmatch-name { font-size: 0.68rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .bracket-pi .bmatch-name-full { display: none; }
     .bracket-pi .bmatch-name-abbr { display: inline; }
+    .bracket-pi .bmatch-record { display: none; }
+    .bracket-pi .bmatch { overflow: hidden; }
 
     /* SVG connector overlay */
     .bracket-svg { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 1; }
