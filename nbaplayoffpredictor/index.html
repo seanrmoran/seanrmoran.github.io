@@ -401,9 +401,13 @@ layout: null
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 0 0.75rem;
-      min-width: 190px;
+      padding: 0 1rem;
+      min-width: 200px;
       flex-shrink: 0;
+      position: relative;
+      background: linear-gradient(180deg, rgba(245,166,35,0.03) 0%, rgba(245,166,35,0.06) 50%, rgba(245,166,35,0.03) 100%);
+      border-left: 1px solid rgba(245,166,35,0.12);
+      border-right: 1px solid rgba(245,166,35,0.12);
     }
 
     /* Conference headers */
@@ -572,6 +576,17 @@ layout: null
       box-shadow: 0 0 10px rgba(var(--champ-rgb, 245,166,35), 0.18), 0 1px 3px rgba(0,0,0,0.2);
     }
 
+    /* Team hover highlight: lights up all appearances of a team across the bracket */
+    .bmatch-team.team-highlight {
+      background: rgba(245,166,35,0.12) !important;
+      outline: 1px solid rgba(245,166,35,0.4);
+      outline-offset: -1px;
+      border-radius: 4px;
+    }
+    .bmatch-team.team-highlight .bmatch-name {
+      color: var(--accent);
+    }
+
     /* No connectors from play-in column */
     .bracket-pi .bmatch::after,
     .bracket-pi .bmatch::before { display: none !important; }
@@ -608,24 +623,42 @@ layout: null
       padding: 0.3rem 0;
       margin-bottom: 0.35rem;
       border-bottom: 2px solid rgba(45,58,84,0.4);
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 3;
     }
     .bracket-east .bracket-col-label { color: var(--accent); border-bottom-color: rgba(245,166,35,0.2); }
     .bracket-west .bracket-col-label { color: var(--red); border-bottom-color: rgba(239,68,68,0.2); }
     .bracket-finals-label {
       text-align: center;
-      font-size: 0.82rem;
+      font-size: 0.95rem;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--accent);
+      letter-spacing: 0.12em;
+      background: linear-gradient(135deg, #F5A623 0%, #FFD700 40%, #F5A623 60%, #DAA520 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       margin-bottom: 0.35rem;
-      border-bottom: 2px solid rgba(245,166,35,0.3);
-      padding-bottom: 0.3rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 2px solid rgba(245,166,35,0.4);
+      position: relative;
+    }
+    .bracket-finals-label::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 20%;
+      right: 20%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(255,215,0,0.6), transparent);
     }
     .bracket-finals-trophy {
       text-align: center;
-      font-size: 1.8rem;
+      font-size: 2rem;
       margin-bottom: 0.3rem;
+      filter: drop-shadow(0 0 6px rgba(245,166,35,0.3));
     }
 
     /* Mobile: horizontal scroll with hint */
@@ -635,14 +668,15 @@ layout: null
         min-height: auto;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
         padding-bottom: 1rem;
         /* Scroll hint gradient */
         mask-image: linear-gradient(to right, black 90%, transparent 100%);
         -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
       }
       .bracket-half { flex-direction: row !important; flex-shrink: 0; }
-      .bracket-col { min-width: 130px; flex: 0 0 auto; padding: 0 0.5rem; }
-      .bracket-finals-center { padding: 0.5rem 0.5rem; flex-shrink: 0; min-width: 160px; }
+      .bracket-col { min-width: 140px; flex: 0 0 auto; padding: 0 0.5rem; }
+      .bracket-finals-center { padding: 0.5rem 0.5rem; flex-shrink: 0; min-width: 170px; }
       .bmatch-name-full { display: none; }
       .bmatch-name-abbr { display: inline; }
       .bracket-conf-header { font-size: 0.7rem; padding: 0.3rem 0 0.5rem; }
@@ -652,16 +686,36 @@ layout: null
       .bracket-pi { display: none !important; }
       /* Hide SVG connector lines on mobile */
       .bracket-svg { display: none; }
+      /* Larger tap targets on mobile */
+      .bmatch-team { min-height: 44px; padding: 0.5rem 0.55rem; }
+      /* Larger series predictions on mobile */
+      .bmatch-series-pred { font-size: 0.78rem; padding: 0.25rem 0; font-weight: 700; color: var(--text); }
+      /* Scroll hint indicator */
+      .bracket-scroll-hint {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+        font-size: 0.72rem;
+        color: var(--text-dim);
+        padding: 0.3rem 0;
+        animation: scrollHintPulse 2s ease-in-out infinite;
+      }
+      @keyframes scrollHintPulse {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+      }
     }
     @media (max-width: 600px) {
-      .bracket-col { min-width: 100px; padding: 0 0.3rem; }
-      .bmatch { font-size: 0.74rem; }
-      .bmatch-team { padding: 0.35rem 0.4rem; min-height: 34px; }
-      .bmatch-name { font-size: 0.74rem; }
-      .bmatch-seed { font-size: 0.62rem; }
-      .bmatch-pct { font-size: 0.68rem; }
-      .bmatch-finals .bmatch-team { padding: 0.4rem 0.5rem; }
-      .bmatch-finals .bmatch-name { font-size: 0.78rem; }
+      .bracket-col { min-width: 120px; padding: 0 0.3rem; }
+      .bmatch { font-size: 0.76rem; }
+      .bmatch-team { padding: 0.45rem 0.45rem; min-height: 44px; }
+      .bmatch-name { font-size: 0.76rem; }
+      .bmatch-seed { font-size: 0.65rem; }
+      .bmatch-pct { font-size: 0.72rem; font-weight: 600; }
+      .bmatch-finals .bmatch-team { padding: 0.5rem 0.55rem; }
+      .bmatch-finals .bmatch-name { font-size: 0.8rem; }
+      .bmatch-series-pred { font-size: 0.75rem; }
     }
 
     /* Full championship odds table */
@@ -702,9 +756,8 @@ layout: null
 
     /* Mobile bracket improvements */
     @media (max-width: 900px) {
-      .bmatch-team { padding: 0.4rem 0.5rem; min-height: 36px; }
-      .bmatch-name { font-size: 0.78rem; }
-      .bmatch-pct { font-size: 0.75rem; }
+      .bmatch-name { font-size: 0.8rem; font-weight: 700; }
+      .bmatch-pct { font-size: 0.78rem; font-weight: 600; }
       .bmatch-record { display: none; }
     }
 
@@ -967,6 +1020,7 @@ layout: null
     <div id="bracket-headline" class="champ-headline"></div>
     <div id="bracket-odds-bar" class="champ-odds-bar"></div>
     <div id="bracket-odds-table-wrap"></div>
+    <div id="bracket-scroll-hint" class="bracket-scroll-hint" style="display:none;">Swipe to explore bracket &#8594;</div>
     <div class="text-center mb-md">
       <div style="font-size:0.8rem;color:var(--text-dim);opacity:0.7;margin-bottom:0.5rem;">Build your own bracket -- click any team to advance them</div>
       <div class="flex-center gap-sm flex-wrap">
@@ -2701,6 +2755,41 @@ function renderBracketHTML() {
   // Draw connectors after DOM is rendered
   requestAnimationFrame(() => requestAnimationFrame(() => drawConnectors()));
 
+  // Show scroll hint on mobile, hide after user scrolls
+  const scrollHint = document.getElementById('bracket-scroll-hint');
+  if (scrollHint) {
+    const isMobile = window.innerWidth <= 900;
+    scrollHint.style.display = isMobile ? 'flex' : 'none';
+    if (isMobile) {
+      const bracketTree = container.querySelector('.bracket-tree');
+      if (bracketTree) {
+        const hideHint = () => { scrollHint.style.display = 'none'; bracketTree.removeEventListener('scroll', hideHint); };
+        bracketTree.addEventListener('scroll', hideHint, { once: true });
+      }
+    }
+  }
+
+  // Team hover highlight: hovering a team highlights all its appearances across the bracket
+  // Only attach once (check flag to avoid duplicate listeners on re-render)
+  if (!container._teamHighlightBound) {
+    container._teamHighlightBound = true;
+    container.addEventListener('mouseover', function(e) {
+      const teamEl = e.target.closest('.bmatch-team[data-team]');
+      if (!teamEl) return;
+      const team = teamEl.dataset.team;
+      container.querySelectorAll('.bmatch-team[data-team="' + team + '"]').forEach(function(el) {
+        el.classList.add('team-highlight');
+      });
+    });
+    container.addEventListener('mouseout', function(e) {
+      const teamEl = e.target.closest('.bmatch-team[data-team]');
+      if (!teamEl) return;
+      container.querySelectorAll('.bmatch-team.team-highlight').forEach(function(el) {
+        el.classList.remove('team-highlight');
+      });
+    });
+  }
+
   // Apply champion path highlight to bracket cards
   const champPathCards = getChampionPath();
   if (champPathCards.length > 0) {
@@ -2860,13 +2949,13 @@ function bmatchHTML(seriesId, isFinals, isPlayin) {
   // Play-in cards: no click handler, no win pct (single game, not a series)
   if (isPlayin) {
     return `<div class="bmatch${playinClass}" id="bs-${seriesId}">
-      <div class="${hClass}" style="${hBorderStyle}">
+      <div class="${hClass}" style="${hBorderStyle}" data-team="${higher}">
         <span class="bmatch-seed">${seedH}</span>
         <span class="bmatch-logo">${teamLogo(higher, logoSize)}</span>
         <span class="bmatch-name"><span class="bmatch-name-full">${hCity}</span><span class="bmatch-name-abbr">${higher}</span></span>
         <span class="bmatch-record">${hRecord}</span>
       </div>
-      <div class="${lClass}" style="${lBorderStyle}">
+      <div class="${lClass}" style="${lBorderStyle}" data-team="${lower}">
         <span class="bmatch-seed">${seedL}</span>
         <span class="bmatch-logo">${teamLogo(lower, logoSize)}</span>
         <span class="bmatch-name"><span class="bmatch-name-full">${lCity}</span><span class="bmatch-name-abbr">${lower}</span></span>
@@ -2881,25 +2970,35 @@ function bmatchHTML(seriesId, isFinals, isPlayin) {
   const hTitle = `title="${hCity} ${hRecord} - Click to advance"`;
   const lTitle = `title="${lCity} ${lRecord} - Click to advance"`;
 
-  // Series prediction text (e.g. "DET in 5")
+  // Series prediction text (e.g. "DET in 5") with team-colored winner name
   const seriesPred = sd.seriesPrediction;
-  const predHtml = (seriesPred && !isPlayin)
-    ? `<div class="bmatch-series-pred">${seriesPred}</div>`
-    : '';
+  let predHtml = '';
+  if (seriesPred && !isPlayin) {
+    // Color the winner abbreviation in the prediction
+    const predParts = seriesPred.match(/^(\w+)\s+(in\s+\d+)$/);
+    if (predParts) {
+      const predTeam = predParts[1];
+      const predRest = predParts[2];
+      const predColor = TEAM_COLORS[predTeam] || 'var(--accent)';
+      predHtml = `<div class="bmatch-series-pred"><strong style="color:${predColor};">${predTeam}</strong> ${predRest}</div>`;
+    } else {
+      predHtml = `<div class="bmatch-series-pred">${seriesPred}</div>`;
+    }
+  }
 
   return `<div class="bmatch${overrideClass}${winnerClass}${finalsClass}" id="bs-${seriesId}">
     <div class="bmatch-prob-bar">
       <div style="width:${pctH}%;background:${colorH};"></div>
       <div style="width:${pctL}%;background:${colorL};"></div>
     </div>
-    <div class="${hClass}" style="${hBorderStyle}" ${hClick} ${hTitle}>
+    <div class="${hClass}" style="${hBorderStyle}" ${hClick} ${hTitle} data-team="${higher}">
       <span class="bmatch-seed">${seedH}</span>
       <span class="bmatch-logo">${teamLogo(higher, logoSize)}</span>
       <span class="bmatch-name"><span class="bmatch-name-full">${hCity}</span><span class="bmatch-name-abbr">${higher}</span></span>${hAdvance}
       <span class="bmatch-record">${hRecord}</span>
       <span class="bmatch-pct${hPctClass}">${pctH}%</span>
     </div>
-    <div class="${lClass}" style="${lBorderStyle}" ${lClick} ${lTitle}>
+    <div class="${lClass}" style="${lBorderStyle}" ${lClick} ${lTitle} data-team="${lower}">
       <span class="bmatch-seed">${seedL}</span>
       <span class="bmatch-logo">${teamLogo(lower, logoSize)}</span>
       <span class="bmatch-name"><span class="bmatch-name-full">${lCity}</span><span class="bmatch-name-abbr">${lower}</span></span>${lAdvance}
