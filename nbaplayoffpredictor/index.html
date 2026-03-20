@@ -2527,7 +2527,7 @@ function renderBracket(data) {
   for (const conf of ['east', 'west']) {
     const bracket = b[conf];
     if (!bracket) continue;
-    const seedPairs = [[1,8],[4,5],[2,7],[3,6]];
+    const seedPairs = [[1,8],[2,7],[3,6],[4,5]];
     bracket.first_round.forEach((m, i) => {
       BRACKET_STATE.seeds[m.higher] = seedPairs[i][0];
       BRACKET_STATE.seeds[m.lower] = seedPairs[i][1];
@@ -2643,19 +2643,11 @@ function renderBracketHTML() {
   // Build the bracket tree: East (L-to-R) | Finals (center) | West (R-to-L)
   let html = '<div class="bracket-tree">';
 
-  // ── East half (left side, flows left-to-right) ──
+  // ── East half (left side, flows left-to-right toward center) ──
   html += '<div class="bracket-half bracket-east">';
   html += '<div style="display:flex;flex-direction:column;flex:1;">';
   html += '<div class="bracket-conf-header bracket-conf-header-east">Eastern Conference</div>';
   html += '<div style="display:flex;flex:1;">';
-
-  // East Play-In column (display-only, before First Round)
-  html += '<div class="bracket-col bracket-pi">';
-  html += '<div class="bracket-col-label">Play-In</div>';
-  html += '<div class="bracket-col-matches">';
-  html += bmatchHTML('east-pi-0', false, true);
-  html += bmatchHTML('east-pi-1', false, true);
-  html += '</div></div>';
 
   // East R1: 4 matchups in 2 pairs (pair 1: 0+3 feed semis-0, pair 2: 1+2 feed semis-1)
   html += '<div class="bracket-col bracket-r1">';
@@ -2669,6 +2661,14 @@ function renderBracketHTML() {
   html += bmatchHTML('east-r1-1');
   html += bmatchHTML('east-r1-2');
   html += '</div>';
+  html += '</div></div>';
+
+  // East Play-In column (display-only, to the right of First Round)
+  html += '<div class="bracket-col bracket-pi">';
+  html += '<div class="bracket-col-label">Play-In</div>';
+  html += '<div class="bracket-col-matches">';
+  html += bmatchHTML('east-pi-0', false, true);
+  html += bmatchHTML('east-pi-1', false, true);
   html += '</div></div>';
 
   // East R2: 2 matchups (conf semis)
@@ -2714,8 +2714,16 @@ function renderBracketHTML() {
   html += '<div class="bracket-conf-header bracket-conf-header-west">Western Conference</div>';
   html += '<div style="display:flex;flex-direction:row-reverse;flex:1;">';
 
-  // West columns in DOM order: R1, R2, R3 -- row-reverse flips display to R3, R2, R1
-  // So visually: Conf Finals (closest to center) | Semis | First Round (far right)
+  // West columns in DOM order with row-reverse: PI, R1, R2, CF
+  // row-reverse flips display to: CF, R2, R1, PI (PI on far right = outer edge)
+
+  // West Play-In column (outermost via row-reverse, rendered first in DOM)
+  html += '<div class="bracket-col bracket-pi">';
+  html += '<div class="bracket-col-label">Play-In</div>';
+  html += '<div class="bracket-col-matches">';
+  html += bmatchHTML('west-pi-0', false, true);
+  html += bmatchHTML('west-pi-1', false, true);
+  html += '</div></div>';
 
   // West R1: 4 matchups in 2 pairs (pair 1: 0+3 feed semis-0, pair 2: 1+2 feed semis-1)
   html += '<div class="bracket-col bracket-r1">';
@@ -2729,14 +2737,6 @@ function renderBracketHTML() {
   html += bmatchHTML('west-r1-1');
   html += bmatchHTML('west-r1-2');
   html += '</div>';
-  html += '</div></div>';
-
-  // West Play-In column (display-only, outermost via row-reverse)
-  html += '<div class="bracket-col bracket-pi">';
-  html += '<div class="bracket-col-label">Play-In</div>';
-  html += '<div class="bracket-col-matches">';
-  html += bmatchHTML('west-pi-0', false, true);
-  html += bmatchHTML('west-pi-1', false, true);
   html += '</div></div>';
 
   // West R2: 2 matchups (conf semis)
