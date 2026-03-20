@@ -563,8 +563,12 @@ layout: null
     .bmatch-playin .bmatch-pct { font-size: 0.62rem; }
 
     /* Play-in column: narrower */
-    .bracket-pi { min-width: 120px; max-width: 135px; flex: 0.6; }
-    .bracket-pi .bracket-col-label { font-size: 0.6rem; }
+    .bracket-pi { min-width: 90px; max-width: 100px; flex: 0; flex-basis: 90px; }
+    .bracket-pi .bracket-col-label { font-size: 0.55rem; }
+    .bracket-pi .bmatch-team { padding: 0.2rem 0.3rem; }
+    .bracket-pi .bmatch-name { font-size: 0.65rem; }
+    .bracket-pi .bmatch-name-full { display: none; }
+    .bracket-pi .bmatch-name-abbr { display: inline; }
 
     /* SVG connector overlay */
     .bracket-svg { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 1; }
@@ -3238,9 +3242,11 @@ function drawConnectors() {
         const destX = destRect.left - rect.left + scrollLeft;
         const midX = (srcX + destX) / 2;
         sourceXs.push(midX);
-        drawLine(srcX, srcY, midX, srcY);
+        drawLine(srcX, srcY, midX, srcY);       // horizontal from source
         segments.push({x1:srcX,y1:srcY,x2:midX,y2:srcY});
-        drawLine(midX, destY, destX, destY);
+        drawLine(midX, srcY, midX, destY);       // vertical to dest height
+        segments.push({x1:midX,y1:srcY,x2:midX,y2:destY});
+        drawLine(midX, destY, destX, destY);     // horizontal to dest
         segments.push({x1:midX,y1:destY,x2:destX,y2:destY});
       } else {
         // West: connect left side of source to right side of dest
@@ -3250,6 +3256,8 @@ function drawConnectors() {
         sourceXs.push(midX);
         drawLine(srcX, srcY, midX, srcY);
         segments.push({x1:srcX,y1:srcY,x2:midX,y2:srcY});
+        drawLine(midX, srcY, midX, destY);
+        segments.push({x1:midX,y1:srcY,x2:midX,y2:destY});
         drawLine(midX, destY, destX, destY);
         segments.push({x1:midX,y1:destY,x2:destX,y2:destY});
       }
