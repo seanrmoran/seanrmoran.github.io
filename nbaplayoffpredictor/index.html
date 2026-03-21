@@ -2649,6 +2649,14 @@ function renderBracketHTML() {
   html += '<div class="bracket-conf-header bracket-conf-header-east">Eastern Conference</div>';
   html += '<div style="display:flex;flex:1;">';
 
+  // East Play-In column (display-only, outermost left)
+  html += '<div class="bracket-col bracket-pi">';
+  html += '<div class="bracket-col-label">Play-In</div>';
+  html += '<div class="bracket-col-matches">';
+  html += bmatchHTML('east-pi-0', false, true);
+  html += bmatchHTML('east-pi-1', false, true);
+  html += '</div></div>';
+
   // East R1: 4 matchups in 2 pairs (pair 1: 0+3 feed semis-0, pair 2: 1+2 feed semis-1)
   html += '<div class="bracket-col bracket-r1">';
   html += '<div class="bracket-col-label">First Round</div>';
@@ -2661,14 +2669,6 @@ function renderBracketHTML() {
   html += bmatchHTML('east-r1-1');
   html += bmatchHTML('east-r1-2');
   html += '</div>';
-  html += '</div></div>';
-
-  // East Play-In column (display-only, to the right of First Round)
-  html += '<div class="bracket-col bracket-pi">';
-  html += '<div class="bracket-col-label">Play-In</div>';
-  html += '<div class="bracket-col-matches">';
-  html += bmatchHTML('east-pi-0', false, true);
-  html += bmatchHTML('east-pi-1', false, true);
   html += '</div></div>';
 
   // East R2: 2 matchups (conf semis)
