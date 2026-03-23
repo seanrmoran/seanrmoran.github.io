@@ -1778,9 +1778,9 @@ function renderMatchups(data, mode) {
     const color = conf === 'East' ? 'var(--accent)' : 'var(--red)';
     const subtitle = isProjected ? 'Projected Playoff Matchups' : 'If Season Ended Today';
     let html = `<div>`;
-    html += `<div class="card"><div class="card-header" style="background:linear-gradient(90deg,${color}22,transparent);">${conf}ern Conference - ${subtitle}</div><div class="card-body">`;
+    html += `<div class="card"><div class="card-header" style="background:linear-gradient(90deg,${color}22,transparent);">${conf}ern Conference</div><div class="card-body">`;
 
-    html += `<div class="bracket-label" style="color:var(--green)">Playoff Seeds (1-6)</div>`;
+    html += `<div class="bracket-label" style="color:var(--green);margin-top:0;">Playoff Seeds (1-6)</div>`;
     for (let i = 0; i < confMatchups.length; i++) {
       const m = confMatchups[i];
       const seedPairs = [[1,8],[2,7],[3,6],[4,5]];
@@ -1788,7 +1788,6 @@ function renderMatchups(data, mode) {
     }
 
     html += `<div class="bracket-label" style="color:var(--yellow);margin-top:1.2rem;">Play-In Tournament (7-10)</div>`;
-    html += `<div style="font-size:0.78rem;color:var(--text-dim);margin-bottom:0.5rem;padding-left:0.25rem;">7 vs 8 - winner gets 7th seed &nbsp;|&nbsp; 9 vs 10 - loser eliminated</div>`;
     const piSeeds = [[7,8],[9,10]];
     for (let i = 0; i < playinMatchups.length; i++) {
       const m = playinMatchups[i];
@@ -1853,7 +1852,6 @@ function matchupRowHTML(hiSeed, loSeed, hi, lo, series, isProjected) {
     seriesHtml = `<div class="flex-row" style="gap:0.6rem;margin-top:0.35rem;padding-top:0.3rem;border-top:1px solid var(--border);">
       <span style="font-size:0.78rem;color:var(--text-dim);">Season Series: ${recordText}</span>
       <span class="flex-row" style="gap:3px;">${dots}</span>
-      <span style="font-size:0.7rem;color:var(--accent);margin-left:auto;">Details →</span>
     </div>`;
   }
 
@@ -2568,23 +2566,20 @@ function renderBracket(data) {
   }
 
   // Play-in tournament (display-only, not interactive)
-  const matchupSrc = data.matchups_projected || {};
-  for (const conf of ['East', 'West']) {
-    const piKey = conf + '_playin';
-    const piMatchups = matchupSrc[piKey] || [];
-    const confKey = conf.toLowerCase();
+  // Play-in tournament (display-only, from MC simulation data)
+  for (const conf of ['east', 'west']) {
+    const piMatchups = b[conf]?.playin || [];
     piMatchups.forEach((m, i) => {
-      const id = `${confKey}-pi-${i}`;
-      const hi = m.higher_seed?.abbreviation;
-      const lo = m.lower_seed?.abbreviation;
+      const id = `${conf}-pi-${i}`;
+      const hi = m.higher;
+      const lo = m.lower;
       if (hi && lo) {
         BRACKET_STATE.seriesData[id] = {
           higher: hi, lower: lo,
           higherPct: 0.5,
           isPlayin: true
         };
-        if (!BRACKET_STATE.seeds[hi]) BRACKET_STATE.seeds[hi] = (i === 0 ? 7 : 9);
-        if (!BRACKET_STATE.seeds[lo]) BRACKET_STATE.seeds[lo] = (i === 0 ? 8 : 10);
+        // Don't assign seeds for play-in teams -- avoids duplicate seed numbers with R1
         BRACKET_STATE.modelPicks[id] = hi;
       }
     });
@@ -2614,7 +2609,6 @@ function renderBracketHeadline(data) {
     headlineEl.innerHTML = `<div style="font-size:1.3rem;font-weight:800;margin-bottom:0.3rem;">
       ${teamLogo(topTeam, 36)}
       <span style="color:${tColor};">Model predicts ${topTeam} to win the title</span>
-      <span style="color:var(--text-dim);font-weight:600;">(${(topPct * 100).toFixed(1)}% probability)</span>
     </div>`;
   } else {
     headlineEl.innerHTML = '';
@@ -2835,7 +2829,7 @@ function renderBracketHTML() {
       .sort((a, b) => (b.champion || 0) - (a.champion || 0));
 
     let tableHtml = '<div class="bracket-odds-table-toggle">';
-    tableHtml += '<a href="#" id="bracket-odds-table-toggle" onclick="var t=document.getElementById(\'bracket-odds-table\');t.style.display=t.style.display===\'none\'?\'block\':\'none\';this.textContent=t.style.display===\'none\'?\'View all championship odds \\u25BE\':\'Hide championship odds \\u25B4\';return false;">View all championship odds \u25BE</a>';
+    tableHtml += '<a href="#" id="bracket-odds-table-toggle" onclick="var t=document.getElementById(\'bracket-odds-table\'),v=t.style.display===\'block\';t.style.display=v?\'none\':\'block\';this.textContent=v?\'View all championship odds \\u25BE\':\'Hide championship odds \\u25B4\';return false;">View all championship odds \u25BE</a>';
     tableHtml += '</div>';
 
     tableHtml += '<div id="bracket-odds-table"><table><thead><tr>';
@@ -3334,8 +3328,7 @@ function renderAccuracyBanner(acc) {
   banner.innerHTML = `<div class="flex-center flex-wrap fs-sm" style="gap:0.5rem 1.5rem;padding:0.6rem 1rem;margin-bottom:0.75rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;">
     <span class="fw-700">Season accuracy: <span style="color:var(--accent);">${acc.season_correct}/${acc.season_total}</span> (${pct}%)</span>
     ${recentHtml}
-    ${brier ? `<span class="stat-tip" data-tip="Lower is better. Vegas is ~0.195" style="color:var(--text-dim);font-size:0.78rem;">Brier: ${brier}</span>` : ''}
-    <span class="fs-xxs dim">Tracking since ${acc.tracking_since}</span>
+    <a href="#methodology" style="color:var(--accent);font-size:0.78rem;text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">See methodology &rarr;</a>
   </div>`;
 }
 
@@ -3404,7 +3397,6 @@ function renderGames(data) {
   const todayIdx = dates.indexOf(data.today);
   GAMES_DAY_INDEX = todayIdx >= 0 ? todayIdx : Math.max(0, dates.length - 1);
   renderGamesDay();
-  renderSignificantGames(data);
 }
 
 function renderGamesDay() {
@@ -3462,13 +3454,13 @@ function renderGamesDay() {
         <div class="game-card-teams">
           <div class="gc-team" style="${awayStyle}">
             ${teamLogo(g.away_team, 26)}
-            <div class="gc-team-name">${g.away_team}</div>
+            <div class="gc-team-name" style="cursor:pointer;" onclick="event.stopPropagation();showTeam('${g.away_team}')" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${g.away_team}</div>
             <div class="gc-score">${g.away_score}</div>
           </div>
           <div class="gc-status">FINAL</div>
           <div class="gc-team" style="${homeStyle}">
             ${teamLogo(g.home_team, 26)}
-            <div class="gc-team-name">${g.home_team}</div>
+            <div class="gc-team-name" style="cursor:pointer;" onclick="event.stopPropagation();showTeam('${g.home_team}')" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${g.home_team}</div>
             <div class="gc-score">${g.home_score}</div>
           </div>
         </div>
@@ -3489,13 +3481,13 @@ function renderGamesDay() {
         <div class="game-card-teams">
           <div class="gc-team">
             ${teamLogo(g.away_team, 26)}
-            <div class="gc-team-name fw-700">${g.away_team}</div>
+            <div class="gc-team-name fw-700" style="cursor:pointer;" onclick="event.stopPropagation();showTeam('${g.away_team}')" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${g.away_team}</div>
             <div class="gc-score">${hasScores ? g.away_score : '-'}</div>
           </div>
           <div class="gc-status"><span class="gc-live">${liveText}</span></div>
           <div class="gc-team">
             ${teamLogo(g.home_team, 26)}
-            <div class="gc-team-name fw-700">${g.home_team}</div>
+            <div class="gc-team-name fw-700" style="cursor:pointer;" onclick="event.stopPropagation();showTeam('${g.home_team}')" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${g.home_team}</div>
             <div class="gc-score">${hasScores ? g.home_score : '-'}</div>
           </div>
         </div>
@@ -3513,25 +3505,17 @@ function renderGamesDay() {
         vegasHtml = `<span class="gc-pred" style="color:var(--text-dim);">Vegas: ${spreadTeam} -${spreadVal}</span>`;
       }
       let edgeHtml = '';
-      if (g.edge != null) {
-        const edgePct = Math.abs(g.edge * 100).toFixed(0);
-        const edgeTeam = g.edge > 0 ? g.home_team : g.away_team;
-        const edgeColor = Math.abs(g.edge) >= 0.05 ? 'var(--accent)' : 'var(--text-dim)';
-        edgeHtml = Math.abs(g.edge) >= 0.02
-          ? `<span class="gc-pred" style="color:${edgeColor};font-weight:600;">Edge: ${edgeTeam} +${edgePct}%</span>`
-          : '';
-      }
       html += `<div class="game-card" style="gap:0.75rem;">
         <div class="game-card-teams">
           <div class="gc-team">
             ${teamLogo(g.away_team, 26)}
-            <div class="gc-team-name fw-700">${g.away_team}</div>
+            <div class="gc-team-name fw-700" style="cursor:pointer;" onclick="event.stopPropagation();showTeam('${g.away_team}')" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${g.away_team}</div>
             <div class="gc-pred" style="color:var(--text-dim);">${awayProb != null ? awayProb+'%' : ''}</div>
           </div>
           <div class="fw-800" style="font-size:0.7rem;color:var(--text-dim);opacity:0.3;">@</div>
           <div class="gc-team">
             ${teamLogo(g.home_team, 26)}
-            <div class="gc-team-name fw-700">${g.home_team}</div>
+            <div class="gc-team-name fw-700" style="cursor:pointer;" onclick="event.stopPropagation();showTeam('${g.home_team}')" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${g.home_team}</div>
             <div class="gc-pred" style="color:var(--text-dim);">${homeProb != null ? homeProb+'%' : ''}</div>
           </div>
         </div>
@@ -3542,17 +3526,10 @@ function renderGamesDay() {
 
   html += `</div></div>`;
 
-  // Insert before the significant games section
   const container = document.getElementById('games-container');
-  const sigCard = document.getElementById('games-significant');
-  if (sigCard) {
-    // Replace just the day card
-    const dayCard = document.getElementById('games-day-card');
-    if (dayCard) dayCard.outerHTML = `<div id="games-day-card">${html}</div>`;
-    else sigCard.insertAdjacentHTML('beforebegin', `<div id="games-day-card">${html}</div>`);
-  } else {
-    container.innerHTML = `<div id="games-day-card">${html}</div>`;
-  }
+  const dayCard = document.getElementById('games-day-card');
+  if (dayCard) dayCard.outerHTML = `<div id="games-day-card">${html}</div>`;
+  else container.innerHTML = `<div id="games-day-card">${html}</div>`;
 }
 
 function gamesNav(dir) {
@@ -3625,48 +3602,6 @@ function fetchLiveScores() {
     .catch(() => {}); // Silently fail
 }
 
-function renderSignificantGames(data) {
-  const container = document.getElementById('games-container');
-  let html = '';
-
-  // Most significant remaining games
-  html += `<div class="card" id="games-significant">
-    <div class="card-header">Most Significant Remaining Games</div>
-    <div class="card-body" style="padding:0;">
-      <table style="font-size:0.84rem;">
-        <thead><tr>
-          <th style="width:70px;">Date</th>
-          <th>Matchup</th>
-          <th style="width:55px;" class="c">Win %</th>
-          <th>Why It Matters</th>
-          <th style="width:60px;" class="c">Impact</th>
-        </tr></thead><tbody>`;
-
-  (data.most_significant || []).forEach((g, i) => {
-    const d = new Date(g.game_date+'T12:00:00');
-    const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const prob = g.home_win_prob;
-    const probColor = prob > 0.6 ? 'var(--green)' : prob < 0.4 ? 'var(--red)' : 'var(--yellow)';
-    const nAffected = g.teams_affected || 2;
-    const seedShifts = g.seed_shifts || 0;
-    const impactColor = nAffected >= 5 ? 'var(--red)' : nAffected >= 3 ? 'var(--yellow)' : 'var(--text-dim)';
-    const affectedList = (g.affected_teams || []).join(', ');
-
-    html += `<tr>
-      <td class="dim">${dateStr}</td>
-      <td>${teamLogo(g.away_team, 18)}${g.away_team} <span class="dim">@</span> ${teamLogo(g.home_team, 18)}${g.home_team}</td>
-      <td class="c fw-700" style="color:${probColor}">${Math.round(prob*100)}%</td>
-      <td class="wrap" style="font-size:0.78rem;color:var(--text-dim);">${g.implications}</td>
-      <td class="c" title="Affects ${affectedList}">
-        <span class="impact-badge" style="background:${impactColor}20;color:${impactColor};">${nAffected} teams</span>
-      </td>
-    </tr>`;
-  });
-
-  html += `</tbody></table></div></div>`;
-
-  container.insertAdjacentHTML('beforeend', html);
-}
 </script>
 </body>
 </html>
