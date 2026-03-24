@@ -1,1 +1,1 @@
-{"last_refresh": "2026-03-23 00:08:05", "generated_at": "2026-03-23 00:08:31", "num_simulations": 10000, "model_version": "v14", "brier_score": 0.199, "accuracy": 0.69, "backtest_games": 11504, "backtest_seasons": "2015-16 through 2024-25"}
+{"last_refresh": "2026-03-24 00:20:44", "generated_at": "2026-03-24 00:21:14", "num_simulations": 10000, "model_version": "v14", "brier_score": 0.199, "accuracy": 0.69, "backtest_games": 11504, "backtest_seasons": "2015-16 through 2024-25"}
