@@ -2578,7 +2578,6 @@ function renderBracket(data) {
     BRACKET_STATE.modelPicks['finals-0'] = b.finals.predicted_champion;
   }
 
-  // Play-in tournament (display-only, not interactive)
   // Play-in tournament (display-only, from MC simulation data)
   for (const conf of ['east', 'west']) {
     const piMatchups = b[conf]?.playin || [];
@@ -2592,7 +2591,9 @@ function renderBracket(data) {
           higherPct: 0.5,
           isPlayin: true
         };
-        // Don't assign seeds for play-in teams -- avoids duplicate seed numbers with R1
+        // Show play-in seeds (7/8 and 9/10)
+        if (m.higher_seed) BRACKET_STATE.seeds[hi] = m.higher_seed;
+        if (m.lower_seed) BRACKET_STATE.seeds[lo] = m.lower_seed;
         BRACKET_STATE.modelPicks[id] = hi;
       }
     });
@@ -2647,84 +2648,16 @@ function renderBracketHeadline(data) {
 function renderBracketHTML() {
   const container = document.getElementById('bracket-container');
 
-  // Build the bracket tree: East (L-to-R) | Finals (center) | West (R-to-L)
+  // Build the bracket tree: West (L-to-R) | Finals (center) | East (R-to-L)
   let html = '<div class="bracket-tree">';
 
-  // ── East half (left side, flows left-to-right toward center) ──
-  html += '<div class="bracket-half bracket-east">';
-  html += '<div style="display:flex;flex-direction:column;flex:1;">';
-  html += '<div class="bracket-conf-header bracket-conf-header-east">Eastern Conference</div>';
-  html += '<div style="display:flex;flex:1;">';
-
-  // East Play-In column (display-only, outermost left)
-  html += '<div class="bracket-col bracket-pi">';
-  html += '<div class="bracket-col-label">Play-In</div>';
-  html += '<div class="bracket-col-matches">';
-  html += bmatchHTML('east-pi-0', false, true);
-  html += bmatchHTML('east-pi-1', false, true);
-  html += '</div></div>';
-
-  // East R1: 4 matchups in 2 pairs (pair 1: 0+3 feed semis-0, pair 2: 1+2 feed semis-1)
-  html += '<div class="bracket-col bracket-r1">';
-  html += '<div class="bracket-col-label">First Round</div>';
-  html += '<div class="bracket-col-matches">';
-  html += '<div class="bracket-pair">';
-  html += bmatchHTML('east-r1-0');
-  html += bmatchHTML('east-r1-3');
-  html += '</div>';
-  html += '<div class="bracket-pair">';
-  html += bmatchHTML('east-r1-1');
-  html += bmatchHTML('east-r1-2');
-  html += '</div>';
-  html += '</div></div>';
-
-  // East R2: 2 matchups (conf semis)
-  html += '<div class="bracket-col bracket-r2">';
-  html += '<div class="bracket-col-label">Conf Semis</div>';
-  html += '<div class="bracket-col-matches">';
-  for (let i = 0; i < 2; i++) html += bmatchHTML(`east-r2-${i}`);
-  html += '</div></div>';
-
-  // East R3: 1 matchup (conf finals)
-  html += '<div class="bracket-col bracket-cf">';
-  html += '<div class="bracket-col-label">Conf Finals</div>';
-  html += '<div class="bracket-col-matches">';
-  html += bmatchHTML('east-r3-0');
-  html += '</div></div>';
-
-  html += '</div></div>'; // end inner flex + conf wrapper
-  html += '</div>'; // end bracket-east
-
-  // ── Finals (center) ──
-  html += '<div class="bracket-finals-center">';
-  html += '<div class="bracket-finals-trophy">&#127942;</div>';
-  html += '<div class="bracket-finals-label">NBA Finals</div>';
-  html += bmatchHTML('finals-0', true);
-
-  // Champion callout - dynamic: shows user's pick when overrides exist
-  const finalsWinner = getSeriesWinner('finals-0');
-  if (finalsWinner) {
-    const tColor = TEAM_COLORS[finalsWinner] || 'var(--accent)';
-    const hasUserPicks = Object.keys(BRACKET_STATE.userPicks).length > 0;
-    const champLabel = hasUserPicks ? 'Your pick' : 'Model predicts';
-    const champName = TEAM_CITY_MAP[finalsWinner] || finalsWinner;
-    html += `<div class="bracket-champ-callout bracket-champ-glow">
-      ${champLabel}: <strong style="color:${tColor};">${champName}</strong> wins the title
-    </div>`;
-  }
-
-  html += '</div>';
-
-  // ── West half (right side, flows right-to-left toward center) ──
+  // ── West half (left side, flows left-to-right toward center) ──
   html += '<div class="bracket-half bracket-west">';
   html += '<div style="display:flex;flex-direction:column;flex:1;">';
   html += '<div class="bracket-conf-header bracket-conf-header-west">Western Conference</div>';
-  html += '<div style="display:flex;flex-direction:row-reverse;flex:1;">';
+  html += '<div style="display:flex;flex:1;">';
 
-  // West columns in DOM order with row-reverse: PI, R1, R2, CF
-  // row-reverse flips display to: CF, R2, R1, PI (PI on far right = outer edge)
-
-  // West Play-In column (outermost via row-reverse, rendered first in DOM)
+  // West Play-In column (display-only, outermost left)
   html += '<div class="bracket-col bracket-pi">';
   html += '<div class="bracket-col-label">Play-In</div>';
   html += '<div class="bracket-col-matches">';
@@ -2762,6 +2695,74 @@ function renderBracketHTML() {
 
   html += '</div></div>'; // end inner flex + conf wrapper
   html += '</div>'; // end bracket-west
+
+  // ── Finals (center) ──
+  html += '<div class="bracket-finals-center">';
+  html += '<div class="bracket-finals-trophy">&#127942;</div>';
+  html += '<div class="bracket-finals-label">NBA Finals</div>';
+  html += bmatchHTML('finals-0', true);
+
+  // Champion callout - dynamic: shows user's pick when overrides exist
+  const finalsWinner = getSeriesWinner('finals-0');
+  if (finalsWinner) {
+    const tColor = TEAM_COLORS[finalsWinner] || 'var(--accent)';
+    const hasUserPicks = Object.keys(BRACKET_STATE.userPicks).length > 0;
+    const champLabel = hasUserPicks ? 'Your pick' : 'Model predicts';
+    const champName = TEAM_CITY_MAP[finalsWinner] || finalsWinner;
+    html += `<div class="bracket-champ-callout bracket-champ-glow">
+      ${champLabel}: <strong style="color:${tColor};">${champName}</strong> wins the title
+    </div>`;
+  }
+
+  html += '</div>';
+
+  // ── East half (right side, flows right-to-left toward center) ──
+  html += '<div class="bracket-half bracket-east">';
+  html += '<div style="display:flex;flex-direction:column;flex:1;">';
+  html += '<div class="bracket-conf-header bracket-conf-header-east">Eastern Conference</div>';
+  html += '<div style="display:flex;flex-direction:row-reverse;flex:1;">';
+
+  // East columns in DOM order with row-reverse: PI, R1, R2, CF
+  // row-reverse flips display to: CF, R2, R1, PI (PI on far right = outer edge)
+
+  // East Play-In column (outermost via row-reverse, rendered first in DOM)
+  html += '<div class="bracket-col bracket-pi">';
+  html += '<div class="bracket-col-label">Play-In</div>';
+  html += '<div class="bracket-col-matches">';
+  html += bmatchHTML('east-pi-0', false, true);
+  html += bmatchHTML('east-pi-1', false, true);
+  html += '</div></div>';
+
+  // East R1: 4 matchups in 2 pairs (pair 1: 0+3 feed semis-0, pair 2: 1+2 feed semis-1)
+  html += '<div class="bracket-col bracket-r1">';
+  html += '<div class="bracket-col-label">First Round</div>';
+  html += '<div class="bracket-col-matches">';
+  html += '<div class="bracket-pair">';
+  html += bmatchHTML('east-r1-0');
+  html += bmatchHTML('east-r1-3');
+  html += '</div>';
+  html += '<div class="bracket-pair">';
+  html += bmatchHTML('east-r1-1');
+  html += bmatchHTML('east-r1-2');
+  html += '</div>';
+  html += '</div></div>';
+
+  // East R2: 2 matchups (conf semis)
+  html += '<div class="bracket-col bracket-r2">';
+  html += '<div class="bracket-col-label">Conf Semis</div>';
+  html += '<div class="bracket-col-matches">';
+  for (let i = 0; i < 2; i++) html += bmatchHTML(`east-r2-${i}`);
+  html += '</div></div>';
+
+  // East R3: 1 matchup (conf finals)
+  html += '<div class="bracket-col bracket-cf">';
+  html += '<div class="bracket-col-label">Conf Finals</div>';
+  html += '<div class="bracket-col-matches">';
+  html += bmatchHTML('east-r3-0');
+  html += '</div></div>';
+
+  html += '</div></div>'; // end inner flex + conf wrapper
+  html += '</div>'; // end bracket-east
 
   html += '</div>'; // end bracket-tree
 
@@ -3062,8 +3063,20 @@ function pickBracketWinner(seriesId, team) {
   // Cascade downstream
   cascadeBracket(seriesId);
 
+  // Preserve scroll position across re-render
+  const tree = document.querySelector('.bracket-tree');
+  const savedScrollLeft = tree ? tree.scrollLeft : 0;
+  const savedScrollTop = tree ? tree.scrollTop : 0;
+
   // Re-render the entire bracket (simplest approach for consistency)
   renderBracketHTML();
+
+  // Restore scroll position
+  const newTree = document.querySelector('.bracket-tree');
+  if (newTree) {
+    newTree.scrollLeft = savedScrollLeft;
+    newTree.scrollTop = savedScrollTop;
+  }
 
   // Flash animation on the picked team
   setTimeout(() => {
@@ -3247,8 +3260,8 @@ function drawConnectors() {
 
       const segments = [];
 
-      if (src.id.startsWith('east')) {
-        // East: connect right side of source to left side of dest
+      if (src.id.startsWith('west')) {
+        // West (left side): connect right side of source to left side of dest
         const srcX = srcRect.right - rect.left + scrollLeft;
         const destX = destRect.left - rect.left + scrollLeft;
         const midX = (srcX + destX) / 2;
@@ -3260,7 +3273,7 @@ function drawConnectors() {
         drawLine(midX, destY, destX, destY);     // horizontal to dest
         segments.push({x1:midX,y1:destY,x2:destX,y2:destY});
       } else {
-        // West: connect left side of source to right side of dest
+        // East (right side): connect left side of source to right side of dest
         const srcX = srcRect.left - rect.left + scrollLeft;
         const destX = destRect.right - rect.left + scrollLeft;
         const midX = (srcX + destX) / 2;
