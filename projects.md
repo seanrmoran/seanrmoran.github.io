@@ -6,6 +6,15 @@ title: Projects
 <h2 class="project-section-heading">Active</h2>
 
 <div class="project-list">
+  <a href="https://homeschoolleap.com" class="project-item">
+    <div class="project-logo-wrap" style="background:#1a9e6f">
+      <img src="/assets/images/projects/homeschoolleap-icon.png" alt="HomeschoolLeap app icon" class="project-logo project-logo--icon">
+    </div>
+    <div class="project-item-inner">
+      <h3>HomeschoolLeap</h3>
+      <p class="project-desc">A step-by-step compliance tool that walks families through everything they need to start homeschooling legally in their state.</p>
+    </div>
+  </a>
   <a href="https://parkerhillprovisions.com" class="project-item">
     <div class="project-logo-wrap" style="background:#1e3a5f">
       <img src="/assets/images/projects/php-logo.png" alt="Parker Hill Provisions logo" class="project-logo project-logo--wide">
@@ -56,12 +65,6 @@ title: Projects
 <h2 class="project-section-heading">Coming Soon</h2>
 
 <div class="project-list">
-  <div class="project-item">
-    <div class="project-item-inner">
-      <h3>HomeschoolLeap</h3>
-      <p class="project-desc">A step-by-step compliance tool that walks families through everything they need to start homeschooling legally in their state.</p>
-    </div>
-  </div>
   <div class="project-item">
     <div class="project-item-inner">
       <h3>Early Days</h3>
