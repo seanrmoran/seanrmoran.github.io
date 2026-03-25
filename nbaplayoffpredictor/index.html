@@ -1120,7 +1120,7 @@ layout: null
               <td>Days of rest (2 days is optimal, 4+ creates rust), age-adjusted B2B fatigue, <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8636381/" target="_blank" style="color:var(--accent);">travel distance and timezone crossing</a>, schedule density, and road trip length.</td>
             </tr>
             <tr>
-              <td style="font-weight:600;">Situation</td>
+              <td style="font-weight:600;">Motivation</td>
               <td>Tanking detection (comparing first-half vs. second-half performance), clinch resting (teams that have locked in a seed may sit starters), and season progress.</td>
             </tr>
             <tr>
@@ -3444,7 +3444,7 @@ function renderCalibrationChart(acc) {
       barmode: 'group', bargap: 0.2, bargroupgap: 0.1,
       legend: { orientation: 'h', y: 1.12, x: 0.5, xanchor: 'center' },
       height: 300,
-    }, { displayModeBar: false, responsive: true });
+    }, { displayModeBar: false, responsive: true, staticPlot: true });
   });
 }
 
