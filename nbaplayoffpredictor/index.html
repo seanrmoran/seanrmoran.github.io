@@ -994,9 +994,9 @@ layout: null
   <nav aria-label="Main navigation">
   <div style="position:relative;">
     <div class="tabs" id="main-tabs">
-      <button class="tab active" data-tab="standings">Standings</button>
+      <button class="tab" data-tab="standings">Standings</button>
       <button class="tab" data-tab="games">Games</button>
-      <button class="tab" data-tab="matchups">Playoffs</button>
+      <button class="tab active" data-tab="matchups">Playoffs</button>
       <button class="tab" data-tab="bracket">Bracket</button>
     </div>
     <div id="team-search-wrap" style="position:absolute;right:0;top:50%;transform:translateY(-50%);">
@@ -1333,7 +1333,7 @@ function navigateTo(hash) {
 }
 
 function handleRoute() {
-  const hash = location.hash || '#standings';
+  const hash = location.hash || '#matchups';
   const parts = hash.slice(1).split('/');
   const page = parts[0];
 
@@ -1403,7 +1403,7 @@ function loadData() {
       if (location.hash && location.hash !== '#') {
         handleRoute();
       } else {
-        document.getElementById('standings').classList.add('active');
+        document.getElementById('matchups').classList.add('active');
       }
       // Show freshness
       if (data.last_refresh) {
