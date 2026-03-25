@@ -380,8 +380,8 @@ layout: null
       display: flex;
       flex: 1;
     }
-    .bracket-east { flex-direction: row; }
-    .bracket-west { flex-direction: row-reverse; }
+    .bracket-west { flex-direction: row; }
+    .bracket-east { flex-direction: row-reverse; }
     .bracket-col {
       display: flex;
       flex-direction: column;
@@ -612,10 +612,10 @@ layout: null
     .bracket-col { padding: 0 1rem; }
 
     /* Subtle column separators (kept as secondary visual aid) */
-    .bracket-east .bracket-col:not(:last-child) {
+    .bracket-west .bracket-col:not(:last-child) {
       border-right: 1px solid rgba(45,58,84,0.3);
     }
-    .bracket-west .bracket-col:not(:last-child) {
+    .bracket-east .bracket-col:not(:last-child) {
       border-left: 1px solid rgba(45,58,84,0.3);
     }
 
@@ -687,8 +687,8 @@ layout: null
       .bmatch-name-full { display: none; }
       .bmatch-name-abbr { display: inline; }
       .bracket-conf-header { font-size: 0.7rem; padding: 0.3rem 0 0.5rem; }
-      .bracket-east .bracket-col:not(:last-child) { border-right: none; }
-      .bracket-west .bracket-col:not(:last-child) { border-left: none; }
+      .bracket-west .bracket-col:not(:last-child) { border-right: none; }
+      .bracket-east .bracket-col:not(:last-child) { border-left: none; }
       /* Hide play-in columns on mobile to save space */
       .bracket-pi { display: none !important; }
       /* Hide SVG connector lines on mobile */
