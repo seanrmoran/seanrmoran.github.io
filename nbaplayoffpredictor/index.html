@@ -285,37 +285,26 @@ layout: null
       .game-card-teams { gap: 0.3rem; }
     }
 
-    /* Hamburger menu for mobile */
-    .hamburger { display: none; }
-    .mobile-menu { display: none; }
+    /* Mobile navigation */
+    .mobile-nav { display: none; }
     @media (max-width: 580px) {
       .tabs { display: none !important; }
-      .hamburger {
-        display: flex; align-items: center; justify-content: center;
-        width: 36px; height: 36px; cursor: pointer;
-        background: var(--surface); border: 1px solid var(--border);
-        border-radius: 8px; font-size: 1.3rem; color: var(--text);
-        position: absolute; left: 0; top: 50%; transform: translateY(-50%);
-        z-index: 50;
-      }
-      .mobile-menu {
-        position: absolute; top: 100%; left: 0; margin-top: 4px;
-        background: var(--surface); border: 1px solid var(--border);
-        border-radius: 8px; min-width: 180px; z-index: 200;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.4); overflow: hidden;
-      }
-      .mobile-menu.open { display: block; }
-      .mobile-menu-item {
-        display: block; width: 100%; padding: 0.75rem 1rem;
-        background: none; border: none; color: var(--text-dim);
-        font-size: 0.9rem; font-family: inherit; text-align: left;
-        cursor: pointer; border-bottom: 1px solid var(--border);
-      }
-      .mobile-menu-item:last-child { border-bottom: none; }
-      .mobile-menu-item:hover, .mobile-menu-item.active {
-        background: rgba(245,166,35,0.1); color: var(--accent);
-      }
       #team-search-wrap { display: none !important; }
+      .mobile-nav {
+        display: flex; align-items: center; gap: 0;
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: 10px; overflow: hidden; margin-bottom: 0.5rem;
+      }
+      .mobile-nav-btn {
+        flex: 1; padding: 0.6rem 0.3rem; background: none; border: none;
+        color: var(--text-dim); font-size: 0.75rem; font-weight: 600;
+        font-family: inherit; cursor: pointer; text-align: center;
+        border-right: 1px solid var(--border); transition: all 0.15s;
+      }
+      .mobile-nav-btn:last-child { border-right: none; }
+      .mobile-nav-btn.active {
+        background: rgba(245,166,35,0.15); color: var(--accent);
+      }
     }
 
     @media (max-width: 480px) {
@@ -1026,13 +1015,12 @@ layout: null
 <div class="container">
   <nav aria-label="Main navigation">
   <div style="position:relative;">
-    <div class="hamburger" id="hamburger-btn" onclick="toggleMobileMenu()">&#9776;</div>
-    <div class="mobile-menu" id="mobile-menu">
-      <button class="mobile-menu-item active" onclick="mobileNav('team-tab')">Team</button>
-      <button class="mobile-menu-item" onclick="mobileNav('standings')">Standings</button>
-      <button class="mobile-menu-item" onclick="mobileNav('games')">Games</button>
-      <button class="mobile-menu-item" onclick="mobileNav('matchups')">Playoffs</button>
-      <button class="mobile-menu-item" onclick="mobileNav('bracket')">Bracket</button>
+    <div class="mobile-nav" id="mobile-nav">
+      <button class="mobile-nav-btn active" onclick="mobileNav('team-tab',this)">Team</button>
+      <button class="mobile-nav-btn" onclick="mobileNav('standings',this)">Standings</button>
+      <button class="mobile-nav-btn" onclick="mobileNav('games',this)">Games</button>
+      <button class="mobile-nav-btn" onclick="mobileNav('matchups',this)">Playoffs</button>
+      <button class="mobile-nav-btn" onclick="mobileNav('bracket',this)">Bracket</button>
     </div>
     <div class="tabs" id="main-tabs">
       <button class="tab active" data-tab="team-tab">Team</button>
@@ -1429,26 +1417,13 @@ document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => activateTab(tab));
 });
 
-// ── Mobile hamburger menu ──
-function toggleMobileMenu() {
-  document.getElementById('mobile-menu').classList.toggle('open');
-}
-function mobileNav(tabName) {
-  document.getElementById('mobile-menu').classList.remove('open');
+// ── Mobile nav ──
+function mobileNav(tabName, btnEl) {
   const tab = document.querySelector(`.tab[data-tab="${tabName}"]`);
   if (tab) activateTab(tab);
-  // Update active state in mobile menu
-  document.querySelectorAll('.mobile-menu-item').forEach(m => m.classList.remove('active'));
-  event.target.classList.add('active');
+  document.querySelectorAll('.mobile-nav-btn').forEach(m => m.classList.remove('active'));
+  if (btnEl) btnEl.classList.add('active');
 }
-// Close mobile menu when clicking outside
-document.addEventListener('click', (e) => {
-  const menu = document.getElementById('mobile-menu');
-  const btn = document.getElementById('hamburger-btn');
-  if (menu && btn && !menu.contains(e.target) && !btn.contains(e.target)) {
-    menu.classList.remove('open');
-  }
-});
 
 function showPage(pageId, skipHash) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
