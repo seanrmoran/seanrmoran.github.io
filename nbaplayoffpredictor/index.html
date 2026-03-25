@@ -285,6 +285,39 @@ layout: null
       .game-card-teams { gap: 0.3rem; }
     }
 
+    /* Hamburger menu for mobile */
+    .hamburger { display: none; }
+    .mobile-menu { display: none; }
+    @media (max-width: 580px) {
+      .tabs { display: none !important; }
+      .hamburger {
+        display: flex; align-items: center; justify-content: center;
+        width: 36px; height: 36px; cursor: pointer;
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: 8px; font-size: 1.3rem; color: var(--text);
+        position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+        z-index: 50;
+      }
+      .mobile-menu {
+        position: absolute; top: 100%; left: 0; margin-top: 4px;
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: 8px; min-width: 180px; z-index: 200;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.4); overflow: hidden;
+      }
+      .mobile-menu.open { display: block; }
+      .mobile-menu-item {
+        display: block; width: 100%; padding: 0.75rem 1rem;
+        background: none; border: none; color: var(--text-dim);
+        font-size: 0.9rem; font-family: inherit; text-align: left;
+        cursor: pointer; border-bottom: 1px solid var(--border);
+      }
+      .mobile-menu-item:last-child { border-bottom: none; }
+      .mobile-menu-item:hover, .mobile-menu-item.active {
+        background: rgba(245,166,35,0.1); color: var(--accent);
+      }
+      #team-search-wrap { display: none !important; }
+    }
+
     @media (max-width: 480px) {
       .hero h1 { font-size: 1.3rem; }
       .hero p { font-size: 0.75rem; }
@@ -993,6 +1026,14 @@ layout: null
 <div class="container">
   <nav aria-label="Main navigation">
   <div style="position:relative;">
+    <div class="hamburger" id="hamburger-btn" onclick="toggleMobileMenu()">&#9776;</div>
+    <div class="mobile-menu" id="mobile-menu">
+      <button class="mobile-menu-item active" onclick="mobileNav('team-tab')">Team</button>
+      <button class="mobile-menu-item" onclick="mobileNav('standings')">Standings</button>
+      <button class="mobile-menu-item" onclick="mobileNav('games')">Games</button>
+      <button class="mobile-menu-item" onclick="mobileNav('matchups')">Playoffs</button>
+      <button class="mobile-menu-item" onclick="mobileNav('bracket')">Bracket</button>
+    </div>
     <div class="tabs" id="main-tabs">
       <button class="tab active" data-tab="team-tab">Team</button>
       <button class="tab" data-tab="standings">Standings</button>
@@ -1386,6 +1427,27 @@ function activateTab(tab, skipHash) {
 // ── Tab switching ──
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => activateTab(tab));
+});
+
+// ── Mobile hamburger menu ──
+function toggleMobileMenu() {
+  document.getElementById('mobile-menu').classList.toggle('open');
+}
+function mobileNav(tabName) {
+  document.getElementById('mobile-menu').classList.remove('open');
+  const tab = document.querySelector(`.tab[data-tab="${tabName}"]`);
+  if (tab) activateTab(tab);
+  // Update active state in mobile menu
+  document.querySelectorAll('.mobile-menu-item').forEach(m => m.classList.remove('active'));
+  event.target.classList.add('active');
+}
+// Close mobile menu when clicking outside
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('mobile-menu');
+  const btn = document.getElementById('hamburger-btn');
+  if (menu && btn && !menu.contains(e.target) && !btn.contains(e.target)) {
+    menu.classList.remove('open');
+  }
 });
 
 function showPage(pageId, skipHash) {
@@ -2227,7 +2289,7 @@ function renderSeedChart(t) {
     xaxis: { gridcolor: '#2a3450', title: '', type: 'category' },
     yaxis: { gridcolor: '#2a3450', title: 'Probability %', range: [0, maxPct * 1.25] },
     height: 270,
-  }, { displayModeBar: false, responsive: true });
+  }, { displayModeBar: false, responsive: true, staticPlot: true });
 }
 
 function renderWinsChart(t) {
@@ -2255,7 +2317,7 @@ function renderWinsChart(t) {
       x: t.wins, y: 1, yref: 'paper', text: 'Current: ' + t.wins,
       showarrow: false, font: { color: '#eab308', size: 10 }, yanchor: 'bottom',
     }],
-  }, { displayModeBar: false, responsive: true });
+  }, { displayModeBar: false, responsive: true, staticPlot: true });
 }
 
 function renderOpponentsChart(t) {
@@ -2285,15 +2347,16 @@ function renderOpponentsChart(t) {
     paper_bgcolor: '#111827', plot_bgcolor: '#111827',
     font: { color: '#e2e8f0', size: 11 },
     margin: { t: 10, b: 30, l: 40, r: 50 },
-    xaxis: { gridcolor: '#2a3450', title: 'Probability %', rangemode: 'tozero' },
-    yaxis: { gridcolor: '#2a3450', type: 'category' },
+    xaxis: { gridcolor: '#2a3450', title: 'Probability %', rangemode: 'tozero', fixedrange: true },
+    yaxis: { gridcolor: '#2a3450', type: 'category', fixedrange: true },
+    dragmode: false,
     height: Math.max(180, top.length * 30 + 50),
-  }, { displayModeBar: false, responsive: true });
+  }, { displayModeBar: false, responsive: true, scrollZoom: false, doubleClick: false });
 
-  // Click bar to open matchup preview
+  // Click bar to navigate to that team
   chartEl.on('plotly_click', function(data) {
     const oppAbbr = data.points[0].customdata;
-    if (oppAbbr) showMatchup(abbr, oppAbbr);
+    if (oppAbbr) showTeam(oppAbbr);
   });
 }
 
