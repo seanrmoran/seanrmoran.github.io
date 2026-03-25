@@ -1057,9 +1057,9 @@ layout: null
 
   <!-- TEAM TAB -->
   <div id="team-tab" class="tab-content" style="padding-top:0.75rem;">
-    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;justify-content:center;margin-bottom:1rem;">
       <select id="team-tab-select" onchange="loadTeamTab(this.value)"
-        style="padding:0.5rem 0.75rem;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:0.9rem;font-family:inherit;min-width:200px;cursor:pointer;">
+        style="padding:0.6rem 1rem;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:10px;font-size:1rem;font-weight:600;font-family:inherit;min-width:250px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%239ca3af%22 stroke-width=%222%22><polyline points=%226 9 12 15 18 9%22/></svg>');background-repeat:no-repeat;background-position:right 0.75rem center;">
       </select>
     </div>
     <div id="team-tab-content"></div>
@@ -2162,9 +2162,10 @@ function renderTeamDetail(t, targetEl) {
   const sosLabel = avgWinProb >= 0.58 ? 'Easy' : avgWinProb >= 0.52 ? 'Below Avg' : avgWinProb >= 0.48 ? 'Average' : avgWinProb >= 0.42 ? 'Above Avg' : 'Tough';
   const sosColor = avgWinProb >= 0.55 ? 'var(--green)' : avgWinProb >= 0.45 ? 'var(--yellow)' : 'var(--red)';
 
+  const isInline = !!targetEl;
   let html = `
-    <div class="flex-between mb-sm">
-      <button class="back-btn" onclick="goBack()">← Back</button>
+    <div class="flex-between mb-sm"${isInline ? ' style="justify-content:flex-end;"' : ''}>
+      ${isInline ? '' : '<button class="back-btn" onclick="goBack()">&#8592; Back</button>'}
       <button id="share-btn" class="back-btn" onclick="shareTeam('${t.abbreviation}','${t.city} ${t.name}','${projSeed}','${t.wins}-${t.losses}','${pctFmt(t.playoff_prob||0)}')">Share</button>
     </div>
     <div class="flex-row gap-lg mb-sm" style="padding-bottom:0.75rem;border-bottom:3px solid ${tColor};">
