@@ -1,0 +1,39 @@
+---
+layout: default
+title: Writing editor
+permalink: /edit/
+noindex: true
+---
+
+{% assign editor_root = 'https://app.pagescms.org/seanrmoran/seanrmoran.github.io/main' %}
+
+<div class="page-header">
+  <h1>Edit your writing</h1>
+</div>
+
+<div class="post-content">
+  <p>Choose an article below to edit its title, date, and text. The visual editor has controls for headings, bold, lists, links, and images.</p>
+
+  <p><a href="{{ editor_root }}/collection/writing"><strong>Open writing editor &rarr;</strong></a> &nbsp; &middot; &nbsp; <a href="{{ editor_root }}/collection/writing/new">New article</a></p>
+
+  <p><strong>First visit:</strong> Sign in to Pages CMS with GitHub. If prompted, install the Pages CMS app and choose <strong>Only select repositories</strong>, then <strong>seanrmoran.github.io</strong>. After signing in, return here and choose an article.</p>
+
+  <p><strong>Save publishes your changes.</strong> Allow a minute or two for the live site to update. Check the formatting in the editor before saving, then open the live article to see it in your site's design.</p>
+</div>
+
+<ul class="article-list">
+  {% for post in site.posts %}
+  <li class="article-item">
+    {% if post.path == '_posts/2025-01-01-music.md' %}
+    <a href="{{ editor_root }}/file/music">
+    {% else %}
+    <a href="{{ editor_root }}/collection/writing/edit/{{ post.path | url_encode }}">
+    {% endif %}
+      <h3>{{ post.title | escape }}</h3>
+      <p class="article-meta">{{ post.date | date: "%B %-d, %Y" }}{% if post.path == '_posts/2025-01-01-music.md' %} &middot; Source editor to preserve photo captions{% endif %}</p>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+
+<p><a href="{{ '/writing/' | relative_url }}">View published writing &rarr;</a></p>
