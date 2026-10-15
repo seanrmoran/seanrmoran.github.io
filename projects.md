@@ -51,33 +51,4 @@ title: Projects
       <p class="project-desc">A local family guide to Sonoma County with activity reviews, camp guides, and tips from a family of five exploring Santa Rosa and beyond.</p>
     </div>
   </a>
-  <a href="https://apps.apple.com/us/app/blitz-box/id6759346152" class="project-item">
-    <div class="project-logo-wrap" style="background:#151525">
-      <img src="/assets/images/projects/blitzbox-icon.png" alt="Blitz Box app icon" class="project-logo project-logo--icon">
-    </div>
-    <div class="project-item-inner">
-      <h3>Blitz Box</h3>
-      <p class="project-desc">A modern dice and tiles game with three game modes, 18 unique cards, and centuries of game design, reimagined.</p>
-    </div>
-  </a>
-</div>
-
-<h2 class="project-section-heading">Coming Soon</h2>
-
-<div class="project-list">
-  <div class="project-item">
-    <div class="project-item-inner">
-      <h3>Early Days</h3>
-      <p class="project-desc">A book and venture concept exploring how 20 companies you use every day started from nothing.</p>
-    </div>
-  </div>
-  <div class="project-item">
-    <div class="project-logo-wrap" style="background:#141210">
-      <img src="/assets/images/projects/sunder-logo.png" alt="Sunder logo" class="project-logo project-logo--wide">
-    </div>
-    <div class="project-item-inner">
-      <h3>Sunder</h3>
-      <p class="project-desc">A gamified music discovery app that guides you through the history of music, one genre at a time.</p>
-    </div>
-  </div>
 </div>
