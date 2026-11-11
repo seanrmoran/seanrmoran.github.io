@@ -3490,6 +3490,11 @@ function loadAccuracy() {
 
 function renderAccuracyBanner(acc) {
   const banner = document.getElementById('accuracy-banner');
+  if (acc && !acc.season_total && acc.pregame_only && acc.pending_count) {
+    banner.style.display = 'block';
+    banner.innerHTML = `<div class="flex-center fs-sm dim" style="padding:0.6rem 1rem;margin-bottom:0.75rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;">Accuracy tracking started ${acc.tracking_since}. Only games predicted before tip-off count; results appear after the next games finish.</div>`;
+    return;
+  }
   if (!acc || !acc.season_total) { banner.style.display = 'none'; return; }
 
   const pct = (acc.season_accuracy * 100).toFixed(1);
@@ -3505,7 +3510,7 @@ function renderAccuracyBanner(acc) {
 
   banner.style.display = 'block';
   banner.innerHTML = `<div class="flex-center flex-wrap fs-sm" style="gap:0.5rem 1.5rem;padding:0.6rem 1rem;margin-bottom:0.75rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;">
-    <span class="fw-700">Season accuracy: <span style="color:var(--accent);">${acc.season_correct}/${acc.season_total}</span> (${pct}%)</span>
+    <span class="fw-700">Season accuracy: <span style="color:var(--accent);">${acc.season_correct}/${acc.season_total}</span> (${pct}%)</span>${acc.pregame_only ? '<span class="dim fs-xs">pre-game predictions only</span>' : ''}
     ${recentHtml}
     <a href="#methodology" style="color:var(--accent);font-size:0.78rem;text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">See methodology &rarr;</a>
   </div>`;
